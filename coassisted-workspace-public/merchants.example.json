@@ -1,0 +1,13 @@
+{
+  "anthropic": {
+    "display_name": "Anthropic",
+    "business_type": "AI / SaaS",
+    "category": "Software Subscriptions",
+    "source": "manual_correction",
+    "confidence": 0.95,
+    "first_seen": "2026-01-01T00:00:00+00:00",
+    "last_seen": "2026-01-01T00:00:00+00:00",
+    "hit_count": 0,
+    "history": []
+  }
+}

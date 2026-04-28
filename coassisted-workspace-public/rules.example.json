@@ -1,0 +1,18 @@
+{
+  "domain_rules": {
+    "acme.com": {
+      "organization": "Acme Corp",
+      "tier": "enterprise",
+      "industry": "software"
+    },
+    "startupx.io": {
+      "organization": "StartupX",
+      "tier": "growth",
+      "industry": "software"
+    },
+    "example.com": {
+      "organization": "Surefox",
+      "tier": "internal"
+    }
+  }
+}

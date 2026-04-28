@@ -1,0 +1,26 @@
+{
+  "default_timezone": "America/Los_Angeles",
+  "default_calendar_id": "primary",
+  "default_from_alias": null,
+  "dry_run": false,
+  "log_level": "INFO",
+  "crm_window_days": 60,
+
+  "_anthropic_comment": "Optional — only needed for LLM-backed features (brand voice extraction, pipeline digest summaries, optional smarter signature parsing). Preferred: set ANTHROPIC_API_KEY in your shell env. Fallback: paste here if env propagation isn't working (common on macOS GUI apps). config.json is gitignored AND excluded from `make handoff` tarballs — keys never travel.",
+  "anthropic_api_key": null,
+
+  "_signature_parser_comment": "How contact enrichment parses email signatures. 'regex' (default) is free + fast. 'regex_then_llm' calls Claude to fill in title/organization when regex misses them (~$0.001 per missed sig). 'llm' always uses Claude on top of regex. Both LLM modes require anthropic_api_key.",
+  "signature_parser_mode": "regex",
+
+  "_attachments_comment": "Outbound: files larger than large_attachment_threshold_kb auto-upload to Drive and a share link is appended to the email body (avoids stdio buffer limits + corporate mail filters). gmail_max_message_kb is a safety pre-check against Gmail's 25MB per-message hard limit. Inbound: files larger than max_inline_download_kb auto-save to default_download_dir so the call never fails — change the dir to anything you want.",
+  "large_attachment_threshold_kb": 500,
+  "gmail_max_message_kb": 22528,
+  "max_inline_download_kb": 5120,
+  "default_download_dir": "~/Gmail Downloads",
+
+  "retry": {
+    "max_attempts": 4,
+    "initial_backoff_seconds": 1.0,
+    "max_backoff_seconds": 30.0
+  }
+}
