@@ -1,7 +1,11 @@
 [project]
-name = "google-workspace-mcp"
-version = "0.2.0"
-description = "Local MCP server: Gmail, Calendar, Drive, Sheets, Docs, Tasks, Contacts (CRM), Chat, and cross-service workflows — 90 tools for Claude Cowork."
+name = "coassisted-workspace"
+version = "0.6.0"
+# IMPORTANT: keep this in sync with _version.py — that's the single source of
+# truth for runtime, and pyproject.toml has to be hand-synced because pip
+# install reads it before _version.py is importable. Use `make bump VERSION=X.Y.Z`
+# to update both atomically.
+description = "Local MCP server: Gmail, Calendar, Drive, Sheets, Docs, Tasks, Contacts (CRM), Chat, plus AP automation (invoices, receipts, vendor follow-up loop) — 183 tools for Claude Cowork."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
@@ -31,6 +35,11 @@ llm = [
 ]
 
 [project.scripts]
+# Console-script entry points. Keep both old + new names so anyone with
+# `coassisted-workspace` muscle memory works AND any cron job that already
+# calls `google-workspace-mcp-refresh` keeps working without surprise.
+coassisted-workspace = "server:main"
+coassisted-workspace-refresh = "refresh_stats:main"
 google-workspace-mcp = "server:main"
 google-workspace-mcp-refresh = "refresh_stats:main"
 

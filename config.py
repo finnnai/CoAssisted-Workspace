@@ -1,4 +1,5 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# See LICENSE file for terms. Removing or altering this header is prohibited.
 """User-configurable defaults loaded from config.json.
 
 The file is optional. If it's missing, defaults are used. If a key is missing
@@ -13,7 +14,7 @@ Example config.json:
     {
       "default_timezone": "America/Los_Angeles",
       "default_calendar_id": "primary",
-      "default_from_alias": "alice@example.com",
+      "default_from_alias": "finnn@surefox.com",
       "dry_run": false,
       "log_level": "INFO",
       "retry": {

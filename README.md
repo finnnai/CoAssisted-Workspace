@@ -1,3 +1,25 @@
+# CoAssisted Workspace
+
+> *Formerly developed under the working title "Google Workspace MCP" — same codebase, same tools, productized.*
+
+**CoAssisted Workspace** is a local MCP server that gives an AI assistant end-to-end control of your Gmail, Calendar, Drive, Sheets, Docs, Tasks, Contacts, and Chat — plus 33 cross-service workflows including territory routing, drive-time block automation, brand-voice extraction, and bulk CRM operations. Includes **actual send** for email (not just drafts), attachments, filters, Meet links, binary file I/O, dry-run mode, and more.
+
+Works with **Claude Code, Claude Cowork**, and any other tool that speaks the Model Context Protocol.
+
+Built with Python + FastMCP + OAuth 2.0. Runs locally, stdio transport, your data never leaves your Mac except to hit Google's APIs.
+
+## Pricing tiers
+
+| Tier | Tools | What it's for |
+|---|---|---|
+| **Free** | 53 tools — all Workspace basics (send, read, organize across all 8 Google services) + system health checks + audit log + **project-registry admin** (`workflow_register_project`, `workflow_list_projects`, `workflow_create_project_sheet` so evaluators can see the AP routing-rule shape) | Get started, run real tasks today, prototype the project-AP structure without paying, decide if it's worth more |
+| **Paid** | All 183 tools — **flagship Receipt Extractor** (LLM-parses inbox + PDFs + photos into a Sheet, archives PDFs to Drive, exports QuickBooks CSV), **Project AP Pipeline** (auto-classify invoice vs. receipt, 5-tier project resolver, internal/external sender split, DM-or-email vendor follow-up loop with brand-voiced asks + project picker, automated reply parsing + row promotion, hybrid Drive layout: per-employee folders + per-project sheets + PDF archive, QuickBooks Bills CSV), Maps × CRM × Calendar workflows, Vehicle Routing optimization, brand voice extraction, bulk operations with rollback, advanced Chat (DMs, search, attachments), full CRM (custom fields, groups, stats refresh), templates + mail merge | Daily-driver productivity, sales/CSM/ops workflows, multi-vehicle routing, expense reporting, project-tracked AP with vendor follow-up loop |
+
+Free tier is fully self-serve. Paid tier requires a license key from the developer (`caw-XXXX-XXXX-XXXX-XXXX` format). Add to `config.json`: `{ "license_key": "caw-..." }`.
+
+> **Note for current users:** the personal/handoff distribution defaults to `DISTRIBUTION_MODE = "personal"` — every tool works as before, no license needed. The paid-tier gating only kicks in for the official plugin marketplace build.
+
+---
 
 ## Tool inventory
 
@@ -235,13 +257,13 @@ The installer is idempotent — safe to re-run. Your `config.json`, `rules.json`
 Once connected, try:
 
 1. **Real send to Josh:**
-   > "Use gmail_send_email to send to alice@example.com: subject 'Real send from MCP', body 'This time it actually goes out.'"
+   > "Use gmail_send_email to send to josh.szott@surefox.com: subject 'Real send from MCP', body 'This time it actually goes out.'"
 
 2. **Quick-add a calendar event:**
    > "Use calendar_quick_add for 'Coffee with Josh next Tuesday 3pm'."
 
 3. **Send a doc as PDF:**
-   > "Use workflow_email_doc_as_pdf to send doc ID `<id>` to alice@example.com."
+   > "Use workflow_email_doc_as_pdf to send doc ID `<id>` to josh.szott@surefox.com."
 
 4. **Save attachments to Drive:**
    > "Find the latest email from Josh with attachments and use workflow_save_email_attachments_to_drive to save them."
@@ -437,7 +459,7 @@ All keys optional; defaults used if absent.
 {
   "default_timezone": "America/Los_Angeles",
   "default_calendar_id": "primary",
-  "default_from_alias": "alice@example.com",
+  "default_from_alias": "finnn@surefox.com",
   "dry_run": false,
   "log_level": "INFO",
   "crm_window_days": 60,

@@ -1,4 +1,5 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# See LICENSE file for terms. Removing or altering this header is prohibited.
 """System tools — health checks, env diagnostics, version info.
 
 Lightweight introspection tools that help users verify the MCP setup without

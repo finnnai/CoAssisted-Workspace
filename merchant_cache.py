@@ -1,4 +1,5 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# See LICENSE file for terms.
 """Persistent merchant cache — Tier 0 of the receipt enrichment ladder.
 
 Stores everything we've learned about a merchant from prior Maps verifications,

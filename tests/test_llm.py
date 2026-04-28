@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE use only.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
 """Tests for the Anthropic LLM wrapper.
 
 Covers the resolution path for `get_api_key` (env var > config.json fallback)

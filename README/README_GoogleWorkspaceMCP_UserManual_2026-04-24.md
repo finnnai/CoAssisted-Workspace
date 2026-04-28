@@ -4,7 +4,7 @@
 
 | Field | Value |
 |---|---|
-| **Owner** | Alice (alice@example.com) |
+| **Owner** | Finnn (finnn@surefox.com) |
 | **MCP version** | 0.2.0 |
 | **Total tools** | 90 across Gmail, Calendar, Drive, Sheets, Docs, Tasks, Contacts, Chat, and cross-service workflows |
 | **Date authored** | 2026-04-24 |
@@ -35,8 +35,8 @@ This manual covers what your Google Workspace MCP can do and how to ask for it. 
 
 ## Gmail — 25
 
-1. Send an email to alice@example.com with subject 'Proposal' and body '…'.
-2. Draft an email to Bob but don't send — save it as a draft.
+1. Send an email to josh.szott@surefox.com with subject 'Proposal' and body '…'.
+2. Draft an email to Conor but don't send — save it as a draft.
 3. Reply to Josh's last email saying 'Confirmed, see you Thursday.'
 4. Reply-all to the most recent thread with the team.
 5. Forward yesterday's invoice email to accounting@mycompany.com with a note 'please process.'
@@ -45,7 +45,7 @@ This manual covers what your Google Workspace MCP can do and how to ask for it. 
 8. Show me the full thread I'm having with Josh about the Q3 roadmap.
 9. Send /Users/finnnai/Desktop/proposal.pdf as an attachment to Josh.
 10. Download the PDF attachment from the invoice email to my Desktop.
-11. Forward the latest Josh thread to Bob with a one-line intro.
+11. Forward the latest Josh thread to Conor with a one-line intro.
 12. Archive all newsletter emails from last week.
 13. Move that phishing-looking email to Trash.
 14. Find every email where I'm CC'd but haven't replied.
@@ -112,20 +112,20 @@ This manual covers what your Google Workspace MCP can do and how to ask for it. 
 
 61. What Google Tasks lists do I have?
 62. Show me my open tasks.
-63. Create a task 'Call Bob about Q3' due tomorrow.
+63. Create a task 'Call Conor about Q3' due tomorrow.
 64. Mark 'Review contract' as complete.
 65. Move that task's due date to next Monday.
 
 ## Contacts + CRM — 15
 
 66. Look up Josh Szott in my contacts.
-67. Create a contact for Bob (bob@example.com) at PartnerCo, title 'CTO'.
+67. Create a contact for Conor (conor@staffwizard.com) at StaffWizard, title 'CTO'.
 68. Update Josh's title to 'Head of Sales'.
 69. Delete the duplicate contact for Sarah.
 70. Add a note to Josh's contact: 'Met at the summit, interested in enterprise plan.'
 71. Tag Conor: `stage=prospect`, `tier=growth`, `industry=HR tech`.
 72. Create a contact group called 'Q2 Prospects'.
-73. Add Josh and Bob to the Q2 Prospects group.
+73. Add Josh and Conor to the Q2 Prospects group.
 74. Who's in my Q2 Prospects group?
 75. Remove Josh from Q2 Prospects.
 76. When did I last email Conor?
@@ -144,14 +144,14 @@ This manual covers what your Google Workspace MCP can do and how to ask for it. 
 86. Delete that Chat message.
 87. Who's in the 'Engineering' space?
 88. Download the attachment from Josh's latest Chat message to my Desktop.
-89. Send Bob a direct Chat message: 'Heads up — the proposal just went out.'
+89. Send Conor a direct Chat message: 'Heads up — the proposal just went out.'
 90. Show me messages from Josh in the Sales Team space from last week.
 
 ## Cross-service workflows — 10
 
 91. Export the Q3 Roadmap doc as a PDF and email it to Josh and Conor.
 92. Save the PDF attachment from the Acme invoice email to my 'Invoices' folder in Drive.
-93. Share the 'Q3 Plan' doc with bob@example.com as commenter and email him the link with a note.
+93. Share the 'Q3 Plan' doc with conor@staffwizard.com as commenter and email him the link with a note.
 94. Turn the email thread with Josh into a calendar event for Thursday 2pm — auto-invite the attendees from the thread.
 95. Send the `cold_outreach` template to every contact in the Q2 Prospects group.
 96. Send the `follow_up_after_meeting` template to Josh, Conor, and three others with first names auto-filled.

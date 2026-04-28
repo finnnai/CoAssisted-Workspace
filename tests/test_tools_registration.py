@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE use only.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
 """Smoke test that EVERY tools/* module registers cleanly with FastMCP.
 
 Catches the entire untested-tools surface (gmail, calendar, drive, sheets,

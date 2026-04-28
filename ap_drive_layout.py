@@ -1,4 +1,5 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# See LICENSE file for terms.
 """AP Drive layout — folder + sheet hierarchy for project-tracked spend.
 
 Structure (per the hybrid model):
@@ -8,9 +9,9 @@ Structure (per the hybrid model):
         ├── Master/                         <— master roll-up sheets
         │   ├── Project Invoices — SMOKE     (one row per submission, all employees)
         │   └── Project Invoices — ALPHA
-        └── Smith, Alice/                   <— per-employee folder
+        └── Szott, Joshua/                  <— per-employee folder
             ├── SMOKE/                      <— per-employee-per-project folder
-            │   ├── Project Invoices — SMOKE [Smith, Alice]   <— employee's sheet
+            │   ├── Project Invoices — SMOKE [Szott, Joshua]   <— employee's sheet
             │   ├── 2026-04-26__Acme__INV-TEST-2026-042.pdf    <— archived original
             │   └── …
             └── ALPHA/
@@ -167,9 +168,9 @@ def ensure_project_subfolder(
 def _last_first(full_name: str) -> str:
     """Convert a free-form display name to 'Last, First' format.
 
-    'Alice Smith'               → 'Smith, Alice'
-    'Alice Smith (CEO)'         → 'Smith, Alice'
-    'alice@example.com'         → 'Alice'           (no last name available)
+    'Joshua Szott'              → 'Szott, Joshua'
+    'Joshua Szott (CEO)'        → 'Szott, Joshua'
+    'finnn@surefox.com'         → 'Finnn'           (no last name available)
     'Smith Jr., John'           → 'Smith Jr., John' (already in form, keep)
     ''                          → 'Unknown'
     """

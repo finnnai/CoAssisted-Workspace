@@ -1,4 +1,5 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# See LICENSE file for terms.
 """Vendor info-request tracker — sidecar store for outstanding follow-ups.
 
 When the invoice orchestrator's quality guard fires (missing invoice number,
@@ -14,7 +15,7 @@ Record shape (one entry per content_key — the row's natural ID):
     {
         "content_key":      "acme|inv-1|10000",         # primary key
         "thread_id":        "Gmail thread_id" or
-                            "spaces/AAQA.../messages/...",
+                            "spaces/AAQA..." (chat space),
         "channel":          "gmail" | "chat",
         "vendor_email":     "billing@vendor.io"  | None,
         "vendor_name":      "Acme Vendor Inc",
@@ -25,14 +26,27 @@ Record shape (one entry per content_key — the row's natural ID):
         "sheet_id":         "1AbC...",                  # parking sheet
         "row_number":       7,                          # 1-indexed including header
         "project_code":     "ALPHA" | None,
+        "chat_thread_name": "spaces/AAQA.../threads/<id>" | null,
+                                                          # chat-only:
+                                                          # threads reminders
+                                                          # back into the same
+                                                          # conversation as
+                                                          # the original
+                                                          # receipt
         "resolved_at":      null,                       # set when reply lands
     }
 
 Cadence:
   - Chat channels: no wait between reminders (real-time interaction).
-  - Email channels: 24h between reminders (don't spam vendors).
-  - Hard cap of 2 reminders for either channel — after that the row stays
-    in AWAITING_INFO and the user has to nudge manually or re-extract.
+  - Email channels: per-stage ladder so we ramp up slowly:
+      - Initial ask:      sent immediately when the guard fires (orchestrator)
+      - 1st reminder:     24h after the initial ask
+      - 2nd reminder:     48h after the 1st reminder
+      - 3rd reminder:     48h after the 2nd reminder
+    See EMAIL_REMINDER_HOURS_LADDER below.
+  - Hard cap of 3 reminders for either channel (4 total messages
+    counting the initial ask) — after that the row stays in AWAITING_INFO
+    and the user has to nudge manually or re-extract.
 """
 
 from __future__ import annotations
@@ -49,9 +63,33 @@ _PROJECT_ROOT = Path(__file__).resolve().parent
 _STORE_PATH = _PROJECT_ROOT / "awaiting_info.json"
 
 # Cadence config — see module docstring.
-EMAIL_REMINDER_HOURS = 24
+#
+# EMAIL_REMINDER_HOURS_LADDER[i] = wait hours BEFORE sending nudge i+1.
+# Index 0 is the wait before the 1st reminder (i.e. after the initial ask),
+# index 1 is the wait before the 2nd, etc.
+#
+# Tuple length must equal MAX_REMINDERS.
+EMAIL_REMINDER_HOURS_LADDER: tuple[int, ...] = (24, 48, 48)
 CHAT_REMINDER_HOURS = 0
-MAX_REMINDERS = 2
+MAX_REMINDERS = len(EMAIL_REMINDER_HOURS_LADDER)
+
+# Backwards-compat: a few callers still read EMAIL_REMINDER_HOURS as a flat
+# default. Point it at the first stage so existing callers don't break.
+EMAIL_REMINDER_HOURS = EMAIL_REMINDER_HOURS_LADDER[0]
+
+
+def _email_wait_hours(reminder_count: int) -> int:
+    """Wait hours before sending the next email reminder.
+
+    `reminder_count` is the count BEFORE we send (i.e. how many reminders
+    have already gone out). When reminder_count is 0, we return the wait
+    before the 1st reminder (24h). When it equals MAX_REMINDERS, no more
+    reminders should fire — we return a very large number as a guard,
+    though due_for_reminder() also short-circuits via the cap check.
+    """
+    if reminder_count >= len(EMAIL_REMINDER_HOURS_LADDER):
+        return 10 ** 9  # effectively "never"
+    return EMAIL_REMINDER_HOURS_LADDER[reminder_count]
 
 
 def _now_iso() -> str:
@@ -98,6 +136,7 @@ def register_request(
     sheet_id: str,
     row_number: int,
     project_code: Optional[str] = None,
+    chat_thread_name: Optional[str] = None,
 ) -> dict:
     """Record a fresh outstanding info request. Caller is responsible for
     actually sending the message — this module just tracks state.
@@ -105,6 +144,12 @@ def register_request(
     Re-registering the same content_key resets the reminder counter (treats
     it as a fresh ask) — useful when the row was bounced from one project to
     another and needs a re-prompt.
+
+    `chat_thread_name` (chat channel only) is the Google Chat thread
+    resource (e.g. "spaces/AAQA.../threads/<id>") — when present, all
+    reminders thread back to the same conversation so the AP back-and-forth
+    stays visually attached to the original receipt message instead of
+    showing up as fresh top-level messages.
     """
     if not content_key:
         raise ValueError("content_key is required")
@@ -124,6 +169,7 @@ def register_request(
         "sheet_id": sheet_id,
         "row_number": int(row_number),
         "project_code": project_code,
+        "chat_thread_name": chat_thread_name,
         "resolved_at": None,
     }
     data[content_key] = rec
@@ -155,7 +201,10 @@ def list_open(*, channel: Optional[str] = None) -> list[dict]:
 def due_for_reminder() -> list[dict]:
     """Outstanding requests ready for a nudge.
 
-      - Email: at least EMAIL_REMINDER_HOURS since the last touch.
+      - Email: per-stage ladder via _email_wait_hours(reminder_count).
+               1st reminder: 24h after initial ask.
+               2nd reminder: 48h after 1st reminder.
+               3rd reminder: 48h after 2nd reminder.
       - Chat:  no wait (CHAT_REMINDER_HOURS = 0) — real-time channel.
       - Cap:   reminder_count < MAX_REMINDERS for either channel.
 
@@ -166,7 +215,8 @@ def due_for_reminder() -> list[dict]:
     for rec in _load().values():
         if rec.get("resolved_at"):
             continue
-        if int(rec.get("reminder_count", 0)) >= MAX_REMINDERS:
+        rcount = int(rec.get("reminder_count", 0))
+        if rcount >= MAX_REMINDERS:
             continue
 
         last_touch = rec.get("last_reminder_at") or rec.get("request_sent_at")
@@ -179,10 +229,10 @@ def due_for_reminder() -> list[dict]:
             out.append(dict(rec))
             continue
 
-        wait_hours = (
-            CHAT_REMINDER_HOURS if rec.get("channel") == "chat"
-            else EMAIL_REMINDER_HOURS
-        )
+        if rec.get("channel") == "chat":
+            wait_hours = CHAT_REMINDER_HOURS
+        else:
+            wait_hours = _email_wait_hours(rcount)
         elapsed_hours = (now - last_dt).total_seconds() / 3600.0
         if elapsed_hours >= wait_hours:
             out.append(dict(rec))

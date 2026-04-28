@@ -1,4 +1,3 @@
-# © 2026 CoAssisted Workspace contributors contributors. Licensed under MIT — see LICENSE.
 """Tests for the tier (free/paid) gating module."""
 
 import pytest

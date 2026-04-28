@@ -1,4 +1,5 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# See LICENSE file for terms.
 """Project invoice extraction — LLM-backed parsing of vendor invoices.
 
 Extends the receipt extractor for B2B/project work where the document is a

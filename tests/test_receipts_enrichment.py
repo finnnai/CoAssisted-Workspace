@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE use only.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
 # See LICENSE file for terms.
 """3-tier enrichment ladder for low-confidence receipts.
 

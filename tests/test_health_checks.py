@@ -1,4 +1,3 @@
-# © 2026 CoAssisted Workspace contributors contributors. Licensed under MIT — see LICENSE.
 """Tests for the system_check_* helper functions in tools/system.py.
 
 These tests exercise the helpers directly (not via MCP) and use mocks for

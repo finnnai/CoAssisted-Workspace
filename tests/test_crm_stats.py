@@ -1,4 +1,3 @@
-# © 2026 CoAssisted Workspace contributors contributors. Licensed under MIT — see LICENSE.
 """Tests for crm_stats.py — pure-function helpers, no Gmail/People calls."""
 
 import config

@@ -1,4 +1,3 @@
-# © 2026 CoAssisted Workspace contributors contributors. Licensed under MIT — see LICENSE.
 """Tests for Maps × CRM × Calendar workflow helpers.
 
 These exercise the pure-Python helpers (no Google API calls) — TSP routing

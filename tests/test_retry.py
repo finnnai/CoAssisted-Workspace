@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE use only.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
 """Tests for retry/backoff logic.
 
 retry.py decides what's retryable (429, 5xx, network) vs fail-fast (4xx

@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE use only.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
 """Tests for the junk-mail classifier.
 
 junk_filter.is_junk decides whether a message should be excluded from CRM

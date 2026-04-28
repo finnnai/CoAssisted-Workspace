@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE use only.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
 """Tests for project_invoices — model, classifier, sheet projection, QB row."""
 
 from __future__ import annotations

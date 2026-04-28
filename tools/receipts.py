@@ -1,4 +1,5 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# See LICENSE file for terms. Removing or altering this header is prohibited.
 """Receipt extractor — flagship workflow + 3 manual override tools.
 
   - workflow_extract_receipts: orchestrator. Scan inbox + Drive folder,

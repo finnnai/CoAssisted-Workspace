@@ -1,4 +1,3 @@
-# © 2026 CoAssisted Workspace contributors contributors. Licensed under MIT — see LICENSE.
 """Tests for the recent_actions JSONL audit log."""
 
 import json

@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE use only.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
 """Tests for ap_drive_layout — folder/sheet hierarchy + name derivation."""
 
 from __future__ import annotations
@@ -21,11 +21,11 @@ def _clear_caches():
 
 
 def test_last_first_basic():
-    assert ap._last_first("Alice Smith") == "Smith, Alice"
+    assert ap._last_first("Joshua Szott") == "Szott, Joshua"
 
 
 def test_last_first_strips_parenthetical():
-    assert ap._last_first("Alice Smith (CEO)") == "Smith, Alice"
+    assert ap._last_first("Joshua Szott (CEO)") == "Szott, Joshua"
     assert ap._last_first("Jane Doe (Operations)") == "Doe, Jane"
 
 
@@ -35,7 +35,7 @@ def test_last_first_keeps_existing_comma_form():
 
 
 def test_last_first_strips_quotes():
-    assert ap._last_first('"Alice Smith"') == "Smith, Alice"
+    assert ap._last_first('"Joshua Szott"') == "Szott, Joshua"
 
 
 def test_last_first_single_word():
@@ -113,13 +113,13 @@ def test_employee_display_name_directory_hit_uses_last_first(monkeypatch):
         def searchDirectoryPeople(self, **kw):
             return self
         def execute(self):
-            return {"people": [{"names": [{"displayName": "Alice Smith"}]}]}
+            return {"people": [{"names": [{"displayName": "Joshua Szott"}]}]}
         def searchContacts(self, **kw):
             raise RuntimeError("not reached")
 
     monkeypatch.setattr(ap, "_people", lambda: _Stub())
-    name = ap.employee_display_name("alice@example.com")
-    assert name == "Smith, Alice"
+    name = ap.employee_display_name("josh.szott@surefox.com")
+    assert name == "Szott, Joshua"
 
 
 def test_employee_display_name_caches_result(monkeypatch):

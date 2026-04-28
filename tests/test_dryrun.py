@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE use only.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
 """Tests for dry-run resolution + canonical preview shape.
 
 Tools accept an optional `dry_run` arg. is_dry_run resolves the effective

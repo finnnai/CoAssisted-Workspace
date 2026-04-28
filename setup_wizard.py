@@ -36,7 +36,7 @@ _VENV_PYTHON = _PROJECT_DIR / ".venv" / "bin" / "python"
 # When forking this MCP for your own team, change this to your email so
 # coworkers see your address as the default in the telemetry opt-in step.
 # Coworkers can still override it per-install or skip entirely.
-_DEVELOPER_EMAIL = "admin@example.com"
+_DEVELOPER_EMAIL = "finnn@surefox.com"
 
 
 # --------------------------------------------------------------------------- #

@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE use only.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
 """Tests for the 4 receipt + brand-voice composed workflows.
 
 These tests exercise the input-model validation surface and confirm the

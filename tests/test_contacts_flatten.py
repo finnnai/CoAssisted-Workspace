@@ -1,4 +1,3 @@
-# © 2026 CoAssisted Workspace contributors contributors. Licensed under MIT — see LICENSE.
 """Tests for tools.contacts._flatten_person and _build_person_body."""
 
 from tools.contacts import _build_person_body, _flatten_person

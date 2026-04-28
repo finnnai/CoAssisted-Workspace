@@ -1,4 +1,5 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# See LICENSE file for terms.
 """Internal vs external sender classification.
 
 Used by the project-invoice extractor to decide whether to auto-reply with

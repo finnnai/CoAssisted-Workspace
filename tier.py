@@ -1,4 +1,5 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# See LICENSE file for terms. Removing or altering this header is prohibited.
 """Tier-aware feature gating for CoAssisted Workspace.
 
 Splits the 183 tools into:
@@ -39,20 +40,27 @@ from typing import Optional
 # --------------------------------------------------------------------------- #
 # Build identifier — non-secret, embedded in every copy of this build.
 # --------------------------------------------------------------------------- #
-# Format: caw-YYYY-MM-DD-XXXX (date + 4-char build suffix). Surfaced in
-# system_check_license output. NOT a secret — anyone running the binary can
-# read it. Useful as a telemetry / fork-detection signal: if you ever see a
-# support ticket referencing a BUILD_HASH from a license that never validated,
-# you know how widespread an unauthorized fork is.
-BUILD_HASH: str = "caw-2026-04-26-a3f7"
+# Derived from _version.py — single source of truth for VERSION + CHANNEL +
+# RELEASE_DATE. Surfaced in system_check_license output. NOT a secret —
+# anyone running the binary can read it. Useful as a telemetry /
+# fork-detection signal: if you ever see a support ticket referencing a
+# BUILD_HASH from a license that never validated, you know how widespread
+# an unauthorized fork is.
+try:
+    from _version import VERSION as _V, CHANNEL as _C, RELEASE_DATE as _D
+    BUILD_HASH: str = f"caw-v{_V}-{_C}-{_D}"
+except ImportError:
+    # Fallback if _version.py isn't on the path (shouldn't happen in practice
+    # since _version.py sits at project root alongside this file).
+    BUILD_HASH: str = "caw-unknown-build"
 
 
 # --------------------------------------------------------------------------- #
 # Distribution mode — controls whether tier gating is enforced.
 # --------------------------------------------------------------------------- #
-# `personal`    — full features for current users. NOTHING is gated.
-# `marketplace` — paid-tier tools return gated_response() unless license_key set. Default for public release.
-DISTRIBUTION_MODE: str = "marketplace"
+# `personal`    — full features for current users. NOTHING is gated. Default.
+# `marketplace` — paid-tier tools return gated_response() unless license_key set.
+DISTRIBUTION_MODE: str = "personal"
 
 
 # --------------------------------------------------------------------------- #

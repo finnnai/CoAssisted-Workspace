@@ -149,7 +149,7 @@ After the wait, restart Cowork and run `chat_list_spaces` (in Cowork: *"list my 
    - Developer contact: your email
 4. Click **Save and Continue**
 5. **Scopes** page: skip (click Save and Continue)
-6. **Test users** page: Add your own Google account (`alice@example.com`). Click **Save and Continue**
+6. **Test users** page: Add your own Google account (`finnn@surefox.com`). Click **Save and Continue**
 7. Back to dashboard
 
 > **Why "test user"?** Because the app is in testing mode, only listed test users can authorize it. That's fine — it's for you only.

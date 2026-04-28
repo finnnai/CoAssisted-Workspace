@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE use only.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
 """Tests for sender_classifier — internal vs external detection."""
 
 from __future__ import annotations
@@ -55,43 +55,43 @@ def test_domain_of():
 
 
 def test_classify_auto_domain_match():
-    sc._override_for_tests(auto_domain="example.com", send_as=set())
-    out = sc.classify("pm@example.com")
+    sc._override_for_tests(auto_domain="surefox.com", send_as=set())
+    out = sc.classify("pm@surefox.com")
     assert out["internal"] is True
     assert out["tier"] == "auto_domain"
-    assert "example.com" in out["reason"]
+    assert "surefox.com" in out["reason"]
 
 
 def test_classify_external_when_no_match():
-    sc._override_for_tests(auto_domain="example.com", send_as=set())
+    sc._override_for_tests(auto_domain="surefox.com", send_as=set())
     out = sc.classify("billing@unum.com")
     assert out["internal"] is False
     assert out["tier"] == "external"
 
 
 def test_classify_handles_rfc_format_sender():
-    sc._override_for_tests(auto_domain="example.com", send_as=set())
-    out = sc.classify("PM Joe <joe@example.com>")
+    sc._override_for_tests(auto_domain="surefox.com", send_as=set())
+    out = sc.classify("PM Joe <joe@surefox.com>")
     assert out["internal"] is True
-    assert out["email"] == "joe@example.com"
+    assert out["email"] == "joe@surefox.com"
 
 
 def test_classify_empty_sender_external():
-    sc._override_for_tests(auto_domain="example.com", send_as=set())
+    sc._override_for_tests(auto_domain="surefox.com", send_as=set())
     assert sc.classify("").get("internal") is False
     assert sc.classify(None).get("internal") is False
 
 
 def test_classify_subdomain_does_not_match():
     """Subdomains aren't auto-included — must be added explicitly."""
-    sc._override_for_tests(auto_domain="example.com", send_as=set())
-    out = sc.classify("user@subsidiary.example.com")
+    sc._override_for_tests(auto_domain="surefox.com", send_as=set())
+    out = sc.classify("user@subsidiary.surefox.com")
     assert out["internal"] is False
 
 
 def test_classify_config_internal_domains_extends():
     """An explicit internal_domains entry adds to the auto-derived set."""
-    sc._override_for_tests(auto_domain="example.com", send_as=set())
+    sc._override_for_tests(auto_domain="surefox.com", send_as=set())
     with patch.object(sc, "_config_internal_domains",
                       return_value={"affiliate.com"}):
         out = sc.classify("partner@affiliate.com")
@@ -100,10 +100,10 @@ def test_classify_config_internal_domains_extends():
 
 
 def test_classify_subsidiary_domains_treated_internal():
-    sc._override_for_tests(auto_domain="example.com", send_as=set())
+    sc._override_for_tests(auto_domain="surefox.com", send_as=set())
     with patch.object(sc, "_config_subsidiary_domains",
-                      return_value={"acmecorp-eu.com"}):
-        out = sc.classify("rep@acmecorp-eu.com")
+                      return_value={"surefox-eu.com"}):
+        out = sc.classify("rep@surefox-eu.com")
     assert out["internal"] is True
     assert out["tier"] == "config_subsidiary"
 
@@ -112,10 +112,10 @@ def test_classify_send_as_alias_internal():
     """When sender exactly matches one of the user's Gmail send-as aliases,
     they're treated as internal (e.g. user forwards from another mailbox)."""
     sc._override_for_tests(
-        auto_domain="example.com",
-        send_as={"alice@otherdomain.io"},
+        auto_domain="surefox.com",
+        send_as={"finnn@otherdomain.io"},
     )
-    out = sc.classify("alice@otherdomain.io")
+    out = sc.classify("finnn@otherdomain.io")
     assert out["internal"] is True
     assert out["tier"] == "send_as_alias"
 
@@ -123,17 +123,17 @@ def test_classify_send_as_alias_internal():
 def test_classify_priority_auto_beats_config():
     """If a domain matches BOTH auto and config, auto wins (it's the
     'primary' identity)."""
-    sc._override_for_tests(auto_domain="example.com", send_as=set())
+    sc._override_for_tests(auto_domain="surefox.com", send_as=set())
     with patch.object(sc, "_config_internal_domains",
-                      return_value={"example.com"}):
-        out = sc.classify("user@example.com")
+                      return_value={"surefox.com"}):
+        out = sc.classify("user@surefox.com")
     assert out["tier"] == "auto_domain"  # not config_internal
 
 
 def test_classify_external_includes_diagnostic_reason():
-    sc._override_for_tests(auto_domain="example.com", send_as=set())
-    out = sc.classify("vendor@external.com")
-    assert "external.com" in out["reason"]
+    sc._override_for_tests(auto_domain="surefox.com", send_as=set())
+    out = sc.classify("vendor@example.com")
+    assert "example.com" in out["reason"]
     assert "not in any internal allowlist" in out["reason"]
 
 
@@ -143,12 +143,12 @@ def test_classify_external_includes_diagnostic_reason():
 
 
 def test_is_internal_true():
-    sc._override_for_tests(auto_domain="example.com", send_as=set())
-    assert sc.is_internal("hr@example.com") is True
+    sc._override_for_tests(auto_domain="surefox.com", send_as=set())
+    assert sc.is_internal("hr@surefox.com") is True
 
 
 def test_is_internal_false():
-    sc._override_for_tests(auto_domain="example.com", send_as=set())
+    sc._override_for_tests(auto_domain="surefox.com", send_as=set())
     assert sc.is_internal("pm@unum.com") is False
 
 
@@ -158,13 +158,13 @@ def test_is_internal_false():
 
 
 def test_internal_domains_unions_all_sources():
-    sc._override_for_tests(auto_domain="example.com", send_as=set())
+    sc._override_for_tests(auto_domain="surefox.com", send_as=set())
     with patch.object(sc, "_config_internal_domains",
                       return_value={"affiliate.com"}):
         with patch.object(sc, "_config_subsidiary_domains",
-                          return_value={"acmecorp-eu.com"}):
+                          return_value={"surefox-eu.com"}):
             out = sc.internal_domains()
-    assert out == {"example.com", "affiliate.com", "acmecorp-eu.com"}
+    assert out == {"surefox.com", "affiliate.com", "surefox-eu.com"}
 
 
 def test_norm_domain_list_strips_at_sign():

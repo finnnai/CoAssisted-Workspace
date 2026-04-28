@@ -1,0 +1,24 @@
+{
+  "SMOKE": {
+    "active": true,
+    "chat_space_ids": [],
+    "client": "Internal",
+    "code": "SMOKE",
+    "currency": "USD",
+    "default_billable": true,
+    "default_markup_pct": 0.0,
+    "filename_patterns": [
+      "(?i)smoke"
+    ],
+    "first_seen": "2026-04-27T06:06:41+00:00",
+    "invoice_count": 56,
+    "last_seen": "2026-04-28T12:59:11-07:00",
+    "name": "Smoke Test — CoAssisted live test",
+    "sender_emails": [
+      "noreply@uber.com",
+      "receipts@anthropic.com"
+    ],
+    "sheet_id": "1zu59h0a8TcXKTFcsK2rEdvneZ6ABTwL9IQKwlRBBIuA",
+    "sheet_name": "Project Invoices — SMOKE — Smoke Test — CoAssisted live test"
+  }
+}

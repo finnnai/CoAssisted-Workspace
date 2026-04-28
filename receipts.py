@@ -1,4 +1,5 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# See LICENSE file for terms. Removing or altering this header is prohibited.
 """Receipt extraction core — LLM-backed parsing of receipts from email, PDF, image.
 
 The flagship feature. Composes Gmail (find) + LLM (extract) + Sheets (log) +

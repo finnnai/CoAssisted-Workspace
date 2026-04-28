@@ -1,4 +1,3 @@
-# © 2026 CoAssisted Workspace contributors contributors. Licensed under MIT — see LICENSE.
 """Tests for the telemetry sanitization pipeline."""
 
 import json
@@ -10,9 +9,9 @@ import telemetry
 
 
 def test_sanitize_email():
-    s = "Failed to load creds for user@example.com — check OAuth"
+    s = "Failed to load creds for finnn@surefox.com — check OAuth"
     out = telemetry.sanitize_string(s)
-    assert "user@example.com" not in out
+    assert "finnn@surefox.com" not in out
     assert "<email>" in out
 
 
@@ -60,7 +59,7 @@ def test_sanitize_gcp_project():
 
 def test_sanitize_recursive_dict():
     obj = {
-        "user": "user@example.com",
+        "user": "finnn@surefox.com",
         "nested": {
             "key": "AIzaSyADgye56k2Vo1Ofe0fnfQyLwrfMw-UXX-E",
             "list": [
@@ -71,7 +70,7 @@ def test_sanitize_recursive_dict():
     }
     out = telemetry.sanitize(obj)
     blob = json.dumps(out)
-    assert "user@example.com" not in blob
+    assert "finnn@surefox.com" not in blob
     assert "AIzaSy" not in blob
     assert "finnnai" not in blob
     assert "bob@example.com" not in blob

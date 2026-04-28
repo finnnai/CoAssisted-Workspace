@@ -1,4 +1,3 @@
-# © 2026 CoAssisted Workspace contributors contributors. Licensed under MIT — see LICENSE.
 """Fixture-based tests — realistic receipt text from common merchants.
 
 Each fixture pairs a real-shaped receipt body with the LLM response we

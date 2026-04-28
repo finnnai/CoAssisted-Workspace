@@ -247,13 +247,13 @@ The installer is idempotent — safe to re-run. Your `config.json`, `rules.json`
 Once connected, try:
 
 1. **Real send to Josh:**
-   > "Use gmail_send_email to send to alice@example.com: subject 'Real send from MCP', body 'This time it actually goes out.'"
+   > "Use gmail_send_email to send to josh.szott@surefox.com: subject 'Real send from MCP', body 'This time it actually goes out.'"
 
 2. **Quick-add a calendar event:**
    > "Use calendar_quick_add for 'Coffee with Josh next Tuesday 3pm'."
 
 3. **Send a doc as PDF:**
-   > "Use workflow_email_doc_as_pdf to send doc ID `<id>` to alice@example.com."
+   > "Use workflow_email_doc_as_pdf to send doc ID `<id>` to josh.szott@surefox.com."
 
 4. **Save attachments to Drive:**
    > "Find the latest email from Josh with attachments and use workflow_save_email_attachments_to_drive to save them."
@@ -449,7 +449,7 @@ All keys optional; defaults used if absent.
 {
   "default_timezone": "America/Los_Angeles",
   "default_calendar_id": "primary",
-  "default_from_alias": "alice@example.com",
+  "default_from_alias": "finnn@surefox.com",
   "dry_run": false,
   "log_level": "INFO",
   "crm_window_days": 60,
@@ -1117,7 +1117,7 @@ Once installed and OAuth'd, ask Cowork any of these:
 1. *"List my calendars"* — sanity check (calendar_list_calendars)
 2. *"Send Josh an email saying I'm running 5 minutes late"* — gmail_send_email
 3. *"Show me my saved contacts"* — contacts_list
-4. *"What's my last interaction with bob@example.com?"* — contacts_last_interaction
+4. *"What's my last interaction with conor@staffwizard.com?"* — contacts_last_interaction
 5. *"Find a 30-minute slot next week for me, Josh, and Brian, between 10am and 4pm"* — workflow_find_meeting_slot
 
 **CRM enrichment:**
@@ -1133,10 +1133,10 @@ Once installed and OAuth'd, ask Cowork any of these:
 **Maps × CRM:**
 12. *"Find contacts within 25 km of Austin, TX"* — workflow_nearby_contacts
 13. *"Plan an optimal route through these 5 sales visits, two vehicles, time windows 9–12"* — workflow_route_optimize_advanced
-14. *"Email alice@example.com a map of where to meet on Friday"* — workflow_email_with_map
+14. *"Email allan@surefox.com a map of where to meet on Friday"* — workflow_email_with_map
 
 **Operational:**
-15. *"Send the handoff archive to alice@example.com"* — workflow_send_handoff_archive
+15. *"Send the handoff archive to allan@surefox.com"* — workflow_send_handoff_archive
 
 ---
 

@@ -1,4 +1,5 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# See LICENSE file for terms. Removing or altering this header is prohibited.
 """Project-invoice extractor — extends the receipt pipeline for AP-style work.
 
 Six tools, all paid-tier (uses Anthropic API):
@@ -261,6 +262,117 @@ def _chat():
 # --------------------------------------------------------------------------- #
 
 
+# Process-lifetime cache of (sheet_id, lowercased_email) pairs we've already
+# granted access to. Avoids re-hitting Drive's permissions API on every
+# scan when the same submitter logs receipts to the same sheet repeatedly.
+_AUTO_SHARE_GRANTED: set[tuple[str, str]] = set()
+
+
+def _share_sheet_with_email(
+    sheet_id: str,
+    email: str,
+    *,
+    role: str = "reader",
+) -> tuple[bool, Optional[str]]:
+    """Idempotently grant a user access to a sheet via Drive permissions API.
+
+    Returns (granted_now, error_msg).
+      - granted_now=True  → the permission was just created
+      - granted_now=False → either already had access OR the call failed;
+                            check error_msg to disambiguate
+      - role: "reader" (default), "commenter", "writer". Stay at reader for
+        AP submitters — they shouldn't be editing rows.
+
+    Idempotent: if the user already has any role on the file, this is a
+    no-op. Process-cached so repeated calls within the same scan don't
+    re-hit the API. Cross-org Workspace policies may still reject the
+    call (HTTP 403) — that surfaces in error_msg so the caller can log
+    but doesn't crash the orchestrator.
+    """
+    if not sheet_id or not email:
+        return False, "sheet_id and email both required"
+
+    cache_key = (sheet_id, email.strip().lower())
+    if cache_key in _AUTO_SHARE_GRANTED:
+        return False, None  # cached as "already granted"
+
+    try:
+        drive = _drive()
+        # First check if the user already has access — Drive's permissions
+        # API doesn't have an upsert, and re-creating an existing perm
+        # produces 400 errors on some plan tiers.
+        existing = drive.permissions().list(
+            fileId=sheet_id,
+            fields="permissions(emailAddress,role,type)",
+            pageSize=100,
+        ).execute()
+        for p in existing.get("permissions", []) or []:
+            if (p.get("emailAddress") or "").lower() == cache_key[1]:
+                _AUTO_SHARE_GRANTED.add(cache_key)
+                return False, None  # already shared
+
+        drive.permissions().create(
+            fileId=sheet_id,
+            body={"type": "user", "role": role, "emailAddress": email},
+            sendNotificationEmail=False,
+            fields="id",
+        ).execute()
+        _AUTO_SHARE_GRANTED.add(cache_key)
+        log.info("auto-shared sheet %s with %s as %s", sheet_id, email, role)
+        return True, None
+    except Exception as e:
+        err = str(e)
+        try:
+            from googleapiclient.errors import HttpError
+            if isinstance(e, HttpError):
+                content = e.content.decode("utf-8", errors="replace")
+                err = (
+                    f"HttpError {e.resp.status if hasattr(e, 'resp') else '?'} "
+                    f"sharing {sheet_id} with {email}: {content[:300]}"
+                )
+        except Exception:
+            pass
+        log.warning("auto-share failed: %s", err)
+        return False, err
+
+
+def _resolve_chat_sender_email(
+    sender_dict: Optional[dict],
+) -> Optional[str]:
+    """Resolve a Chat sender resource (e.g. 'users/12345...') to an email
+    via People API. Used by the auto-share feature so receipts submitted
+    via chat can grant the submitter sheet access.
+
+    Returns None if resolution fails. Process-cached.
+    """
+    if not sender_dict:
+        return None
+    name = sender_dict.get("name") or ""
+    if not name or not name.startswith("users/"):
+        return None
+    if not hasattr(_resolve_chat_sender_email, "_cache"):
+        _resolve_chat_sender_email._cache = {}
+    cache = _resolve_chat_sender_email._cache  # type: ignore[attr-defined]
+    if name in cache:
+        return cache[name]
+    try:
+        person_resource = "people/" + name.split("/", 1)[1]
+        people_svc = gservices.people()
+        resp = people_svc.people().get(
+            resourceName=person_resource,
+            personFields="emailAddresses",
+        ).execute()
+        for e in (resp.get("emailAddresses") or []):
+            val = (e.get("value") or "").strip().lower()
+            if val and "@" in val:
+                cache[name] = val
+                return val
+    except Exception as e:
+        log.warning("People API email lookup failed for %s: %s", name, e)
+    cache[name] = None
+    return None
+
+
 def _sheet_title_for_project(code: str, project_name: str) -> str:
     """Canonical sheet title — '<prefix><code> — <name>'."""
     return f"{PROJECT_SHEET_PREFIX}{code} — {project_name}"
@@ -511,9 +623,9 @@ def _project_picker_block() -> str:
 def _greeting_name(recipient_name: Optional[str]) -> str:
     """Pick a first-name greeting from a free-form display name.
 
-    'Alice Smith'      → 'Alice'
-    'Alice Smith (CEO)'→ 'Alice'
-    'alice@example.com'→ ''  (no greeting personalization for raw emails)
+    'Joshua Szott'     → 'Joshua'
+    'Josh Szott (CEO)' → 'Josh'
+    'finnn@surefox.com'→ ''  (no greeting personalization for raw emails)
     None / ''          → ''
     """
     if not recipient_name:
@@ -538,6 +650,7 @@ def _compose_info_request(
     reminder_count: int = 0,
     audience: str = "vendor",
     recipient_name: Optional[str] = None,
+    urgency_tier: Optional[int] = None,
 ) -> dict:
     """Build the outbound request body. Returns {'subject', 'plain', 'html'}.
 
@@ -551,6 +664,20 @@ def _compose_info_request(
                     accurate, so the ask is brisker and clearer about what's
                     blocking the payment.
 
+    `urgency_tier` controls the tone of the request (1–4):
+      - 1 (first ask): warm, helpful, no pressure
+      - 2 (friendly nudge): brief, acknowledges prior ask
+      - 3 (second nudge): direct but still friendly — no escalation language,
+                          no consequences mentioned
+      - 4 (final reminder): plainly says this is the last automated nudge,
+                            and that without a response the item will be
+                            flagged for review. No manager escalation, no
+                            payment threats — just the soft "flag for review"
+                            consequence.
+      Defaults: if not specified, derived from is_reminder + reminder_count.
+      Backwards-compat: is_reminder=True maps to tier 2; reminder_count==1
+      maps to tier 3; reminder_count>=2 maps to tier 4.
+
     Uses Claude with the user's brand-voice.md as context so the tone matches
     their existing outbound mail. Falls back to a deterministic default if the
     LLM is unavailable — the message still ships, it just sounds generic.
@@ -558,20 +685,39 @@ def _compose_info_request(
     Also surfaces project context so the recipient knows which job we're
     tracking this against and can correct/pick if needed.
     """
-    is_employee = audience == "employee"
-    field_lines = "\n".join(
-        f"  • {_FIELD_PROMPT_LABELS.get(f, f)}"
-        for f in missing_fields
-    )
+    import hashlib
 
-    invoice_summary = []
-    if inv.vendor:
-        invoice_summary.append(f"Vendor: {inv.vendor}")
-    if inv.total:
-        invoice_summary.append(f"Total we found: {inv.currency} {inv.total}")
-    if inv.invoice_date:
-        invoice_summary.append(f"Date we found: {inv.invoice_date}")
-    summary_block = "\n".join(invoice_summary) or "(no fields parsed)"
+    # Derive urgency_tier from is_reminder and reminder_count if not explicit.
+    #   reminder_count==0 → tier 2 (first nudge after the original ask)
+    #   reminder_count==1 → tier 3 (second nudge, still friendly)
+    #   reminder_count>=2 → tier 4 (final reminder, no consequences)
+    if urgency_tier is None:
+        if is_reminder:
+            if reminder_count >= 2:
+                urgency_tier = 4
+            elif reminder_count == 1:
+                urgency_tier = 3
+            else:
+                urgency_tier = 2
+        else:
+            urgency_tier = 1
+
+    is_employee = audience == "employee"
+
+    # Build tone variant index deterministically from source_id hash.
+    # This ensures the same invoice always gets the same variant on re-send.
+    source_id = inv.source_id or ""
+    variant_seed = hashlib.md5(source_id.encode()).digest()[0]
+    variant_idx = variant_seed % 3  # Pick from 3 variants per (audience, tier)
+
+    # Render fields inline for 1-2 fields, as bullets for 3+.
+    has_many_fields = len(missing_fields) >= 3
+
+    # Build field summary for inline mention.
+    field_labels = [
+        _FIELD_PROMPT_LABELS.get(f, f)
+        for f in missing_fields
+    ]
 
     # Project context — what we routed to, what alternatives exist.
     project_picker = _project_picker_block()
@@ -585,25 +731,6 @@ def _compose_info_request(
                 )
         except Exception:
             pass
-    project_block = ""
-    if proj_resolved_to:
-        project_block = (
-            f"\nProject we're tracking this against: {proj_resolved_to}\n"
-            "If this should be billed to a different project, just say which "
-            "in your reply."
-        )
-    elif project_picker:
-        project_block = (
-            "\nWe weren't sure which project this is for — could you let "
-            "us know? Active projects:\n"
-            f"{project_picker}\n"
-            "Reply with the project code (e.g. 'ALPHA') or the name."
-        )
-
-    nudge_clause = (
-        " (just a quick follow-up to the note I sent earlier)"
-        if is_reminder else ""
-    )
 
     # LLM-composed brand-voiced version — preferred path
     try:
@@ -615,45 +742,202 @@ def _compose_info_request(
                 f"BRAND VOICE GUIDELINES (mirror this tone):\n{brand}\n\n"
                 if brand else ""
             )
+
+            # Tone guidance by urgency tier and audience.
+            # NOTE: Tiers 3 and 4 deliberately avoid consequence/escalation
+            # language. We don't threaten manager loops or payment freezes —
+            # the goal is steady, friendly persistence, not pressure tactics.
+            if is_employee:
+                if urgency_tier == 1:
+                    tone_desc = (
+                        "TONE: Direct, professional, clear about what blocks payment. "
+                        "No pressure, but factual and efficient. "
+                        "Example opener: 'I noticed an invoice came in but…'"
+                    )
+                elif urgency_tier == 2:
+                    tone_desc = (
+                        "TONE: Quick nudge, friendly but efficient. "
+                        "Acknowledge the prior ask. Direct about next steps. "
+                        "Example: 'Quick follow-up on the [vendor] invoice — still need…'"
+                    )
+                elif urgency_tier == 3:
+                    tone_desc = (
+                        "TONE: Second nudge — friendly, slightly more direct than tier 2 "
+                        "but still warm. NO escalation language, NO consequences mentioned, "
+                        "NO mention of managers or payment delays. Just keep it natural. "
+                        "Example: 'Circling back on the [vendor] invoice — still need…'"
+                    )
+                else:  # tier 4
+                    tone_desc = (
+                        "TONE: Final automated reminder. Stay friendly. "
+                        "Plainly state this is the last auto-nudge. "
+                        "NO manager escalation, NO payment threats. "
+                        "The 'flag for review' consequence belongs in the "
+                        "CLOSING line — combine it with the reply ask, e.g.: "
+                        "'Mind dropping that in a quick reply here? Without a "
+                        "reply, I'll have to flag this for review.' Do NOT put "
+                        "the flag note on its own paragraph in the body."
+                    )
+            else:  # vendor
+                if urgency_tier == 1:
+                    tone_desc = (
+                        "TONE: Warm, helpful, conversational. "
+                        "Example opener: 'I noticed an invoice came in but…'"
+                    )
+                elif urgency_tier == 2:
+                    tone_desc = (
+                        "TONE: Friendly follow-up, still warm but brief. "
+                        "Example: 'Quick nudge on the invoice — still need…'"
+                    )
+                elif urgency_tier == 3:
+                    tone_desc = (
+                        "TONE: Second nudge — still warm and professional, slightly more "
+                        "direct than tier 2. NO escalation language, NO consequences. "
+                        "Example: 'Circling back on the invoice — still need…'"
+                    )
+                else:  # tier 4
+                    tone_desc = (
+                        "TONE: Final automated reminder. Stay professional and warm. "
+                        "Plainly state this is the last auto-nudge. "
+                        "NO account-manager escalation, NO payment threats. "
+                        "The 'flag for review' consequence belongs in the "
+                        "CLOSING line — combine it with the reply ask, e.g.: "
+                        "'Mind dropping that in a quick reply here? Without a "
+                        "reply, I'll have to flag this for review.' Do NOT put "
+                        "the flag note on its own paragraph in the body."
+                    )
+
             audience_note = (
-                "AUDIENCE: This is going to an EMPLOYEE who submitted an "
-                "incomplete invoice for AP processing. They're paid to be "
-                "accurate, so be direct and clear about what's blocking the "
-                "payment — no over-apologizing, no soft-pedaling. Brisk and "
-                "professional. Two-three sentences max plus the bullet list."
+                "AUDIENCE: This is going to an EMPLOYEE. "
+                "They submitted an incomplete invoice for AP processing. "
+                "Direct and clear about what blocks payment — "
+                "no over-apologizing."
                 if is_employee else
-                "AUDIENCE: This is going to a vendor. Conversational, warm, "
-                "polite. No jargon."
+                "AUDIENCE: This is going to a VENDOR. Conversational, warm, "
+                "professional. No jargon."
             )
+
             first_name = _greeting_name(recipient_name)
             greeting_clause = (
-                f"Open with 'Hi {first_name},'. "
+                f"Open with 'Hi {first_name},' — be conversational. "
                 if first_name else
-                "Open with a generic greeting (no name)."
+                "Open with a generic, warm greeting."
             )
+
+            # Build prompt for field mention style.
+            # Each missing field name MUST be visually emphasized so the
+            # reader's eye lands on what's actually being asked for.
+            #
+            # CRITICAL: the LLM must ONLY ask for the fields in the
+            # missing_fields list — don't let it invent extras like
+            # "PO number" or "description of work" if they aren't on
+            # the list. The exact field names are pinned below.
+            exact_fields_block = (
+                "MISSING FIELDS — ask for EXACTLY these and NOTHING ELSE. "
+                "Do NOT add extra fields like 'PO number', 'project code', "
+                "'description of work', etc. unless they appear in this list. "
+                "Use these exact names (the user-friendly labels):\n"
+                + "\n".join(f"  - {label}" for label in field_labels)
+                + "\n"
+            )
+            fields_instruction = (
+                exact_fields_block
+                + "\n"
+                + (
+                    "Render those fields as a conversational bulleted list. "
+                    "Keep descriptions short. EVERY field name in the list "
+                    "must be wrapped in <b>...</b> in HTML and "
+                    "**double-asterisks** in plain text."
+                    if has_many_fields else
+                    "Render those field(s) inline in the prose — no bullet "
+                    "list. Reference each one in natural prose. EVERY field "
+                    "name must be wrapped in <b>...</b> in HTML and "
+                    "**double-asterisks** in plain text so the reader's eye "
+                    "lands on it (example: '...still need the **invoice "
+                    "number**' or '...need <b>invoice number</b> and "
+                    "<b>due date</b>')."
+                )
+            )
+
+            # Render what we have so far — inline in prose, not as a labeled block.
+            have_parts = []
+            if inv.vendor:
+                have_parts.append(f"vendor: {inv.vendor}")
+            if inv.total:
+                have_parts.append(f"total: {inv.currency} {inv.total}")
+            if inv.invoice_date:
+                have_parts.append(f"date: {inv.invoice_date}")
+            have_summary = ", ".join(have_parts) if have_parts else None
+
+            project_note = ""
+            if proj_resolved_to:
+                project_note = (
+                    f"\nMention that we're tracking this against {proj_resolved_to}. "
+                    "If it should be billed to a different project, let them know "
+                    "they can say so in their reply."
+                )
+            elif project_picker:
+                project_note = (
+                    "\nWe're not sure which project this is for — ask them to "
+                    "confirm. Provide the active project options and ask them to "
+                    "reply with the code or name."
+                )
+
+            closing_instruction = (
+                "Close with a natural question that invites a reply, like "
+                "'Mind dropping that in a quick reply here?' or "
+                "'Can you reply with these here?'"
+                + (
+                    " For tier 4 ONLY, append the soft consequence to the "
+                    "same closing sentence: '… Without a reply, I'll have to "
+                    "flag this for review.' Same paragraph as the question."
+                    if urgency_tier == 4 else ""
+                )
+            )
+
             prompt = (
                 f"{brand_block}"
-                f"{audience_note}\n\n"
+                f"{audience_note}\n"
+                f"{tone_desc}\n\n"
                 f"{greeting_clause}"
-                "Write a short message asking for a few missing fields on an "
-                "invoice. Address them as 'you'. Don't sign off with a name — "
+                "Write a short, conversational message asking for missing "
+                "invoice fields. Address them as 'you'. Don't sign off — "
                 "the client adds the signature.\n\n"
-                "MUST INCLUDE — keep these as a labeled block in the body so "
-                "the recipient sees what we already extracted (don't paraphrase, "
-                "render verbatim):\n"
-                f"What I have so far:\n{summary_block}\n"
-                f"{project_block}\n\n"
-                "What's missing — list these as bullet points in the body "
-                "exactly as they appear here:\n"
-                f"{field_lines}\n\n"
-                "Make sure the project context above is included clearly so "
-                "they can confirm or correct it.\n\n"
-                "Close with: 'Just reply line-by-line on this thread — "
-                "I'll pick it up automatically.'\n\n"
-                f"This is{' a quick nudge — ' if is_reminder else ' the first ask. '}"
-                f"{'reminder #' + str(reminder_count) if is_reminder else ''}\n\n"
+                f"{fields_instruction}\n\n"
+                "Write 3–4 short paragraphs (each a real paragraph, "
+                "not a list item). Each paragraph should be 1–2 sentences MAX "
+                "for visual breathing room — break up dense ideas across "
+                "paragraphs instead of stacking them. Be natural and avoid "
+                "sounding templated. Match the user's brand voice.\n\n"
+                "PARAGRAPH STRUCTURE: separate the ask, the project-tracking "
+                "context, and the closing question into DISTINCT paragraphs. "
+                "Don't run them together. In plain text, use double newlines "
+                "(\\n\\n) between paragraphs. In HTML, use one <p> tag per "
+                "paragraph.\n\n"
+                "DO NOT mention what we already have (vendor / total / date) "
+                "in the body of the message — that goes in a separate REFERENCE "
+                "FOOTER below the sign-off (described next).\n\n"
+                f"For your context only — what we already have: "
+                f"{have_summary or 'no fields parsed'}"
+                f"{project_note}\n\n"
+                f"{closing_instruction}\n\n"
+                "AFTER the closing question, end with a 'Thanks!' line on its "
+                "own paragraph. THEN add a reference footer on its own "
+                "paragraph, BELOW 'Thanks!', wrapped in <b> tags in HTML and "
+                "wrapped in **double-asterisks** in plain text.\n\n"
+                "The reference footer must read EXACTLY: "
+                + (f"\"For reference: {have_summary}.\""
+                   if have_summary else
+                   "(skip the footer — we have no fields to reference)")
+                + "\n\n"
                 "Return ONLY a JSON object — no prose, no fences:\n"
-                '{"subject": "...", "plain": "...", "html": "<full HTML body>"}'
+                '{"subject": "...", "plain": "...", "html": "<full HTML body>"}\n\n'
+                "HTML body must use real <p> tags for paragraphs. "
+                "The reference footer in HTML must be: "
+                + (f"<p><b>For reference: {have_summary}.</b></p>"
+                   if have_summary else "(skip)") + " — placed AFTER <p>Thanks!</p>. "
+                + ("Only use <ul> with <li> if 3+ fields are missing."
+                   if has_many_fields else "Don't use bullet lists.")
             )
             resp = llm.call_simple(prompt, max_tokens=900, temperature=0.4)
             text = (resp.get("text") or "").strip()
@@ -667,87 +951,538 @@ def _compose_info_request(
     except Exception as e:
         log.warning("brand-voice composition failed, using fallback: %s", e)
 
-    # Deterministic fallback — tone shifts with audience.
+    # Deterministic fallback — tone shifts with audience and urgency tier.
     first_name = _greeting_name(recipient_name)
     greet = f"Hi {first_name}" if first_name else "Hi there"
-    if is_employee:
-        subj = (
-            f"AP submission needs a couple of fields{nudge_clause} — "
-            f"{inv.vendor or 'invoice'}"
+
+    # Tier 1 openers (employee vs vendor, variant-based). All three
+    # variants are designed to flow into "I'm missing **X** to..." or
+    # "I need a few details before..." — the body builder appends the
+    # verb so openers stay short and don't pre-bake any field-count
+    # assumptions.
+    employee_openers = [
+        "I noticed an invoice came in.",
+        "Just reviewing an invoice that came in.",
+        "I have an invoice here.",
+    ]
+    vendor_openers = [
+        "I noticed an invoice came in.",
+        "Thanks for sending that invoice.",
+        "I'm looking at your invoice.",
+    ]
+
+    opener = (
+        employee_openers[variant_idx]
+        if is_employee else
+        vendor_openers[variant_idx]
+    )
+
+    # Helper: "the Acme Roofing invoice" if vendor is set, else
+    # "the invoice" — used by tiers 2/3/4 body language.
+    vendor_phrase = (
+        f"the {inv.vendor} invoice" if inv.vendor else "the invoice"
+    )
+
+    # Build field mention — inline for 1-2 fields, bullets for 3+.
+    # Each field name is wrapped in **markdown bold** markers; the HTML
+    # post-processor below converts **...** into <b>...</b>. Plain-text
+    # email clients render ** as bold (or at least leave the asterisks
+    # in place as a visual marker) — same content, two presentations.
+    #
+    # NOTE: field_mention contains JUST the bolded labels (no "missing"
+    # prefix). Each tier's body sentence supplies the verb ("I'm
+    # missing X" / "still need X" / etc.) so prose reads cleanly.
+    field_lines = ""
+    field_mention = ""
+    if has_many_fields:
+        field_lines = "\n".join(
+            f"  • **{label}**"
+            for label in field_labels
         )
-        plain = (
-            f"{greet}{nudge_clause},\n\n"
-            "I can't push this through to AP without the following — "
-            "could you grab them and reply here?\n\n"
-            f"{field_lines}\n\n"
-            f"What I have so far:\n{summary_block}\n"
-            f"{project_block}\n\n"
-            "Just reply line-by-line on this thread — I'll pick it up "
-            "automatically.\n\n"
-            "Thanks!"
+    elif len(field_labels) == 0:
+        # Edge case: no missing fields (shouldn't happen in practice).
+        field_mention = ""
+    elif len(field_labels) == 1:
+        field_mention = f"**{field_labels[0].lower()}**"
+    else:  # len(field_labels) == 2
+        field_mention = (
+            f"**{field_labels[0].lower()}** and "
+            f"**{field_labels[1].lower()}**"
         )
-    else:
-        subj = (
-            f"Invoice follow-up{nudge_clause}: missing details from "
-            f"{inv.vendor or 'your invoice'}"
-        )
-        plain = (
-            f"{greet}{nudge_clause},\n\n"
-            "Thanks for sending the invoice. Before I can get this routed "
-            "for payment, I need a few details that weren't on the document "
-            "I received:\n\n"
-            f"{field_lines}\n\n"
-            f"What I have so far:\n{summary_block}\n"
-            f"{project_block}\n\n"
-            "Just reply line-by-line on this thread — I'll pick it up "
-            "automatically.\n\n"
-            "Thanks!"
-        )
-    project_html = ""
+
+    # Tier-specific body paragraphs.
+    # field_mention contains JUST the bolded labels — each branch
+    # supplies the verb ("I'm missing X" / "still need X").
+    if urgency_tier == 1:
+        if is_employee:
+            if has_many_fields:
+                body_para = (
+                    f"{opener} I need these fields to push it through "
+                    f"to AP:\n\n"
+                    f"{field_lines}"
+                )
+            else:
+                body_para = (
+                    f"{opener} I'm missing {field_mention} "
+                    f"to route it through AP."
+                )
+        else:
+            if has_many_fields:
+                body_para = (
+                    f"{opener} I need a few details before I can send "
+                    f"it for payment:\n\n"
+                    f"{field_lines}"
+                )
+            else:
+                body_para = (
+                    f"{opener} I'm missing {field_mention} "
+                    f"so I can get it paid."
+                )
+    elif urgency_tier == 2:
+        if is_employee:
+            if has_many_fields:
+                body_para = (
+                    f"Quick follow-up on {vendor_phrase} — "
+                    f"still need these to push it through:\n\n"
+                    f"{field_lines}"
+                )
+            else:
+                body_para = (
+                    f"Quick follow-up on {vendor_phrase} — "
+                    f"still need {field_mention}."
+                )
+        else:
+            if has_many_fields:
+                body_para = (
+                    f"Quick nudge on {vendor_phrase} — "
+                    f"still waiting on these:\n\n"
+                    f"{field_lines}"
+                )
+            else:
+                body_para = (
+                    f"Quick nudge on {vendor_phrase} — "
+                    f"still need {field_mention} to move this forward."
+                )
+    elif urgency_tier == 3:
+        # Second nudge — friendly, slightly more direct than tier 2,
+        # but no escalation language and no consequences.
+        if is_employee:
+            if has_many_fields:
+                body_para = (
+                    f"Circling back on {vendor_phrase} — "
+                    f"still need these:\n\n"
+                    f"{field_lines}"
+                )
+            else:
+                body_para = (
+                    f"Circling back on {vendor_phrase} — "
+                    f"still need {field_mention}."
+                )
+        else:
+            if has_many_fields:
+                body_para = (
+                    f"Circling back on {vendor_phrase} — "
+                    f"still on the hook for these:\n\n"
+                    f"{field_lines}"
+                )
+            else:
+                body_para = (
+                    f"Circling back on {vendor_phrase} — "
+                    f"still need {field_mention}."
+                )
+    else:  # tier 4 — final automated reminder
+        # The "flag for review" note is appended to the closing CTA below
+        # (not its own paragraph in the body) so the message reads tighter.
+        if is_employee:
+            if has_many_fields:
+                body_para = (
+                    f"One last reminder on {vendor_phrase} — "
+                    f"still need these:\n\n"
+                    f"{field_lines}"
+                )
+            else:
+                body_para = (
+                    f"One last reminder on {vendor_phrase} — "
+                    f"still need {field_mention}."
+                )
+        else:
+            if has_many_fields:
+                body_para = (
+                    f"Last reminder from me on {vendor_phrase} — "
+                    f"still need these:\n\n"
+                    f"{field_lines}"
+                )
+            else:
+                body_para = (
+                    f"Last reminder from me on {vendor_phrase} — "
+                    f"still need {field_mention}."
+                )
+
+    # Project context lives in the body (above the sign-off). The vendor /
+    # total / date reference line lives BELOW "Thanks!" and is bolded — it's
+    # an at-a-glance footer, not part of the conversational ask.
+    summary_parts = []
+    if inv.vendor:
+        summary_parts.append(f"vendor: {inv.vendor}")
+    if inv.total:
+        summary_parts.append(f"total: {inv.currency} {inv.total}")
+    if inv.invoice_date:
+        summary_parts.append(f"date: {inv.invoice_date}")
+    reference_line = (
+        f"For reference: {', '.join(summary_parts)}."
+        if summary_parts else None
+    )
+
+    project_paragraphs: list[str] = []
     if proj_resolved_to:
-        project_html = (
-            f"<p><b>Project we're tracking this against:</b> "
-            f"{proj_resolved_to}<br>"
-            "If this should be billed to a different project, just say which "
-            "in your reply.</p>"
+        project_paragraphs.append(
+            f"We're tracking this against {proj_resolved_to}. "
+            "If it should be a different project, just say so."
         )
     elif project_picker:
-        # Render the picker as an HTML list
-        picker_items = "".join(
-            f"<li>{line.strip().lstrip('•').strip()}</li>"
-            for line in project_picker.split("\n")
-            if line.strip().startswith("•") or line.strip().startswith("…")
+        project_paragraphs.append(
+            f"We weren't sure which project — mind confirming? "
+            f"Active projects: {project_picker}. "
+            "Reply with the code or name."
         )
-        project_html = (
-            "<p><b>We weren't sure which project this is for — could you "
-            "let us know?</b> Active projects:</p>"
-            f"<ul>{picker_items}</ul>"
-            "<p>Reply with the project code (e.g. <code>ALPHA</code>) "
-            "or the name.</p>"
-        )
-    html = (
-        f"<p>{greet}{nudge_clause},</p>"
-        + (
-            "<p>I can't push this through to AP without the following — "
-            "could you grab them and reply here?</p>"
-            if is_employee else
-            "<p>Thanks for sending the invoice. Before I can get this routed "
-            "for payment, I need a few details that weren't on the document "
-            "I received:</p>"
-        )
-        + "<ul>"
-        + "".join(
-            f"<li>{_FIELD_PROMPT_LABELS.get(f, f)}</li>"
-            for f in missing_fields
-        )
-        + "</ul>"
-        f"<p><b>What I have so far:</b><br>{summary_block.replace(chr(10), '<br>')}</p>"
-        f"{project_html}"
-        "<p>Just reply line-by-line on this thread — I'll pick it up "
-        "automatically.</p>"
-        "<p>Thanks!</p>"
+
+    closing_cta = (
+        "Can you reply with these here?" if has_many_fields
+        else "Mind dropping that in a quick reply here?"
     )
-    return {"subject": subj, "plain": plain, "html": html}
+    # Tier 4 only — append the soft "flag for review" consequence to the
+    # closing question so they live in the same sentence/paragraph.
+    if urgency_tier == 4:
+        closing_cta = (
+            f"{closing_cta} "
+            "Without a reply, I'll have to flag this for review."
+        )
+
+    # Plain-text assembly — one blank line between every paragraph.
+    if is_employee:
+        subj = f"AP submission — {inv.vendor or 'invoice'}"
+    else:
+        subj = f"Invoice follow-up: {inv.vendor or 'your invoice'}"
+
+    plain_paragraphs = [f"{greet},"]
+    # body_para may already contain \n\n internal breaks (tier 4, multi-field
+    # bullet list, etc.) — split it so every chunk becomes its own paragraph.
+    for chunk in body_para.split("\n\n"):
+        if chunk.strip():
+            plain_paragraphs.append(chunk.strip())
+    for pp in project_paragraphs:
+        plain_paragraphs.append(pp)
+    plain_paragraphs.append(closing_cta)
+    plain_paragraphs.append("Thanks!")
+    if reference_line:
+        # Plain-text "bold" via asterisks — most clients render this as bold,
+        # and even those that don't still keep it visually distinct.
+        plain_paragraphs.append(f"**{reference_line}**")
+    plain = "\n\n".join(plain_paragraphs)
+
+    # HTML assembly — every paragraph (including each project paragraph and
+    # the flag note) gets its own <p> tag for proper rendering.
+    html_parts = [f"<p>{greet},</p>"]
+    for chunk in body_para.split("\n\n"):
+        chunk = chunk.strip()
+        if not chunk:
+            continue
+        if chunk.startswith("•"):
+            # Convert leading-bullet block into a <ul>.
+            items = [
+                f"<li>{line.strip().lstrip('•').strip()}</li>"
+                for line in chunk.split("\n")
+                if line.strip().startswith("•")
+            ]
+            html_parts.append("<ul>" + "".join(items) + "</ul>")
+        else:
+            html_parts.append(f"<p>{chunk}</p>")
+    for pp in project_paragraphs:
+        html_parts.append(f"<p>{pp}</p>")
+    html_parts.append(f"<p>{closing_cta}</p>")
+    html_parts.append("<p>Thanks!</p>")
+    if reference_line:
+        # Bold reference footer below the sign-off.
+        html_parts.append(f"<p><b>{reference_line}</b></p>")
+
+    html = "\n".join(html_parts)
+
+    # Markdown-bold post-processor: every **chunk** in the HTML (e.g.
+    # the missing field names embedded in the body or the reference
+    # footer) becomes <b>chunk</b>. Done here so we apply the same
+    # rule to the whole assembled HTML in one pass.
+    import re as _re_md_bold
+    html = _re_md_bold.sub(
+        r"\*\*(.+?)\*\*",
+        r"<b>\1</b>",
+        html,
+        flags=_re_md_bold.DOTALL,
+    )
+
+    # ---------------------------------------------------------------- #
+    # Chat (text-message-style) variant
+    # ---------------------------------------------------------------- #
+    # Google Chat doesn't render HTML or **md-bold**. It uses *single
+    # asterisks* for bold. We mirror the same tier-based language as
+    # email but condense to 1–3 short lines max — like an SMS:
+    #   - no "Hi <name>," greeting
+    #   - no "Thanks!" sign-off
+    #   - no separate vendor/total/date footer
+    #   - project context squeezed to a parenthetical (or dropped)
+    #   - field names wrapped in *single asterisks* for chat-bold
+    chat = _compose_chat_variant(
+        inv=inv,
+        field_labels=field_labels,
+        urgency_tier=urgency_tier,
+        is_employee=is_employee,
+        proj_resolved_to=proj_resolved_to,
+    )
+
+    return {"subject": subj, "plain": plain, "html": html, "chat": chat}
+
+
+def _compose_chat_variant(
+    *,
+    inv: "_pi.ExtractedInvoice",
+    field_labels: list[str],
+    urgency_tier: int,
+    is_employee: bool,
+    proj_resolved_to: Optional[str],
+) -> str:
+    """Build a short SMS-style chat message for Google Chat sends.
+
+    Produces something like:
+
+      Tier 1 (single field):
+        "Got the Acme Roofing invoice but missing *invoice number*.
+         (tracked: ALPHA) Mind dropping that here?"
+
+      Tier 4 (single field):
+        "Last reminder on the Acme Roofing invoice — still need
+         *invoice number*. Mind dropping that here? Without a reply,
+         I'll have to flag this for review."
+
+    Field names use Google Chat's *single-asterisk* bold convention.
+    Newlines kept minimal — chat clients tend to render every newline
+    as breathing room, and we want this to feel like a quick text.
+    """
+    vendor_label = inv.vendor or "invoice"
+
+    # Format field names for chat-bold. Keep them lowercase and short —
+    # we strip the parenthetical hint that the email composer keeps in.
+    def _short(label: str) -> str:
+        # "Invoice number (as printed on the invoice)" → "invoice number"
+        base = label.split("(", 1)[0].strip()
+        return base.lower()
+
+    short_fields = [_short(lbl) for lbl in field_labels]
+    chat_fields = [f"*{f}*" for f in short_fields]
+
+    # Inline join: "*a*", "*a* and *b*", "*a*, *b*, *c*"
+    if not chat_fields:
+        field_phrase = ""  # edge case
+    elif len(chat_fields) == 1:
+        field_phrase = chat_fields[0]
+    elif len(chat_fields) == 2:
+        field_phrase = f"{chat_fields[0]} and {chat_fields[1]}"
+    else:
+        field_phrase = ", ".join(chat_fields[:-1]) + f", and {chat_fields[-1]}"
+
+    pronoun = "that" if len(chat_fields) <= 1 else "those"
+
+    # Tier-specific opener (text-message-tight).
+    if urgency_tier == 1:
+        opener = f"Got the {vendor_label} invoice but missing {field_phrase}."
+    elif urgency_tier == 2:
+        opener = f"Quick nudge on the {vendor_label} invoice — still need {field_phrase}."
+    elif urgency_tier == 3:
+        opener = f"Circling back on the {vendor_label} invoice — still need {field_phrase}."
+    else:  # tier 4
+        opener = f"Last reminder on the {vendor_label} invoice — still need {field_phrase}."
+
+    # Project context as a tight parenthetical (only if resolved).
+    project_bit = ""
+    if proj_resolved_to:
+        # Strip the long " — Project Name" suffix; just the code.
+        code = proj_resolved_to.split("—", 1)[0].strip()
+        project_bit = f" (tracked: {code})"
+
+    # Closing — same as email but condensed.
+    closing = f"Mind dropping {pronoun} here?"
+    if urgency_tier == 4:
+        closing = f"{closing} Without a reply, I'll have to flag this for review."
+
+    return f"{opener}{project_bit} {closing}"
+
+
+def _compose_acknowledgement(
+    inv: _pi.ExtractedInvoice,
+    *,
+    sheet_id: Optional[str] = None,
+    sheet_name: Optional[str] = None,
+    doc_type: str = "invoice",
+    status: str = "OPEN",
+    is_promotion: bool = False,
+    audience: str = "vendor",
+    recipient_name: Optional[str] = None,
+) -> dict:
+    """Build a 'we got it / it's logged' acknowledgement message.
+
+    Returns the same {subject, plain, html, chat} shape as
+    _compose_info_request so the existing send helpers work unchanged.
+
+    Triggered on:
+      - successful initial extraction (no quality_fail → row written)
+      - row promotion AWAITING_INFO → OPEN after a reply fills the gaps
+        (set is_promotion=True so the wording acknowledges the follow-up)
+
+    `sheet_id` (when provided) becomes a clickable link to the sheet
+    so the recipient can click through to verify their row.
+    """
+    is_employee = audience == "employee"
+    first_name = _greeting_name(recipient_name)
+    greet = f"Hi {first_name}" if first_name else "Hi there"
+
+    vendor_label = inv.vendor or doc_type
+    doc_label = doc_type.upper()
+
+    # Lead sentence varies based on initial vs promotion.
+    if is_promotion:
+        lead = (
+            f"Thanks — got everything we needed and the {vendor_label} "
+            f"{doc_type} is logged."
+        )
+    else:
+        lead = (
+            f"Got the {vendor_label} {doc_type} and logged it."
+        )
+
+    # Build a "what we recorded" summary line. Bolded labels get converted
+    # to <b> by the same regex post-processor used elsewhere.
+    recorded: list[str] = []
+    if inv.vendor:
+        recorded.append(f"vendor: **{inv.vendor}**")
+    if inv.invoice_number:
+        recorded.append(f"invoice #: **{inv.invoice_number}**")
+    if inv.total:
+        recorded.append(
+            f"total: **{(inv.currency or 'USD')} {inv.total}**"
+        )
+    if inv.invoice_date:
+        recorded.append(f"date: **{inv.invoice_date}**")
+    if inv.project_code:
+        recorded.append(f"project: **{inv.project_code}**")
+    summary_line = ", ".join(recorded) if recorded else None
+
+    # "Logged as INVOICE in ALPHA — status: OPEN" for the doc-type/status line.
+    status_bits: list[str] = [f"Logged as **{doc_label}**"]
+    if inv.project_code:
+        status_bits.append(f"in **{inv.project_code}**")
+    status_bits.append(f"status: **{status}**")
+    status_line = " — ".join([" ".join(status_bits[:2])] + status_bits[2:])
+
+    # Sheet link — Google Sheets renders /edit#gid=0 cleanly.
+    sheet_url = (
+        f"https://docs.google.com/spreadsheets/d/{sheet_id}/edit"
+        if sheet_id else None
+    )
+    sheet_para_text = (
+        f"Sheet: {sheet_name or 'project AP sheet'} — {sheet_url}"
+        if sheet_url else None
+    )
+    sheet_para_html = (
+        f'Sheet: <a href="{sheet_url}">{sheet_name or "project AP sheet"}</a>'
+        if sheet_url else None
+    )
+
+    # Subject + body.
+    subj = f"Logged: {vendor_label} {doc_type}"
+    if is_promotion:
+        subj = f"Logged: {vendor_label} {doc_type} (now complete)"
+
+    plain_paragraphs: list[str] = [f"{greet},", lead]
+    if summary_line:
+        plain_paragraphs.append(summary_line)
+    plain_paragraphs.append(status_line)
+    if sheet_para_text:
+        plain_paragraphs.append(sheet_para_text)
+    plain_paragraphs.append("Thanks!")
+    plain = "\n\n".join(plain_paragraphs)
+
+    html_parts = [f"<p>{greet},</p>", f"<p>{lead}</p>"]
+    if summary_line:
+        html_parts.append(f"<p>{summary_line}</p>")
+    html_parts.append(f"<p>{status_line}</p>")
+    if sheet_para_html:
+        html_parts.append(f"<p>{sheet_para_html}</p>")
+    html_parts.append("<p>Thanks!</p>")
+    html = "\n".join(html_parts)
+
+    # Convert **md-bold** → <b> in the HTML (same rule as info-requests).
+    import re as _re_md_bold
+    html = _re_md_bold.sub(
+        r"\*\*(.+?)\*\*",
+        r"<b>\1</b>",
+        html,
+        flags=_re_md_bold.DOTALL,
+    )
+
+    # Chat (SMS-tight) variant.
+    # Use *single-asterisk* bold for Google Chat.
+    chat_bits: list[str] = []
+    # Chat layout — multi-line for visual hierarchy:
+    #   1. Headline ("Got it — logged" / "now complete")
+    #   2. Bulleted summary of the actual extracted fields
+    #   3. Sheet link on its own line at the bottom
+    #
+    # Field labels are bolded with *single asterisks* (Google Chat's
+    # bold convention). Lines without asterisks render plain.
+    if is_promotion:
+        headline = f"✓ Got it — *{vendor_label}* {doc_type} is now complete."
+    else:
+        headline = f"✓ Got the *{vendor_label}* {doc_type} — logged."
+
+    # Render every field that's relevant to this doc_type. When a field
+    # is missing, show "*Need your help*" as a bolded placeholder so the
+    # submitter sees exactly what's blocking and can reply with it in
+    # the same thread.
+    NEED_HELP = "*Need your help*"
+    is_invoice = doc_label.lower() == "invoice"
+
+    summary_lines: list[str] = []
+    summary_lines.append(
+        f"- *Vendor*: {inv.vendor or NEED_HELP}"
+    )
+    # Invoice # only relevant for invoices — receipts don't have one.
+    if is_invoice:
+        summary_lines.append(
+            f"- *Invoice #*: {inv.invoice_number or NEED_HELP}"
+        )
+    summary_lines.append(
+        f"- *Date*: {inv.invoice_date or NEED_HELP}"
+    )
+    if inv.total:
+        summary_lines.append(
+            f"- *Total*: {(inv.currency or 'USD')} {inv.total}"
+        )
+    else:
+        summary_lines.append(f"- *Total*: {NEED_HELP}")
+    summary_lines.append(f"- *Doc type*: {doc_label}")
+    summary_lines.append(
+        f"- *Project*: {inv.project_code or NEED_HELP}"
+    )
+    summary_lines.append(f"- *Status*: {status}")
+
+    # Stitch it all together with newlines so it renders as a clean block
+    # in Chat instead of one long horizontal run.
+    chat_parts = [headline, "\n".join(summary_lines)]
+    if sheet_url:
+        # Plain URL — Google Chat auto-detects and renders as a clickable
+        # link. Slack-style "<url|label>" syntax doesn't work here.
+        chat_parts.append(f"View sheet → {sheet_url}")
+    chat = "\n\n".join(chat_parts)
+
+    return {"subject": subj, "plain": plain, "html": html, "chat": chat}
 
 
 def _send_info_request_via_gmail(
@@ -803,8 +1538,20 @@ def _send_info_request_via_gmail(
 
 def _send_info_request_via_chat(
     *, space_name: str, message_text: str,
+    thread_name: Optional[str] = None,
 ) -> tuple[bool, Optional[str]]:
-    """Post a message in the original Chat space. Returns (sent, error_msg).
+    """Post a message in the original Chat space.
+
+    Returns (sent, error_msg).
+
+    If `thread_name` is provided (e.g. "spaces/AAQA.../threads/<id>"), the
+    message is posted as a REPLY in that thread — keeping the info-request
+    visually attached to the original receipt message. Otherwise it lands
+    as a new top-level message in the space.
+
+    Falls back gracefully if Chat rejects the thread (e.g. the thread was
+    deleted) — `messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD`
+    causes the API to start a new thread instead of erroring.
 
     Chat doesn't support inline HTML the way email does, so we send the
     plain-text variant with the field bullets rendered as ASCII bullets.
@@ -812,10 +1559,14 @@ def _send_info_request_via_chat(
     try:
         chat = _chat()
         body_with_marker = message_text + "\n\n— " + _r.BOT_FOOTER_MARKER
-        chat.spaces().messages().create(
-            parent=space_name,
-            body={"text": body_with_marker},
-        ).execute()
+        body: dict = {"text": body_with_marker}
+        kwargs: dict = {"parent": space_name, "body": body}
+        if thread_name:
+            body["thread"] = {"name": thread_name}
+            kwargs["messageReplyOption"] = (
+                "REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD"
+            )
+        chat.spaces().messages().create(**kwargs).execute()
         return True, None
     except Exception as e:
         err = str(e)
@@ -835,17 +1586,28 @@ def _send_info_request_via_chat(
 
 def _send_info_request_via_employee_dm(
     *, employee_email: str, message_text: str,
-) -> tuple[bool, Optional[str], Optional[str]]:
+) -> tuple[bool, Optional[str], Optional[str], Optional[str]]:
     """DM the employee directly via Google Chat.
-    Returns (sent, space_name, error_msg).
+    Returns (sent, space_name, thread_name, error_msg).
 
     `find_or_create_dm` is idempotent — same DM space each call for the same
     person — so over time MCP maintains a 'default chat open with each
     employee' for AP follow-ups.
 
+    Threading: every AP DM follow-up uses the stable threadKey
+    "ap-followup-<employee_email>". Chat resolves this to the same thread
+    on every send, so all AP back-and-forth (initial ask + reminders +
+    employee replies) stacks neatly in one DM thread per employee instead
+    of cluttering with new top-level messages each time.
+
+    The returned `thread_name` is the resolved thread resource (e.g.
+    "spaces/AAQA.../threads/<id>") — the caller should store it on the
+    vendor_followups record so reminders thread back to the same place.
+
     error_msg carries the actual reason on failure (HttpError details when
     available) so the orchestrator can log + stamp into row notes. The
-    caller is expected to fall back to Gmail-thread reply on (False, None, _).
+    caller is expected to fall back to Gmail-thread reply on
+    (False, None, None, _).
     """
     if not employee_email:
         return False, None, "no_employee_email"
@@ -895,7 +1657,7 @@ def _send_info_request_via_employee_dm(
                 "(not in contacts or directory)"
             )
             log.warning("employee DM: %s", err)
-            return False, None, err
+            return False, None, None, err
 
         # Chat user resource: people/N → users/N
         chat_user = "users/" + person_resource.split("/", 1)[1]
@@ -914,14 +1676,27 @@ def _send_info_request_via_employee_dm(
             ).execute()
         space_name = space.get("name")
         if not space_name:
-            return False, None, "chat_space_create_returned_no_name"
+            return False, None, None, "chat_space_create_returned_no_name"
+
+        # Stable threadKey so all AP follow-ups for this employee stack in
+        # one DM thread (initial ask → reminders → reply parsing). Chat
+        # resolves the same threadKey to the same thread on every send.
+        thread_key = f"ap-followup-{employee_email}"
 
         body_with_marker = message_text + "\n\n— " + _r.BOT_FOOTER_MARKER
-        chat.spaces().messages().create(
+        body = {
+            "text": body_with_marker,
+            "thread": {"threadKey": thread_key},
+        }
+        sent_msg = chat.spaces().messages().create(
             parent=space_name,
-            body={"text": body_with_marker},
+            body=body,
+            messageReplyOption="REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD",
         ).execute()
-        return True, space_name, None
+        # The response includes the resolved thread name — capture it so
+        # the orchestrator can store it on the vendor_followups record.
+        thread_name = (sent_msg.get("thread") or {}).get("name")
+        return True, space_name, thread_name, None
     except Exception as e:
         err = str(e)
         try:
@@ -935,7 +1710,7 @@ def _send_info_request_via_employee_dm(
         except Exception:
             pass
         log.warning("employee DM send failed for %s: %s", employee_email, err)
-        return False, None, err
+        return False, None, None, err
 
 
 def _validate_invoice_quality(
@@ -1386,6 +2161,9 @@ def register(mcp) -> None:
                 sent = False
                 request_channel = None
                 request_thread_id = None
+                # Filled in if the DM path succeeds — used for register so
+                # reminders thread back into the same DM conversation.
+                chat_thread_name_for_register: Optional[str] = None
                 tracking_key = ck or f"src:{source_id}"
                 if (
                     quality_fail
@@ -1405,15 +2183,23 @@ def register(mcp) -> None:
                     )
 
                     send_errors: list[str] = []
-                    dm_sent, dm_space, dm_err = _send_info_request_via_employee_dm(
-                        employee_email=employee_email,
-                        message_text=composed["plain"],
+                    dm_sent, dm_space, dm_thread, dm_err = (
+                        _send_info_request_via_employee_dm(
+                            employee_email=employee_email,
+                            # Use the condensed chat variant for DM — full
+                            # email plain text is way too long for a
+                            # real-time channel.
+                            message_text=composed.get("chat") or composed["plain"],
+                        )
                     )
                     if dm_err:
                         send_errors.append(f"dm: {dm_err}")
                     if dm_sent and dm_space:
                         request_channel = "chat"
                         request_thread_id = dm_space
+                        # Stash the resolved thread name so reminders
+                        # thread back into the same DM conversation.
+                        chat_thread_name_for_register = dm_thread
                         sent = True
                     else:
                         gm_sent, gm_err = _send_info_request_via_gmail(
@@ -1510,6 +2296,7 @@ def register(mcp) -> None:
                                 sheet_id=sheet_id,
                                 row_number=row_number,
                                 project_code=inv.project_code,
+                                chat_thread_name=chat_thread_name_for_register,
                             )
                             results["requests_sent"] = (
                                 results.get("requests_sent", 0) + 1
@@ -1517,6 +2304,84 @@ def register(mcp) -> None:
                             request_sent = True
                         except Exception as e:
                             log.warning("vendor_followups register failed: %s", e)
+
+                # Acknowledgement on clean initial submission — only when
+                # there's no quality_fail (we're not asking for missing
+                # info), the sender is internal (we don't auto-reply to
+                # external vendors), and we resolved a project. DM-first
+                # with email-thread fallback.
+                # Auto-share the project sheet with the internal/subsidiary
+                # submitter so the "View sheet" link in the ACK actually works.
+                # Idempotent — skips if they already have access.
+                ack_share_email = (
+                    sender_classification.get("email") or sender
+                ) if sender_classification else None
+                if (
+                    inv.project_code
+                    and sheet_id
+                    and ack_share_email
+                    and sender_classification
+                    and sender_classification.get("internal")
+                ):
+                    try:
+                        _share_sheet_with_email(
+                            sheet_id, ack_share_email, role="reader",
+                        )
+                    except Exception as e:
+                        log.warning(
+                            "inbox auto-share to %s failed: %s",
+                            ack_share_email, e,
+                        )
+
+                ack_sent_for_record = False
+                if (
+                    not quality_fail
+                    and sender_classification
+                    and sender_classification.get("internal")
+                    and inv.project_code
+                ):
+                    try:
+                        recipient_name = None
+                        if "<" in (sender or ""):
+                            recipient_name = (
+                                sender.split("<", 1)[0].strip().strip('"')
+                            )
+                        ack = _compose_acknowledgement(
+                            inv,
+                            sheet_id=sheet_id,
+                            sheet_name=inv.project_code,
+                            doc_type="invoice",
+                            status="OPEN",
+                            is_promotion=False,
+                            audience="employee",
+                            recipient_name=recipient_name,
+                        )
+                        ack_employee_email = (
+                            sender_classification.get("email") or sender
+                        )
+                        # DM first (uses stable threadKey so all AP comms
+                        # for this employee stay in one thread).
+                        ack_dm_sent, _, _, _ = (
+                            _send_info_request_via_employee_dm(
+                                employee_email=ack_employee_email,
+                                message_text=ack.get("chat") or ack["plain"],
+                            )
+                        )
+                        if ack_dm_sent:
+                            ack_sent_for_record = True
+                        else:
+                            # Fall back to replying on the email thread.
+                            email_thread = msg.get("threadId") or mid
+                            ack_gm_sent, _ = _send_info_request_via_gmail(
+                                thread_id=email_thread,
+                                to=ack_employee_email,
+                                subject=ack["subject"],
+                                plain=ack["plain"],
+                                html=ack["html"],
+                            )
+                            ack_sent_for_record = bool(ack_gm_sent)
+                    except Exception as e:
+                        log.warning("ack send (inbox) failed: %s", e)
 
                 new_records.append({
                     "source_id": source_id,
@@ -1528,6 +2393,7 @@ def register(mcp) -> None:
                     "status": inv.status,
                     "info_request_sent": request_sent,
                     "request_channel": request_channel,
+                    "ack_sent": ack_sent_for_record,
                     "missing_fields": missing_fields,
                     "sender_classification": (
                         sender_classification if sender_classification else None
@@ -2276,7 +3142,14 @@ def register(mcp) -> None:
                 elif channel == "chat":
                     ok, send_err = _send_info_request_via_chat(
                         space_name=rec["thread_id"],  # space resource name
-                        message_text=composed["plain"],
+                        # Condensed chat variant — short SMS-style message.
+                        message_text=composed.get("chat") or composed["plain"],
+                        # Thread back to the original receipt's thread so
+                        # reminders stack inside the same conversation
+                        # rather than starting a new top-level message.
+                        # Falls back to top-level send for legacy records
+                        # registered before this field existed.
+                        thread_name=rec.get("chat_thread_name"),
                     )
 
                 if ok:
@@ -2405,9 +3278,61 @@ def register(mcp) -> None:
                     continue
 
                 results["rows_updated"] += 1
+                ack_sent = False
+                ack_err = None
                 if promoted:
                     results["rows_promoted"] += 1
                     _vf.mark_resolved(ck)
+
+                    # Send acknowledgement on the same channel/thread —
+                    # they replied with the missing info, the loop is
+                    # closing, so confirm it landed.
+                    try:
+                        ack_inv = _pi.ExtractedInvoice(
+                            vendor=rec.get("vendor_name"),
+                            invoice_number=parsed.get("invoice_number"),
+                            total=parsed.get("total"),
+                            invoice_date=parsed.get("invoice_date"),
+                            currency=parsed.get("currency"),
+                            project_code=rec.get("project_code"),
+                        )
+                        # Audience: gmail recipient w/ vendor email = vendor;
+                        # internal DM/chat = employee. Conservative default.
+                        ack_audience = (
+                            "employee" if channel == "chat"
+                            else "vendor"
+                        )
+                        ack = _compose_acknowledgement(
+                            ack_inv,
+                            sheet_id=rec.get("sheet_id"),
+                            sheet_name=rec.get("project_code")
+                            or "project AP sheet",
+                            doc_type="invoice",
+                            status="OPEN",
+                            is_promotion=True,
+                            audience=ack_audience,
+                        )
+                        if channel == "gmail":
+                            to = rec.get("vendor_email")
+                            if to:
+                                ack_sent, ack_err = (
+                                    _send_info_request_via_gmail(
+                                        thread_id=rec["thread_id"],
+                                        to=to,
+                                        subject=ack["subject"],
+                                        plain=ack["plain"],
+                                        html=ack["html"],
+                                    )
+                                )
+                        elif channel == "chat":
+                            ack_sent, ack_err = _send_info_request_via_chat(
+                                space_name=rec["thread_id"],
+                                message_text=ack.get("chat") or ack["plain"],
+                                thread_name=rec.get("chat_thread_name"),
+                            )
+                    except Exception as e:
+                        log.warning("ack send failed for %s: %s", ck, e)
+                        ack_err = str(e)
                 else:
                     results["rows_still_awaiting"] += 1
 
@@ -2416,6 +3341,8 @@ def register(mcp) -> None:
                     "vendor_name": rec.get("vendor_name"),
                     "parsed": parsed,
                     "promoted_to_open": promoted,
+                    "ack_sent": ack_sent,
+                    "ack_error": ack_err,
                 })
 
             return json.dumps(
@@ -2766,6 +3693,10 @@ def _scan_chat_for_invoices(
         source_id = f"chat:{message_name}"
         text = (msg.get("text") or "").strip()
         attachments = msg.get("attachment") or []
+        # The thread the original receipt message lives in — captured here
+        # so info-requests + reminders can thread back to it instead of
+        # starting a new top-level conversation each time.
+        original_thread_name = (msg.get("thread") or {}).get("name")
 
         # Prefer attachments — that's where most invoices live.
         inv = None
@@ -2900,17 +3831,25 @@ def _scan_chat_for_invoices(
             results["by_project"][inv.project_code] = (
                 results["by_project"].get(inv.project_code, 0) + 1
             )
-        # Chat info-request side-effect.
+        # Chat info-request side-effect. NOTE: not gated on ck because
+        # the most common reason we're sending the ask is that the
+        # invoice_number (which feeds ck) is what's missing. Falls back
+        # to a source_id-based tracking key when ck is None.
+        chat_tracking_key = ck or f"src:{source_id}"
         if (
             chat_quality_fail
             and params.request_missing_info
-            and ck
             and params.chat_space_id
         ):
             composed = _compose_info_request(inv, chat_missing_fields)
             sent, send_err = _send_info_request_via_chat(
                 space_name=params.chat_space_id,
-                message_text=composed["plain"],
+                # Condensed chat variant — short SMS-style message.
+                message_text=composed.get("chat") or composed["plain"],
+                # Thread back to the original receipt message so the
+                # ask is visually attached to the receipt the bot is
+                # asking about.
+                thread_name=original_thread_name,
             )
             if not sent and send_err:
                 inv.notes = (
@@ -2920,7 +3859,7 @@ def _scan_chat_for_invoices(
             if sent:
                 try:
                     _vf.register_request(
-                        content_key=ck,
+                        content_key=chat_tracking_key,
                         thread_id=params.chat_space_id,
                         channel="chat",
                         vendor_email=None,
@@ -2929,6 +3868,7 @@ def _scan_chat_for_invoices(
                         sheet_id=sheet_id,
                         row_number=cache.get("rows_appended", 0) + 1,
                         project_code=inv.project_code,
+                        chat_thread_name=original_thread_name,
                     )
                     results["requests_sent"] = (
                         results.get("requests_sent", 0) + 1
@@ -2936,6 +3876,38 @@ def _scan_chat_for_invoices(
                     chat_request_sent = True
                 except Exception as e:
                     log.warning("vendor_followups (chat) register failed: %s", e)
+
+        # Acknowledgement on clean initial submission — only when there
+        # was NO quality failure (we're not asking for missing info, the
+        # row is OPEN, the loop is closed before it started).
+        chat_ack_sent = False
+        if (
+            not chat_quality_fail
+            and params.chat_space_id
+            and inv.project_code
+        ):
+            try:
+                ack = _compose_acknowledgement(
+                    inv,
+                    sheet_id=sheet_id,
+                    sheet_name=inv.project_code,
+                    doc_type="invoice",
+                    status="OPEN",
+                    is_promotion=False,
+                    audience="employee",
+                )
+                ack_ok, ack_err = _send_info_request_via_chat(
+                    space_name=params.chat_space_id,
+                    message_text=ack.get("chat") or ack["plain"],
+                    # Thread back to the original receipt — the ack
+                    # lives directly under it.
+                    thread_name=original_thread_name,
+                )
+                chat_ack_sent = bool(ack_ok)
+                if not ack_ok and ack_err:
+                    log.warning("chat ack send failed: %s", ack_err)
+            except Exception as e:
+                log.warning("chat ack compose/send failed: %s", e)
 
         new_records.append({
             "source_id": source_id,
@@ -2945,6 +3917,7 @@ def _scan_chat_for_invoices(
             "project_code": inv.project_code,
             "status": inv.status,
             "info_request_sent": chat_request_sent,
+            "ack_sent": chat_ack_sent,
             "missing_fields": chat_missing_fields,
             "resolution": rr.as_dict(),
             "confidence": inv.confidence,
@@ -2988,10 +3961,17 @@ def _resolve_for_receipt(rec, params, *, filename=None, chat_space_id=None,
 def _route_project_receipt(
     rec, *, source_id, params, results, sheet_cache, new_records, now_iso,
     filename=None, chat_space_id=None, sender_email=None, receipt_link="",
+    chat_thread_name=None, submitter_email=None,
 ):
     """Resolve project + dedup + append a single receipt row. Mutates results
     and sheet_cache in place. Single source of truth for the receipt-write
-    path so Drive/Chat scanners stay short."""
+    path so Drive/Chat scanners stay short.
+
+    `chat_thread_name` (optional) is the original receipt's chat thread —
+    when provided AND project resolves cleanly, an ACK is posted threaded
+    back to the receipt so the submitter gets immediate confirmation that
+    the row was logged.
+    """
     if params.skip_low_confidence and rec.confidence < 0.4:
         results["skipped_low_conf"] += 1
         return
@@ -3042,6 +4022,68 @@ def _route_project_receipt(
         results["by_project"][project_code] = (
             results["by_project"].get(project_code, 0) + 1
         )
+
+    # Auto-share the project sheet with the submitter (idempotent) —
+    # so when the ACK lands with a "View sheet" link, clicking it
+    # actually opens the row instead of a permission-denied screen.
+    # Gated on:
+    #   - we know the submitter's email
+    #   - submitter is internal or subsidiary (never share with externals)
+    #   - we have a resolved project sheet (not the NEEDS_REVIEW parking)
+    auto_share_sent = False
+    if submitter_email and project_code:
+        try:
+            import sender_classifier as _sc
+            cls = _sc.classify(submitter_email)
+            if cls.get("internal"):
+                granted, share_err = _share_sheet_with_email(
+                    sheet_id, submitter_email, role="reader",
+                )
+                auto_share_sent = bool(granted)
+                if share_err:
+                    log.warning(
+                        "auto-share to %s failed: %s",
+                        submitter_email, share_err,
+                    )
+        except Exception as e:
+            log.warning("auto-share orchestration failed: %s", e)
+
+    # Acknowledgement on the chat thread — only when we have the thread,
+    # the chat space, AND a resolved project (no point ack'ing a row
+    # parked in NEEDS_REVIEW). Build a synthetic ExtractedInvoice
+    # shape from the receipt so the ACK composer can render it the
+    # same way as invoices.
+    ack_sent = False
+    if chat_thread_name and chat_space_id and project_code:
+        try:
+            ack_inv = _pi.ExtractedInvoice(
+                vendor=rec.merchant,
+                invoice_number=None,
+                total=rec.total,
+                currency=rec.currency,
+                invoice_date=rec.date,
+                project_code=project_code,
+            )
+            ack = _compose_acknowledgement(
+                ack_inv,
+                sheet_id=sheet_id,
+                sheet_name=project_code,
+                doc_type="receipt",
+                status="OPEN",
+                is_promotion=False,
+                audience="employee",
+            )
+            ok, ack_err = _send_info_request_via_chat(
+                space_name=chat_space_id,
+                message_text=ack.get("chat") or ack["plain"],
+                thread_name=chat_thread_name,
+            )
+            ack_sent = bool(ok)
+            if not ok and ack_err:
+                log.warning("receipt ack send failed: %s", ack_err)
+        except Exception as e:
+            log.warning("receipt ack compose/send failed: %s", e)
+
     new_records.append({
         "source_id": source_id,
         "doc_type": "receipt",
@@ -3050,6 +4092,8 @@ def _route_project_receipt(
         "total": rec.total,
         "currency": rec.currency,
         "project_code": project_code,
+        "ack_sent": ack_sent,
+        "auto_share_granted": auto_share_sent,
         "resolution": rr.as_dict(),
         "confidence": rec.confidence,
     })
@@ -3151,6 +4195,10 @@ def _scan_chat_for_project_receipts(
         source_id = f"chat:{message_name}"
         text = (msg.get("text") or "").strip()
         attachments = msg.get("attachment") or []
+        # The thread the original receipt message lives in — captured here
+        # so info-requests + reminders can thread back to it instead of
+        # starting a new top-level conversation each time.
+        original_thread_name = (msg.get("thread") or {}).get("name")
 
         # Resolve sender display name via the same People-API path the
         # regular receipt extractor uses, so the [Metadata] block is human.
@@ -3159,6 +4207,12 @@ def _scan_chat_for_project_receipts(
             sender = _resolve_chat_sender_display(msg.get("sender"))
         except Exception:
             sender = None
+        # Also resolve the sender's email — used by the auto-share path
+        # so the bot can grant the submitter access to the project sheet.
+        try:
+            submitter_email = _resolve_chat_sender_email(msg.get("sender"))
+        except Exception:
+            submitter_email = None
 
         rec = None
         used_filename = None
@@ -3227,6 +4281,11 @@ def _scan_chat_for_project_receipts(
             rec, source_id=source_id, params=params, results=results,
             sheet_cache=sheet_cache, new_records=new_records, now_iso=now_iso,
             filename=used_filename, chat_space_id=params.chat_space_id,
+            # Thread back to the original receipt message so the ACK
+            # lands directly under the receipt the bot is logging.
+            chat_thread_name=original_thread_name,
+            # Sender email enables auto-share of the project sheet.
+            submitter_email=submitter_email,
         )
 
 

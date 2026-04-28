@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
 # See LICENSE file for terms.
 """Live-API smoke test for the receipt extractor.
 

@@ -1,4 +1,5 @@
-# © 2026 CoAssisted Workspace contributors. Licensed under MIT — see LICENSE.
+# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# See LICENSE file for terms. Removing or altering this header is prohibited.
 """Telemetry — sanitized health-check reports for software improvement.
 
 Used by `system_doctor`: when any check returns warn/fail, we build a
