@@ -1,0 +1,66 @@
+[project]
+name = "google-workspace-mcp"
+version = "0.2.0"
+description = "Local MCP server: Gmail, Calendar, Drive, Sheets, Docs, Tasks, Contacts (CRM), Chat, and cross-service workflows — 90 tools for Claude Cowork."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Finnn"}]
+dependencies = [
+    "mcp[cli]>=1.2.0",
+    "pydantic>=2.6",
+    "google-auth>=2.29",
+    "google-auth-oauthlib>=1.2",
+    "google-auth-httplib2>=0.2",
+    "google-api-python-client>=2.120",
+    "googlemaps>=4.10",
+    # Pillow shrinks oversized phone-photo receipts before Claude Vision.
+    # Anthropic API caps images at 5MB; phones routinely produce 6–18MB.
+    "Pillow>=10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+# Install with: pip install -e ".[llm]"
+# Required for: refresh_brand_voice.py, pipeline_digest.py, the optional
+# LLM-backed signature parser, and the system_check_anthropic_key tool.
+llm = [
+    "anthropic>=0.40",
+]
+
+[project.scripts]
+google-workspace-mcp = "server:main"
+google-workspace-mcp-refresh = "refresh_stats:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+# Top-level single-file modules (anything outside tools/).
+py-modules = [
+    "server",
+    "auth",
+    "errors",
+    "config",
+    "gservices",
+    "logging_util",
+    "retry",
+    "dryrun",
+    "rendering",
+    "templates",
+    "rules",
+    "crm_stats",
+    "refresh_stats",
+    "enrich_inbox",
+    "junk_filter",
+    "llm",
+    "refresh_brand_voice",
+]
+packages = ["tools"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
