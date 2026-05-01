@@ -160,9 +160,42 @@ def register(
     sheet_name: Optional[str] = None,
     currency: str = "USD",
     active: bool = True,
+    # --- Wave 2 additions (AP-5 / AP-6 / AP-9) ---
+    drive_folder_id: Optional[str] = None,
+    drive_subfolders: Optional[dict[str, Optional[str]]] = None,
+    name_aliases: Optional[list[str]] = None,
+    staffwizard_job_number: Optional[str] = None,
+    staffwizard_job_desc: Optional[str] = None,
+    assigned_team_emails: Optional[list[str]] = None,
+    billing_origin_state: Optional[str] = None,
+    billing_terms: Optional[str] = None,
+    billing_cadence: Optional[str] = None,
+    customer_email: Optional[str] = None,
 ) -> dict:
     """Upsert a project. Re-registering with the same code merges incrementally
-    (new sender_emails / patterns are appended, dedup'd; scalar fields overwrite).
+    (new sender_emails / patterns / aliases are appended, dedup'd; scalar
+    fields overwrite when supplied, preserve when None).
+
+    Wave 2 fields:
+        drive_folder_id, drive_subfolders — Drive tree IDs created by AP-6
+            workflow_register_new_project. drive_subfolders maps subfolder
+            name (receipts/invoices/labor/statements_amex/statements_wex/
+            workday_supplier/workday_journal) → folder ID. None values mean
+            "not created yet, build lazily on first write."
+        name_aliases — alternate spellings the AP-5 subject classifier
+            should recognize (e.g. ["GE1", "Golden Eagle"] for "Google -
+            Golden Eagle 1").
+        staffwizard_job_number, staffwizard_job_desc — keys from the
+            StaffWizard Overall Report. Used by AP-7 labor ingestion to
+            map the job back to a project_code.
+        assigned_team_emails — guards / managers on this project. AP-5
+            uses this to route inbound receipts when subject matching
+            misses.
+        billing_origin_state — "NY" unlocks the weekly-billing option in
+            AP-9 per the operator's New York project rule.
+        billing_terms — "Net-15" default; override per customer.
+        billing_cadence — "monthly" default; "weekly" for NY projects.
+        customer_email — where AR-9 sends customer invoices.
     """
     key = _normalize_code(code)
     if not key:
@@ -206,6 +239,34 @@ def register(
     record["currency"] = currency or "USD"
     record["active"] = bool(active)
     record["last_seen"] = now
+
+    # --- Wave 2 fields. None means "preserve existing", explicit values overwrite. ---
+    if drive_folder_id is not None:
+        record["drive_folder_id"] = drive_folder_id
+    if drive_subfolders is not None:
+        # Merge: existing subfolder IDs are kept unless the caller passes
+        # a new value (including explicit None to clear).
+        merged = dict(existing.get("drive_subfolders") or {})
+        merged.update(drive_subfolders)
+        record["drive_subfolders"] = merged
+    record["name_aliases"] = _merge_list(
+        existing.get("name_aliases"), name_aliases,
+    )
+    if staffwizard_job_number is not None:
+        record["staffwizard_job_number"] = staffwizard_job_number
+    if staffwizard_job_desc is not None:
+        record["staffwizard_job_desc"] = staffwizard_job_desc
+    record["assigned_team_emails"] = _merge_list(
+        existing.get("assigned_team_emails"), assigned_team_emails,
+    )
+    if billing_origin_state is not None:
+        record["billing_origin_state"] = billing_origin_state
+    if billing_terms is not None:
+        record["billing_terms"] = billing_terms
+    if billing_cadence is not None:
+        record["billing_cadence"] = billing_cadence
+    if customer_email is not None:
+        record["customer_email"] = customer_email
 
     data[key] = record
     _save(data)
@@ -444,6 +505,114 @@ def _llm_infer_project(invoice_text: str, projects: list[dict]) -> Optional[dict
         "confidence": float(data.get("confidence") or 0.5),
         "rationale": data.get("rationale") or "",
     }
+
+
+# --------------------------------------------------------------------------- #
+# Wave 2 helpers — alias / team / StaffWizard resolution + Drive subfolders
+# --------------------------------------------------------------------------- #
+
+
+# Confidence boost when an additional Wave 2 signal corroborates a tier match.
+CONF_ALIAS = 0.92
+CONF_TEAM = 0.88
+CONF_STAFFWIZARD = 0.95
+
+
+def resolve_by_alias(query: str) -> Optional[dict]:
+    """Match a free-text query against project_name + name_aliases.
+
+    Used by AP-5 when an inbound subject line carries a project hint
+    like 'Receipt for GE1' or 'Condor 12 fuel'. Case- and whitespace-
+    insensitive substring match. First match wins (registry order).
+    """
+    if not query:
+        return None
+    q = query.lower().strip()
+    for record in list_all(active_only=True):
+        candidates = [record.get("name") or "", record.get("code") or ""]
+        candidates += list(record.get("name_aliases") or [])
+        for c in candidates:
+            if c and c.lower() in q:
+                return dict(record)
+    return None
+
+
+def resolve_by_team_email(email: str) -> list[dict]:
+    """Return projects this email is assigned to, sorted by recency.
+
+    Multiple matches are possible (rotating duty). AP-5 falls back to
+    calendar / geo tiebreakers when len > 1.
+    """
+    if not email:
+        return []
+    e = _norm_email(email)
+    out = []
+    for record in list_all(active_only=True):
+        emails = [_norm_email(x) for x in (record.get("assigned_team_emails") or [])]
+        if e in emails:
+            out.append(dict(record))
+    out.sort(key=lambda r: r.get("last_seen") or "", reverse=True)
+    return out
+
+
+def resolve_by_staffwizard_job(
+    job_number: Optional[str],
+    job_description: Optional[str],
+) -> Optional[dict]:
+    """Match against StaffWizard Overall Report's JobNumber + JobDescription.
+
+    AP-7 labor ingestion uses this — the daily report carries a
+    {JobNumber, JobDescription} pair per shift, and we need to know
+    which registered project_code that maps to.
+    """
+    if not job_number and not job_description:
+        return None
+    jn = (job_number or "").strip().lower()
+    jd = (job_description or "").strip().lower()
+    for record in list_all(active_only=True):
+        rn = (record.get("staffwizard_job_number") or "").strip().lower()
+        rd = (record.get("staffwizard_job_desc") or "").strip().lower()
+        if jn and rn and jn == rn:
+            if not jd or not rd or jd == rd:
+                return dict(record)
+    return None
+
+
+def update_drive_subfolder(
+    code: str,
+    subfolder_key: str,
+    folder_id: str,
+) -> bool:
+    """Record a Drive folder ID for a per-project subfolder.
+
+    Used by AP-6 lazy expansion (e.g., the first June-2026 receipt
+    triggers creation of `Receipts/2026-06/` and stamps the ID here)
+    and by `workflow_register_new_project` which creates the full
+    subtree on registration.
+
+    Subfolder keys are free-form strings; conventional ones include:
+    'receipts', 'invoices', 'labor', 'statements_amex', 'statements_wex',
+    'workday_supplier', 'workday_journal', plus monthly buckets like
+    'receipts_2026_05'.
+    """
+    key = _normalize_code(code)
+    data = _load()
+    if key not in data:
+        return False
+    subs = data[key].setdefault("drive_subfolders", {})
+    subs[subfolder_key] = folder_id
+    data[key]["last_seen"] = _now_iso()
+    _save(data)
+    return True
+
+
+def get_drive_subfolder(code: str, subfolder_key: str) -> Optional[str]:
+    """Return the Drive folder ID for a project's subfolder, or None."""
+    rec = get(code)
+    if not rec:
+        return None
+    subs = rec.get("drive_subfolders") or {}
+    return subs.get(subfolder_key)
 
 
 # Test helper — let unit tests redirect the registry to a tempdir.

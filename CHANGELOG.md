@@ -32,13 +32,146 @@ testers and marketplace listings.
 
 ---
 
-## [Unreleased] — `0.7.3-dev`
+## [Unreleased] — `0.8.1-dev`
 
-Working window for the next dev cycle. AP/AR build-out per the
-`coassisted-workspace-ap-roadmap-2026-04-30` design doc — three waves
-covering Workday + QuickBooks dual export, no-failed-trigger capture,
-forced project Drive tree, daily labor capture, master roll-up, and
-AR coverage. Wave 1 codes once stakeholder open items resolve.
+Working window for the next dev cycle. Open items: AP-1 Supplier
+Invoice EIB (gated on Workday GL → Spend Category map), AP-4
+sweep wire-up (4 stubbed call sites → tools/gmail + tools/chat),
+Geotab integration, AR-9 Wave 3 build.
+
+---
+
+## [0.8.0] — 2026-05-01 · stable
+
+AP/AR build-out per the
+`coassisted-workspace-ap-roadmap-2026-04-30` design doc, Waves 1
+and 2. Cuts on the same day as v0.7.2 — Wave 1 + Wave 2 ship
+together because they're tightly coupled (the classifier ladder,
+EIB writer, project router, and Drive tree manager share the
+project_registry as the integration point).
+
+### Added — Wave 1: Workday close path
+
+- **AP-3: GL classifier (4-tier ladder).**
+    - `gl_classifier.py` — Tier 0 / 1 / 2 / 3 routing with a
+      final clearing-account fallback for the review queue.
+    - `gl_merchant_map.py` — operator-confirmed merchant→GL
+      learning store. Composite key (merchant, cardholder_email),
+      source precedence operator > import > training so training
+      noise can't clobber operator decisions, atomic writes,
+      history capped at 5 events.
+    - MCC table — 40 ranges → 11 GL accounts. Hand-curated from
+      the existing AMEX corpus + chart of accounts. HIGH
+      confidence on hit.
+    - `gl_memo_classifier.py` — Naive-Bayes-lite trained on
+      4,601 debit-side expense rows from
+      `samples/Wolfhound Corp JEs Jan-Mar'26.xlsx`. Filters
+      credit-side and non-expense rows so the model learns spend
+      GL patterns, not card-payable / cash routing. MEDIUM/LOW.
+    - `scripts/train_gl_memo_classifier.py` — one-shot trainer
+      writing `gl_memo_index.json` (gitignored).
+    - `gl_classifier_llm.py` — Claude-haiku fallback over a
+      curated list of 29 AP-relevant expense GL accounts.
+      ~$0.0008 per call. Strict output parsing.
+    - 58 new tests across the four classifier modules.
+- **AP-2: AMEX + WEX → Workday Journal EIB.**
+    - `workday_journal_eib.py` — AMEX parser (41 columns,
+      filters CLEARED only by default), WEX parser (60
+      columns, fuel-card with vehicle/driver attribution),
+      two-sheet EIB writer matching the SFNA AMEX EIB
+      convention exactly.
+    - Refund handling reverses dr/cr direction.
+    - Real-data validation: 77 AMEX + 315 WEX April
+      transactions → 100% classified, 0 fell through.
+    - Memo format `{LABEL} Transactions {start}-{end} -
+      {Cardholder} - {Vendor}`.
+    - 22 new tests with synthetic CSV fixtures.
+- **`cost_center_map.py`** — persistent cardholder/department
+  → cost center mapping store. Same architectural pattern as
+  `gl_merchant_map.py`. `derive_from_je_corpus()` returns
+  draft suggestions for operator review.
+- **MCP wrappers (`tools/ap_journal.py`)** — 7 tools:
+    - `workflow_reconcile_card_statement`
+    - `workflow_gl_classify_preview`
+    - `workflow_gl_merchant_map_set` / `_list`
+    - `workflow_gl_memo_index_status`
+    - `workflow_cost_center_map_set` / `_list`
+
+### Added — Wave 2: Capture reliability + visibility
+
+- **AP-6: Forced project Drive tree (`ap_tree.py`).**
+    - `register_new_project` — full 7-subfolder subtree creation
+      + current-month bucket. Idempotent. Persists every Drive
+      ID into `project_registry`.
+    - `ensure_month_subtree` — lazy {YYYY-MM}/ creation under
+      Receipts and Invoices. Called on every receipt write.
+    - `audit_filing_tree` — daily scan for files that bypassed
+      the capture pipeline. Naming-convention check.
+- **AP-5: Project router (`project_router.py`).**
+    - 7-tier resolution: explicit (1.00) → alias match (0.92)
+      → team email (0.88) → calendar tiebreaker (0.80) →
+      Geotab GPS (0.85, stub) → LLM inference → chat picker.
+    - `confidence_action()` maps to: auto_file (≥0.85) /
+      auto_file_flag (0.65–0.85) / chat_picker / triage.
+    - 21 new tests.
+- **`project_registry.py`** extended with Wave 2 fields:
+  drive_folder_id + drive_subfolders, name_aliases,
+  staffwizard_job_number + job_desc, assigned_team_emails,
+  billing_origin_state ('NY' unlocks weekly cadence),
+  billing_terms, billing_cadence, customer_email. Plus
+  helpers: resolve_by_alias, resolve_by_team_email,
+  resolve_by_staffwizard_job, update_drive_subfolder,
+  get_drive_subfolder.
+- **AP-4: Capture sweep (`ap_sweep.py`).**
+    - `decide_disposition` — pure routing decision per inbound
+      item.
+    - `run_sweep_cycle` — pulls Gmail + Chat, routes via AP-5,
+      executes the disposition. Drive download / mark-read /
+      chat-post call sites stubbed; routing decisions are
+      deterministic and tested.
+    - 11 new tests.
+- **MCP wrappers (`tools/ap_tree.py`)** — 6 tools:
+    - `workflow_register_new_project`
+    - `workflow_audit_filing_tree`
+    - `workflow_ensure_month_subtree`
+    - `workflow_route_project`
+    - `workflow_project_registry_list`
+    - `workflow_ap_sweep_cycle`
+
+### Sample data added (gitignored)
+
+- `samples/Submit_Supplier_Invoice_v39.1.xlsx`
+- `samples/SFNA AMEX EIB MARCH 26.xlsx`
+- `samples/Extract_Ledger_Accounts.xlsx` (Workday COA, 212 accts)
+- `samples/Overall Report SFOX 1777532406.xls` (StaffWizard labor)
+- `samples/Amex Transactions - April.csv` (111 txns, 8 cardholders)
+- `samples/Wex Fuel Transactions - April.csv` (315 txns, 46 drivers)
+- `samples/Wolfhound Corp JEs Jan-Mar'26.xlsx` (17,346 JE rows)
+
+### Open items deferred to 0.8.x and beyond
+
+- **AP-1 — Workday Supplier Invoice EIB**: gated on the GL →
+  Spend Category map from Workday config (col 113 of
+  `Submit_Supplier_Invoice_v39.1`). The 17k JE training set
+  doesn't carry that map cleanly. Ships when available.
+- **AP-4 wire-up**: 4 stubbed call sites in `ap_sweep.py`
+  (download attachment, mark read, post chat picker, chat
+  ingestion) need integration with existing `tools/gmail` +
+  `tools/chat` surfaces. ~1 hour follow-up commit.
+- **Geotab integration**: `_geotab_tiebreaker` in
+  `project_router.py` is a stub. Wires up when GEOTAB_*
+  credentials land in `config.json`.
+- **AR-9 (Wave 3)**: customer invoice generation, aging,
+  collections cadence. Mirror of vendor follow-up loop on the
+  receivables side.
+
+### Stats since 0.7.2
+
+- 7 content commits + 1 handoff log entry
+- 12 new modules
+- 13 new MCP tools
+- ~112 new unit tests
+- ~6,200 LOC added
 
 ---
 

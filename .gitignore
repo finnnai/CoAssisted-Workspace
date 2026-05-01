@@ -11,6 +11,17 @@ config.json
 # Auto-tagging rules (personal data)
 rules.json
 
+# Sample data — local-only training and reference files
+# (AMEX/WEX statements, JE training base, EIB templates, labor reports)
+samples/
+
+# AP/AR generated artifacts (rebuilt from samples/ via train_gl_*.py
+# and grown at runtime as operators confirm classifications).
+gl_memo_index.json
+gl_merchant_map.json
+cost_center_map.json
+ap_tree_audit.json
+
 # Logs
 logs/
 

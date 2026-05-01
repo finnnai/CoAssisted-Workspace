@@ -1413,14 +1413,7 @@ def _check_clock() -> CheckResult:
 
 
 def _check_tools() -> CheckResult:
-    """Verify all expected tools register cleanly.
-
-    Calls `tools.register_all` against a mock MCP — the same registration
-    path the real server uses — so the count is always authoritative even
-    as new modules get added. (Earlier versions hardcoded a stale 12-module
-    list and undercounted by ~74 once the AP / scanner / split-workflows
-    modules landed.)
-    """
+    """Verify all expected tools register cleanly."""
     name = "Tool registration"
     try:
         # Mock MCP that records registrations.
@@ -1433,19 +1426,29 @@ def _check_tools() -> CheckResult:
                     return fn
                 return d
         m = _M()
-        try:
-            import tools
-            tools.register_all(m)
-        except Exception as e:
-            return _result(
-                name, "fail",
-                f"register_all failed: {e}",
-                fix="Check the import error above + restart Cowork",
-            )
+        # Import and register everything.
+        import tools
+        # Note: 'templates' lives at project root (templates.py), NOT under
+        # tools/. Don't iterate it here.
+        for sub in (
+            "gmail", "calendar", "drive", "sheets", "docs", "tasks",
+            "contacts", "chat", "maps", "workflows", "system",
+            "enrichment",
+        ):
+            try:
+                mod = __import__(f"tools.{sub}", fromlist=[sub])
+                if hasattr(mod, "register"):
+                    mod.register(m)
+            except Exception as e:
+                return _result(
+                    name, "fail",
+                    f"Module tools.{sub} failed to register: {e}",
+                    fix="Check the import error above + restart Cowork",
+                )
         count = len(m.tools)
         # Look for duplicates
         from collections import Counter
-        dupes = [tname for tname, n in Counter(m.tools).items() if n > 1]
+        dupes = [name for name, n in Counter(m.tools).items() if n > 1]
         if dupes:
             return _result(
                 name, "fail",

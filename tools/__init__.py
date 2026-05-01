@@ -1,6 +1,8 @@
 """Tool modules. Each module exposes a `register(mcp)` function."""
 
 from . import access_audit as _access_audit
+from . import ap_journal as _ap_journal
+from . import ap_tree as _ap_tree
 from . import calendar as _calendar
 from . import executive_briefing as _executive_briefing
 from . import chat as _chat
@@ -70,3 +72,5 @@ def register_all(mcp) -> None:
     _scanner.register(mcp)
     _system.register(mcp)
     _handoff.register(mcp)
+    _ap_journal.register(mcp)
+    _ap_tree.register(mcp)

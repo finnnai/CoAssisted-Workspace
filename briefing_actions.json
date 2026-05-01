@@ -1,0 +1,3368 @@
+{
+  "fZfhaXgw": {
+    "token": "fZfhaXgw",
+    "kind": "approve_send",
+    "label": "Approve send: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "draft_id": "r664546933262536829",
+      "thread_id": "19dd98b857de96e2"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.747944-07:00",
+    "expires_at": "2026-04-30T08:13:52.747925-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "lJo5nipZ": {
+    "token": "lJo5nipZ",
+    "kind": "schedule_send",
+    "label": "Schedule send: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "draft_id": "r664546933262536829",
+      "thread_id": "19dd98b857de96e2",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.748389-07:00",
+    "expires_at": "2026-04-30T08:13:52.748380-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "fYxhzkXp": {
+    "token": "fYxhzkXp",
+    "kind": "mark_read",
+    "label": "Mark read: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "thread_id": "19dd98b857de96e2"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.748802-07:00",
+    "expires_at": "2026-04-30T08:13:52.748795-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "heyKDsOP": {
+    "token": "heyKDsOP",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "thread_id": "19dd98b857de96e2",
+      "title": "Reply: Re: Allo trial \ud83d\udcde",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd98b857de96e2"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.749182-07:00",
+    "expires_at": "2026-04-30T08:13:52.749175-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "3kDbc6WY": {
+    "token": "3kDbc6WY",
+    "kind": "approve_send",
+    "label": "Approve send: Receipt",
+    "payload": {
+      "draft_id": "r-125665545320289296",
+      "thread_id": "19dd0bc990cebab5"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.749554-07:00",
+    "expires_at": "2026-04-30T08:13:52.749547-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "7yYCrrZ0": {
+    "token": "7yYCrrZ0",
+    "kind": "schedule_send",
+    "label": "Schedule send: Receipt",
+    "payload": {
+      "draft_id": "r-125665545320289296",
+      "thread_id": "19dd0bc990cebab5",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.749957-07:00",
+    "expires_at": "2026-04-30T08:13:52.749950-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "fEwrtZ1O": {
+    "token": "fEwrtZ1O",
+    "kind": "mark_read",
+    "label": "Mark read: Receipt",
+    "payload": {
+      "thread_id": "19dd0bc990cebab5"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.750469-07:00",
+    "expires_at": "2026-04-30T08:13:52.750462-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "GFzkjrhW": {
+    "token": "GFzkjrhW",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Receipt",
+    "payload": {
+      "thread_id": "19dd0bc990cebab5",
+      "title": "Reply: Receipt",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd0bc990cebab5"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.750888-07:00",
+    "expires_at": "2026-04-30T08:13:52.750880-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "B7rDfXTo": {
+    "token": "B7rDfXTo",
+    "kind": "approve_send",
+    "label": "Approve send: Invoice",
+    "payload": {
+      "draft_id": "r3485743110068937875",
+      "thread_id": "19dd0b95baec0957"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.751336-07:00",
+    "expires_at": "2026-04-30T08:13:52.751329-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "efqEc7Qf": {
+    "token": "efqEc7Qf",
+    "kind": "schedule_send",
+    "label": "Schedule send: Invoice",
+    "payload": {
+      "draft_id": "r3485743110068937875",
+      "thread_id": "19dd0b95baec0957",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.751830-07:00",
+    "expires_at": "2026-04-30T08:13:52.751819-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "fJlUjGoI": {
+    "token": "fJlUjGoI",
+    "kind": "mark_read",
+    "label": "Mark read: Invoice",
+    "payload": {
+      "thread_id": "19dd0b95baec0957"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.752503-07:00",
+    "expires_at": "2026-04-30T08:13:52.752497-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "5EiqkYyL": {
+    "token": "5EiqkYyL",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Invoice",
+    "payload": {
+      "thread_id": "19dd0b95baec0957",
+      "title": "Reply: Invoice",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd0b95baec0957"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.753034-07:00",
+    "expires_at": "2026-04-30T08:13:52.753029-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "ZGVfx-vb": {
+    "token": "ZGVfx-vb",
+    "kind": "approve_send",
+    "label": "Approve send: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "draft_id": "r-6675438477136744732",
+      "thread_id": "19dd026da5302f1a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.753582-07:00",
+    "expires_at": "2026-04-30T08:13:52.753577-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "k0vZma5T": {
+    "token": "k0vZma5T",
+    "kind": "schedule_send",
+    "label": "Schedule send: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "draft_id": "r-6675438477136744732",
+      "thread_id": "19dd026da5302f1a",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.754152-07:00",
+    "expires_at": "2026-04-30T08:13:52.754146-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "VKbAJiN0": {
+    "token": "VKbAJiN0",
+    "kind": "mark_read",
+    "label": "Mark read: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "thread_id": "19dd026da5302f1a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.754711-07:00",
+    "expires_at": "2026-04-30T08:13:52.754706-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "s_h0-EPm": {
+    "token": "s_h0-EPm",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "thread_id": "19dd026da5302f1a",
+      "title": "Reply: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd026da5302f1a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.755263-07:00",
+    "expires_at": "2026-04-30T08:13:52.755256-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "KzUOysbC": {
+    "token": "KzUOysbC",
+    "kind": "approve_send",
+    "label": "Approve send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r9218175680263684810",
+      "thread_id": "19dc1f91a00bb3c1"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.755831-07:00",
+    "expires_at": "2026-04-30T08:13:52.755826-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "f2Mk80sR": {
+    "token": "f2Mk80sR",
+    "kind": "schedule_send",
+    "label": "Schedule send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r9218175680263684810",
+      "thread_id": "19dc1f91a00bb3c1",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.756451-07:00",
+    "expires_at": "2026-04-30T08:13:52.756446-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "-gGEkbjb": {
+    "token": "-gGEkbjb",
+    "kind": "mark_read",
+    "label": "Mark read: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1f91a00bb3c1"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.757036-07:00",
+    "expires_at": "2026-04-30T08:13:52.757031-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "VcneI6Ml": {
+    "token": "VcneI6Ml",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1f91a00bb3c1",
+      "title": "Reply: Fwd: MCP test mail merge \u2014 Joshua",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1f91a00bb3c1"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.757620-07:00",
+    "expires_at": "2026-04-30T08:13:52.757614-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "t08XYloh": {
+    "token": "t08XYloh",
+    "kind": "approve_send",
+    "label": "Approve send: Regression: string attachment",
+    "payload": {
+      "draft_id": "r-684926371864019096",
+      "thread_id": "19dc1f91662a064c"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.758172-07:00",
+    "expires_at": "2026-04-30T08:13:52.758167-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "TbDtp4AI": {
+    "token": "TbDtp4AI",
+    "kind": "schedule_send",
+    "label": "Schedule send: Regression: string attachment",
+    "payload": {
+      "draft_id": "r-684926371864019096",
+      "thread_id": "19dc1f91662a064c",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.758762-07:00",
+    "expires_at": "2026-04-30T08:13:52.758757-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "OWuOyLSg": {
+    "token": "OWuOyLSg",
+    "kind": "mark_read",
+    "label": "Mark read: Regression: string attachment",
+    "payload": {
+      "thread_id": "19dc1f91662a064c"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.759289-07:00",
+    "expires_at": "2026-04-30T08:13:52.759284-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "PesDqYVF": {
+    "token": "PesDqYVF",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Regression: string attachment",
+    "payload": {
+      "thread_id": "19dc1f91662a064c",
+      "title": "Reply: Regression: string attachment",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1f91662a064c"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.759790-07:00",
+    "expires_at": "2026-04-30T08:13:52.759786-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "O966KE5J": {
+    "token": "O966KE5J",
+    "kind": "approve_send",
+    "label": "Approve send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r8052049359433115559",
+      "thread_id": "19dc1ea8a3e78cdf"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.760296-07:00",
+    "expires_at": "2026-04-30T08:13:52.760291-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "LuzxhY4u": {
+    "token": "LuzxhY4u",
+    "kind": "schedule_send",
+    "label": "Schedule send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r8052049359433115559",
+      "thread_id": "19dc1ea8a3e78cdf",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.760820-07:00",
+    "expires_at": "2026-04-30T08:13:52.760816-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Dat6HiE2": {
+    "token": "Dat6HiE2",
+    "kind": "mark_read",
+    "label": "Mark read: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1ea8a3e78cdf"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.761382-07:00",
+    "expires_at": "2026-04-30T08:13:52.761377-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Mxtnf6l8": {
+    "token": "Mxtnf6l8",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1ea8a3e78cdf",
+      "title": "Reply: Fwd: MCP test mail merge \u2014 Joshua",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1ea8a3e78cdf"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.761929-07:00",
+    "expires_at": "2026-04-30T08:13:52.761924-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "O6VtePCk": {
+    "token": "O6VtePCk",
+    "kind": "approve_send",
+    "label": "Approve send: MCP test \u2014 small attachment",
+    "payload": {
+      "draft_id": "r-144627732253049204",
+      "thread_id": "19dc1d720b803623"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.762472-07:00",
+    "expires_at": "2026-04-30T08:13:52.762468-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "CwAF__KR": {
+    "token": "CwAF__KR",
+    "kind": "schedule_send",
+    "label": "Schedule send: MCP test \u2014 small attachment",
+    "payload": {
+      "draft_id": "r-144627732253049204",
+      "thread_id": "19dc1d720b803623",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.763009-07:00",
+    "expires_at": "2026-04-30T08:13:52.763004-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "7I-9nBvA": {
+    "token": "7I-9nBvA",
+    "kind": "mark_read",
+    "label": "Mark read: MCP test \u2014 small attachment",
+    "payload": {
+      "thread_id": "19dc1d720b803623"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.763610-07:00",
+    "expires_at": "2026-04-30T08:13:52.763606-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "4zoyXSK8": {
+    "token": "4zoyXSK8",
+    "kind": "mark_as_task",
+    "label": "Mark as task: MCP test \u2014 small attachment",
+    "payload": {
+      "thread_id": "19dc1d720b803623",
+      "title": "Reply: MCP test \u2014 small attachment",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1d720b803623"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.764184-07:00",
+    "expires_at": "2026-04-30T08:13:52.764179-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "sbVUexs8": {
+    "token": "sbVUexs8",
+    "kind": "approve_send",
+    "label": "Approve send: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "draft_id": "r8608573446018179735",
+      "thread_id": "19dc1d6b8ae1d55a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.764749-07:00",
+    "expires_at": "2026-04-30T08:13:52.764745-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "hDKp9cbf": {
+    "token": "hDKp9cbf",
+    "kind": "schedule_send",
+    "label": "Schedule send: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "draft_id": "r8608573446018179735",
+      "thread_id": "19dc1d6b8ae1d55a",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.765326-07:00",
+    "expires_at": "2026-04-30T08:13:52.765321-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "wdoKQ9fP": {
+    "token": "wdoKQ9fP",
+    "kind": "mark_read",
+    "label": "Mark read: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "thread_id": "19dc1d6b8ae1d55a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.765929-07:00",
+    "expires_at": "2026-04-30T08:13:52.765924-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "xYRFgYFp": {
+    "token": "xYRFgYFp",
+    "kind": "mark_as_task",
+    "label": "Mark as task: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "thread_id": "19dc1d6b8ae1d55a",
+      "title": "Reply: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1d6b8ae1d55a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.766539-07:00",
+    "expires_at": "2026-04-30T08:13:52.766535-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "uKPrNTVF": {
+    "token": "uKPrNTVF",
+    "kind": "approve_send",
+    "label": "Approve send: Fwd: Claude Data | Due Outs",
+    "payload": {
+      "draft_id": "r-2180980481560985285",
+      "thread_id": "19da7f87e063c2cb"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.767095-07:00",
+    "expires_at": "2026-04-30T08:13:52.767091-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "dYSU8uJ4": {
+    "token": "dYSU8uJ4",
+    "kind": "schedule_send",
+    "label": "Schedule send: Fwd: Claude Data | Due Outs",
+    "payload": {
+      "draft_id": "r-2180980481560985285",
+      "thread_id": "19da7f87e063c2cb",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.767691-07:00",
+    "expires_at": "2026-04-30T08:13:52.767687-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "leEurq7V": {
+    "token": "leEurq7V",
+    "kind": "mark_read",
+    "label": "Mark read: Fwd: Claude Data | Due Outs",
+    "payload": {
+      "thread_id": "19da7f87e063c2cb"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.768263-07:00",
+    "expires_at": "2026-04-30T08:13:52.768258-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "XLEksnT-": {
+    "token": "XLEksnT-",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Fwd: Claude Data | Due Outs",
+    "payload": {
+      "thread_id": "19da7f87e063c2cb",
+      "title": "Reply: Fwd: Claude Data | Due Outs",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19da7f87e063c2cb"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.768827-07:00",
+    "expires_at": "2026-04-30T08:13:52.768823-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "TUivH39F": {
+    "token": "TUivH39F",
+    "kind": "accept_meeting",
+    "label": "Accept: Office",
+    "payload": {
+      "event_id": "1ekana509v2s3gel9uqkuk3kvk_20260429",
+      "response": "accepted"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.769394-07:00",
+    "expires_at": "2026-04-30T08:13:52.769390-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "kGZu_BQ1": {
+    "token": "kGZu_BQ1",
+    "kind": "decline_meeting",
+    "label": "Decline: Office",
+    "payload": {
+      "event_id": "1ekana509v2s3gel9uqkuk3kvk_20260429",
+      "response": "declined"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.769981-07:00",
+    "expires_at": "2026-04-30T08:13:52.769977-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "A0m1e-UV": {
+    "token": "A0m1e-UV",
+    "kind": "suggest_new_time",
+    "label": "Suggest new time: Office",
+    "payload": {
+      "event_id": "1ekana509v2s3gel9uqkuk3kvk_20260429",
+      "current_start_iso": "2026-04-29",
+      "current_end_iso": "2026-04-30"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.770595-07:00",
+    "expires_at": "2026-04-30T08:13:52.770591-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "uCJpugkZ": {
+    "token": "uCJpugkZ",
+    "kind": "accept_meeting",
+    "label": "Accept: Daily ISOC Briefing",
+    "payload": {
+      "event_id": "i2top9kjbqrr58buodhpcohg79_20260429T140000Z",
+      "response": "accepted"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.771244-07:00",
+    "expires_at": "2026-04-30T08:13:52.771239-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "FDpDxXwU": {
+    "token": "FDpDxXwU",
+    "kind": "decline_meeting",
+    "label": "Decline: Daily ISOC Briefing",
+    "payload": {
+      "event_id": "i2top9kjbqrr58buodhpcohg79_20260429T140000Z",
+      "response": "declined"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.771852-07:00",
+    "expires_at": "2026-04-30T08:13:52.771848-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "1EHaAZjw": {
+    "token": "1EHaAZjw",
+    "kind": "suggest_new_time",
+    "label": "Suggest new time: Daily ISOC Briefing",
+    "payload": {
+      "event_id": "i2top9kjbqrr58buodhpcohg79_20260429T140000Z",
+      "current_start_iso": "2026-04-29T07:00:00-07:00",
+      "current_end_iso": "2026-04-29T07:30:00-07:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:13:52.772454-07:00",
+    "expires_at": "2026-04-30T08:13:52.772451-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "lxkqQIVv": {
+    "token": "lxkqQIVv",
+    "kind": "approve_send",
+    "label": "Approve send: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "draft_id": "r6360042358653430096",
+      "thread_id": "19dd98b857de96e2"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.065589-07:00",
+    "expires_at": "2026-04-30T08:15:32.065560-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "lrcA38bh": {
+    "token": "lrcA38bh",
+    "kind": "schedule_send",
+    "label": "Schedule send: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "draft_id": "r6360042358653430096",
+      "thread_id": "19dd98b857de96e2",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.067766-07:00",
+    "expires_at": "2026-04-30T08:15:32.067743-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "a44wzIMW": {
+    "token": "a44wzIMW",
+    "kind": "mark_read",
+    "label": "Mark read: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "thread_id": "19dd98b857de96e2"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.069275-07:00",
+    "expires_at": "2026-04-30T08:15:32.069266-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Vxm8BO0v": {
+    "token": "Vxm8BO0v",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "thread_id": "19dd98b857de96e2",
+      "title": "Reply: Re: Allo trial \ud83d\udcde",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd98b857de96e2"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.070372-07:00",
+    "expires_at": "2026-04-30T08:15:32.070364-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "yOnqv86o": {
+    "token": "yOnqv86o",
+    "kind": "approve_send",
+    "label": "Approve send: Receipt",
+    "payload": {
+      "draft_id": "r-7877652908735602876",
+      "thread_id": "19dd0bc990cebab5"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.071398-07:00",
+    "expires_at": "2026-04-30T08:15:32.071390-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "bPDnU_Es": {
+    "token": "bPDnU_Es",
+    "kind": "schedule_send",
+    "label": "Schedule send: Receipt",
+    "payload": {
+      "draft_id": "r-7877652908735602876",
+      "thread_id": "19dd0bc990cebab5",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.072589-07:00",
+    "expires_at": "2026-04-30T08:15:32.072581-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "RNxb0aKK": {
+    "token": "RNxb0aKK",
+    "kind": "mark_read",
+    "label": "Mark read: Receipt",
+    "payload": {
+      "thread_id": "19dd0bc990cebab5"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.073694-07:00",
+    "expires_at": "2026-04-30T08:15:32.073687-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "mzLAZYcz": {
+    "token": "mzLAZYcz",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Receipt",
+    "payload": {
+      "thread_id": "19dd0bc990cebab5",
+      "title": "Reply: Receipt",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd0bc990cebab5"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.074725-07:00",
+    "expires_at": "2026-04-30T08:15:32.074719-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "pM5asNFE": {
+    "token": "pM5asNFE",
+    "kind": "approve_send",
+    "label": "Approve send: Invoice",
+    "payload": {
+      "draft_id": "r-1298866208665077055",
+      "thread_id": "19dd0b95baec0957"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.075691-07:00",
+    "expires_at": "2026-04-30T08:15:32.075685-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "o5sXi6AP": {
+    "token": "o5sXi6AP",
+    "kind": "schedule_send",
+    "label": "Schedule send: Invoice",
+    "payload": {
+      "draft_id": "r-1298866208665077055",
+      "thread_id": "19dd0b95baec0957",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.076632-07:00",
+    "expires_at": "2026-04-30T08:15:32.076627-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "YMbiIs5l": {
+    "token": "YMbiIs5l",
+    "kind": "mark_read",
+    "label": "Mark read: Invoice",
+    "payload": {
+      "thread_id": "19dd0b95baec0957"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.077568-07:00",
+    "expires_at": "2026-04-30T08:15:32.077562-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "QjBKeiDq": {
+    "token": "QjBKeiDq",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Invoice",
+    "payload": {
+      "thread_id": "19dd0b95baec0957",
+      "title": "Reply: Invoice",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd0b95baec0957"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.078684-07:00",
+    "expires_at": "2026-04-30T08:15:32.078678-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "y4RUZ029": {
+    "token": "y4RUZ029",
+    "kind": "approve_send",
+    "label": "Approve send: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "draft_id": "r6080467584750623114",
+      "thread_id": "19dd026da5302f1a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.079642-07:00",
+    "expires_at": "2026-04-30T08:15:32.079637-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "594tVypF": {
+    "token": "594tVypF",
+    "kind": "schedule_send",
+    "label": "Schedule send: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "draft_id": "r6080467584750623114",
+      "thread_id": "19dd026da5302f1a",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.080587-07:00",
+    "expires_at": "2026-04-30T08:15:32.080581-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "VKx2tM2F": {
+    "token": "VKx2tM2F",
+    "kind": "mark_read",
+    "label": "Mark read: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "thread_id": "19dd026da5302f1a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.081455-07:00",
+    "expires_at": "2026-04-30T08:15:32.081450-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "iT3RsrDp": {
+    "token": "iT3RsrDp",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "thread_id": "19dd026da5302f1a",
+      "title": "Reply: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd026da5302f1a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.082316-07:00",
+    "expires_at": "2026-04-30T08:15:32.082312-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "b1yXwDz4": {
+    "token": "b1yXwDz4",
+    "kind": "approve_send",
+    "label": "Approve send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r1503832705351839894",
+      "thread_id": "19dc1f91a00bb3c1"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.083191-07:00",
+    "expires_at": "2026-04-30T08:15:32.083186-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "kM30wJex": {
+    "token": "kM30wJex",
+    "kind": "schedule_send",
+    "label": "Schedule send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r1503832705351839894",
+      "thread_id": "19dc1f91a00bb3c1",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.084110-07:00",
+    "expires_at": "2026-04-30T08:15:32.084105-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "gCUGiCQS": {
+    "token": "gCUGiCQS",
+    "kind": "mark_read",
+    "label": "Mark read: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1f91a00bb3c1"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.085030-07:00",
+    "expires_at": "2026-04-30T08:15:32.085025-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "L69HyZ4G": {
+    "token": "L69HyZ4G",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1f91a00bb3c1",
+      "title": "Reply: Fwd: MCP test mail merge \u2014 Joshua",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1f91a00bb3c1"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.085966-07:00",
+    "expires_at": "2026-04-30T08:15:32.085962-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "-zLjo8qE": {
+    "token": "-zLjo8qE",
+    "kind": "approve_send",
+    "label": "Approve send: Regression: string attachment",
+    "payload": {
+      "draft_id": "r-4241745826162142862",
+      "thread_id": "19dc1f91662a064c"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.086835-07:00",
+    "expires_at": "2026-04-30T08:15:32.086830-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "O3GPTiCB": {
+    "token": "O3GPTiCB",
+    "kind": "schedule_send",
+    "label": "Schedule send: Regression: string attachment",
+    "payload": {
+      "draft_id": "r-4241745826162142862",
+      "thread_id": "19dc1f91662a064c",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.087654-07:00",
+    "expires_at": "2026-04-30T08:15:32.087650-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "tkdjIU3A": {
+    "token": "tkdjIU3A",
+    "kind": "mark_read",
+    "label": "Mark read: Regression: string attachment",
+    "payload": {
+      "thread_id": "19dc1f91662a064c"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.088484-07:00",
+    "expires_at": "2026-04-30T08:15:32.088480-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "WMC-ByuZ": {
+    "token": "WMC-ByuZ",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Regression: string attachment",
+    "payload": {
+      "thread_id": "19dc1f91662a064c",
+      "title": "Reply: Regression: string attachment",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1f91662a064c"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.089358-07:00",
+    "expires_at": "2026-04-30T08:15:32.089353-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "H0UI-9vF": {
+    "token": "H0UI-9vF",
+    "kind": "approve_send",
+    "label": "Approve send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r5016690759107144351",
+      "thread_id": "19dc1ea8a3e78cdf"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.090207-07:00",
+    "expires_at": "2026-04-30T08:15:32.090203-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "D_eCEL21": {
+    "token": "D_eCEL21",
+    "kind": "schedule_send",
+    "label": "Schedule send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r5016690759107144351",
+      "thread_id": "19dc1ea8a3e78cdf",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.091063-07:00",
+    "expires_at": "2026-04-30T08:15:32.091059-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "_gAHO8gI": {
+    "token": "_gAHO8gI",
+    "kind": "mark_read",
+    "label": "Mark read: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1ea8a3e78cdf"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.091967-07:00",
+    "expires_at": "2026-04-30T08:15:32.091963-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "-6esVKLQ": {
+    "token": "-6esVKLQ",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1ea8a3e78cdf",
+      "title": "Reply: Fwd: MCP test mail merge \u2014 Joshua",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1ea8a3e78cdf"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.092884-07:00",
+    "expires_at": "2026-04-30T08:15:32.092880-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "yDgEuYYv": {
+    "token": "yDgEuYYv",
+    "kind": "approve_send",
+    "label": "Approve send: MCP test \u2014 small attachment",
+    "payload": {
+      "draft_id": "r1815531196888040448",
+      "thread_id": "19dc1d720b803623"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.093767-07:00",
+    "expires_at": "2026-04-30T08:15:32.093763-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "DEfI-dgk": {
+    "token": "DEfI-dgk",
+    "kind": "schedule_send",
+    "label": "Schedule send: MCP test \u2014 small attachment",
+    "payload": {
+      "draft_id": "r1815531196888040448",
+      "thread_id": "19dc1d720b803623",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.094635-07:00",
+    "expires_at": "2026-04-30T08:15:32.094631-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "agQkNGPd": {
+    "token": "agQkNGPd",
+    "kind": "mark_read",
+    "label": "Mark read: MCP test \u2014 small attachment",
+    "payload": {
+      "thread_id": "19dc1d720b803623"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.095463-07:00",
+    "expires_at": "2026-04-30T08:15:32.095459-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "cGhXsn_-": {
+    "token": "cGhXsn_-",
+    "kind": "mark_as_task",
+    "label": "Mark as task: MCP test \u2014 small attachment",
+    "payload": {
+      "thread_id": "19dc1d720b803623",
+      "title": "Reply: MCP test \u2014 small attachment",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1d720b803623"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.096359-07:00",
+    "expires_at": "2026-04-30T08:15:32.096355-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "xjxtZ9Dm": {
+    "token": "xjxtZ9Dm",
+    "kind": "approve_send",
+    "label": "Approve send: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "draft_id": "r8016889155483213689",
+      "thread_id": "19dc1d6b8ae1d55a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.097219-07:00",
+    "expires_at": "2026-04-30T08:15:32.097215-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "eexrcgu_": {
+    "token": "eexrcgu_",
+    "kind": "schedule_send",
+    "label": "Schedule send: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "draft_id": "r8016889155483213689",
+      "thread_id": "19dc1d6b8ae1d55a",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.098068-07:00",
+    "expires_at": "2026-04-30T08:15:32.098065-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "j8BaX__P": {
+    "token": "j8BaX__P",
+    "kind": "mark_read",
+    "label": "Mark read: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "thread_id": "19dc1d6b8ae1d55a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.098924-07:00",
+    "expires_at": "2026-04-30T08:15:32.098921-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "myaHc3qg": {
+    "token": "myaHc3qg",
+    "kind": "mark_as_task",
+    "label": "Mark as task: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "thread_id": "19dc1d6b8ae1d55a",
+      "title": "Reply: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1d6b8ae1d55a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.099789-07:00",
+    "expires_at": "2026-04-30T08:15:32.099786-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "-0Pr4glJ": {
+    "token": "-0Pr4glJ",
+    "kind": "approve_send",
+    "label": "Approve send: Fwd: Claude Data | Due Outs",
+    "payload": {
+      "draft_id": "r767622980342946260",
+      "thread_id": "19da7f87e063c2cb"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.100673-07:00",
+    "expires_at": "2026-04-30T08:15:32.100670-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "xVVEvYCx": {
+    "token": "xVVEvYCx",
+    "kind": "schedule_send",
+    "label": "Schedule send: Fwd: Claude Data | Due Outs",
+    "payload": {
+      "draft_id": "r767622980342946260",
+      "thread_id": "19da7f87e063c2cb",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.101517-07:00",
+    "expires_at": "2026-04-30T08:15:32.101514-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "mehXE36O": {
+    "token": "mehXE36O",
+    "kind": "mark_read",
+    "label": "Mark read: Fwd: Claude Data | Due Outs",
+    "payload": {
+      "thread_id": "19da7f87e063c2cb"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.102371-07:00",
+    "expires_at": "2026-04-30T08:15:32.102367-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "De1yfR6w": {
+    "token": "De1yfR6w",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Fwd: Claude Data | Due Outs",
+    "payload": {
+      "thread_id": "19da7f87e063c2cb",
+      "title": "Reply: Fwd: Claude Data | Due Outs",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19da7f87e063c2cb"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.103228-07:00",
+    "expires_at": "2026-04-30T08:15:32.103224-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "emXjC1Le": {
+    "token": "emXjC1Le",
+    "kind": "accept_meeting",
+    "label": "Accept: Office",
+    "payload": {
+      "event_id": "1ekana509v2s3gel9uqkuk3kvk_20260429",
+      "response": "accepted"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.104118-07:00",
+    "expires_at": "2026-04-30T08:15:32.104115-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "gPMsSeAg": {
+    "token": "gPMsSeAg",
+    "kind": "decline_meeting",
+    "label": "Decline: Office",
+    "payload": {
+      "event_id": "1ekana509v2s3gel9uqkuk3kvk_20260429",
+      "response": "declined"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.104996-07:00",
+    "expires_at": "2026-04-30T08:15:32.104993-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "bR1MI9t-": {
+    "token": "bR1MI9t-",
+    "kind": "suggest_new_time",
+    "label": "Suggest new time: Office",
+    "payload": {
+      "event_id": "1ekana509v2s3gel9uqkuk3kvk_20260429",
+      "current_start_iso": "2026-04-29",
+      "current_end_iso": "2026-04-30"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.105873-07:00",
+    "expires_at": "2026-04-30T08:15:32.105869-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "sbI2GUFp": {
+    "token": "sbI2GUFp",
+    "kind": "accept_meeting",
+    "label": "Accept: Daily ISOC Briefing",
+    "payload": {
+      "event_id": "i2top9kjbqrr58buodhpcohg79_20260429T140000Z",
+      "response": "accepted"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.106779-07:00",
+    "expires_at": "2026-04-30T08:15:32.106776-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "kzX1eX85": {
+    "token": "kzX1eX85",
+    "kind": "decline_meeting",
+    "label": "Decline: Daily ISOC Briefing",
+    "payload": {
+      "event_id": "i2top9kjbqrr58buodhpcohg79_20260429T140000Z",
+      "response": "declined"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.107687-07:00",
+    "expires_at": "2026-04-30T08:15:32.107683-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "uEKYz03H": {
+    "token": "uEKYz03H",
+    "kind": "suggest_new_time",
+    "label": "Suggest new time: Daily ISOC Briefing",
+    "payload": {
+      "event_id": "i2top9kjbqrr58buodhpcohg79_20260429T140000Z",
+      "current_start_iso": "2026-04-29T07:00:00-07:00",
+      "current_end_iso": "2026-04-29T07:30:00-07:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:15:32.108557-07:00",
+    "expires_at": "2026-04-30T08:15:32.108554-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "jb8QmQE7": {
+    "token": "jb8QmQE7",
+    "kind": "approve_send",
+    "label": "Approve send: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "draft_id": "r-8442487916643568453",
+      "thread_id": "19dd98b857de96e2"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.779963-07:00",
+    "expires_at": "2026-04-30T08:18:48.779928-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "kXaHSmuc": {
+    "token": "kXaHSmuc",
+    "kind": "schedule_send",
+    "label": "Schedule send: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "draft_id": "r-8442487916643568453",
+      "thread_id": "19dd98b857de96e2",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.783645-07:00",
+    "expires_at": "2026-04-30T08:18:48.783615-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Vorncmjx": {
+    "token": "Vorncmjx",
+    "kind": "mark_read",
+    "label": "Mark read: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "thread_id": "19dd98b857de96e2"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.785986-07:00",
+    "expires_at": "2026-04-30T08:18:48.785974-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Bf_O4KTe": {
+    "token": "Bf_O4KTe",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "thread_id": "19dd98b857de96e2",
+      "title": "Reply: Re: Allo trial \ud83d\udcde",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd98b857de96e2"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.787782-07:00",
+    "expires_at": "2026-04-30T08:18:48.787774-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "N60-c66s": {
+    "token": "N60-c66s",
+    "kind": "approve_send",
+    "label": "Approve send: Receipt",
+    "payload": {
+      "draft_id": "r-3608631053097275933",
+      "thread_id": "19dd0bc990cebab5"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.789439-07:00",
+    "expires_at": "2026-04-30T08:18:48.789432-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "juF0whg0": {
+    "token": "juF0whg0",
+    "kind": "schedule_send",
+    "label": "Schedule send: Receipt",
+    "payload": {
+      "draft_id": "r-3608631053097275933",
+      "thread_id": "19dd0bc990cebab5",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.791106-07:00",
+    "expires_at": "2026-04-30T08:18:48.791099-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "fZ7vqqMy": {
+    "token": "fZ7vqqMy",
+    "kind": "mark_read",
+    "label": "Mark read: Receipt",
+    "payload": {
+      "thread_id": "19dd0bc990cebab5"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.792741-07:00",
+    "expires_at": "2026-04-30T08:18:48.792729-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Cv7JzlNm": {
+    "token": "Cv7JzlNm",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Receipt",
+    "payload": {
+      "thread_id": "19dd0bc990cebab5",
+      "title": "Reply: Receipt",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd0bc990cebab5"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.794176-07:00",
+    "expires_at": "2026-04-30T08:18:48.794169-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "187ijNLj": {
+    "token": "187ijNLj",
+    "kind": "approve_send",
+    "label": "Approve send: Invoice",
+    "payload": {
+      "draft_id": "r-7036690920160101269",
+      "thread_id": "19dd0b95baec0957"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.795673-07:00",
+    "expires_at": "2026-04-30T08:18:48.795667-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "hNOa9AqK": {
+    "token": "hNOa9AqK",
+    "kind": "schedule_send",
+    "label": "Schedule send: Invoice",
+    "payload": {
+      "draft_id": "r-7036690920160101269",
+      "thread_id": "19dd0b95baec0957",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.797096-07:00",
+    "expires_at": "2026-04-30T08:18:48.797090-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "dHdhQ2rA": {
+    "token": "dHdhQ2rA",
+    "kind": "mark_read",
+    "label": "Mark read: Invoice",
+    "payload": {
+      "thread_id": "19dd0b95baec0957"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.798503-07:00",
+    "expires_at": "2026-04-30T08:18:48.798498-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "WjW1E6eu": {
+    "token": "WjW1E6eu",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Invoice",
+    "payload": {
+      "thread_id": "19dd0b95baec0957",
+      "title": "Reply: Invoice",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd0b95baec0957"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.799791-07:00",
+    "expires_at": "2026-04-30T08:18:48.799786-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "kWaEoofS": {
+    "token": "kWaEoofS",
+    "kind": "approve_send",
+    "label": "Approve send: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "draft_id": "r5934028084555812271",
+      "thread_id": "19dd026da5302f1a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.801071-07:00",
+    "expires_at": "2026-04-30T08:18:48.801066-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "6-EmnZlk": {
+    "token": "6-EmnZlk",
+    "kind": "schedule_send",
+    "label": "Schedule send: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "draft_id": "r5934028084555812271",
+      "thread_id": "19dd026da5302f1a",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.802421-07:00",
+    "expires_at": "2026-04-30T08:18:48.802417-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "GxsGddnJ": {
+    "token": "GxsGddnJ",
+    "kind": "mark_read",
+    "label": "Mark read: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "thread_id": "19dd026da5302f1a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.803745-07:00",
+    "expires_at": "2026-04-30T08:18:48.803740-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "gPnsTFdg": {
+    "token": "gPnsTFdg",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "thread_id": "19dd026da5302f1a",
+      "title": "Reply: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd026da5302f1a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.805091-07:00",
+    "expires_at": "2026-04-30T08:18:48.805087-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "tCLApGFH": {
+    "token": "tCLApGFH",
+    "kind": "approve_send",
+    "label": "Approve send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r2085723576243160436",
+      "thread_id": "19dc1f91a00bb3c1"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.807004-07:00",
+    "expires_at": "2026-04-30T08:18:48.806999-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "kju4-dAD": {
+    "token": "kju4-dAD",
+    "kind": "schedule_send",
+    "label": "Schedule send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r2085723576243160436",
+      "thread_id": "19dc1f91a00bb3c1",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.808230-07:00",
+    "expires_at": "2026-04-30T08:18:48.808226-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "lNcGDsn_": {
+    "token": "lNcGDsn_",
+    "kind": "mark_read",
+    "label": "Mark read: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1f91a00bb3c1"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.809985-07:00",
+    "expires_at": "2026-04-30T08:18:48.809969-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "DlcyxAJc": {
+    "token": "DlcyxAJc",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1f91a00bb3c1",
+      "title": "Reply: Fwd: MCP test mail merge \u2014 Joshua",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1f91a00bb3c1"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.811390-07:00",
+    "expires_at": "2026-04-30T08:18:48.811382-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "CyUzeoLn": {
+    "token": "CyUzeoLn",
+    "kind": "approve_send",
+    "label": "Approve send: Regression: string attachment",
+    "payload": {
+      "draft_id": "r7330571124007592724",
+      "thread_id": "19dc1f91662a064c"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.813338-07:00",
+    "expires_at": "2026-04-30T08:18:48.813333-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "ICRUxNq4": {
+    "token": "ICRUxNq4",
+    "kind": "schedule_send",
+    "label": "Schedule send: Regression: string attachment",
+    "payload": {
+      "draft_id": "r7330571124007592724",
+      "thread_id": "19dc1f91662a064c",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.814891-07:00",
+    "expires_at": "2026-04-30T08:18:48.814886-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "YtNEDL68": {
+    "token": "YtNEDL68",
+    "kind": "mark_read",
+    "label": "Mark read: Regression: string attachment",
+    "payload": {
+      "thread_id": "19dc1f91662a064c"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.816408-07:00",
+    "expires_at": "2026-04-30T08:18:48.816397-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "SVE4m6Wp": {
+    "token": "SVE4m6Wp",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Regression: string attachment",
+    "payload": {
+      "thread_id": "19dc1f91662a064c",
+      "title": "Reply: Regression: string attachment",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1f91662a064c"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.817678-07:00",
+    "expires_at": "2026-04-30T08:18:48.817671-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "11NBjwge": {
+    "token": "11NBjwge",
+    "kind": "approve_send",
+    "label": "Approve send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r-8535737515623909625",
+      "thread_id": "19dc1ea8a3e78cdf"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.818922-07:00",
+    "expires_at": "2026-04-30T08:18:48.818918-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "6wFDt0Ca": {
+    "token": "6wFDt0Ca",
+    "kind": "schedule_send",
+    "label": "Schedule send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r-8535737515623909625",
+      "thread_id": "19dc1ea8a3e78cdf",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.820140-07:00",
+    "expires_at": "2026-04-30T08:18:48.820136-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "BDgONQxH": {
+    "token": "BDgONQxH",
+    "kind": "mark_read",
+    "label": "Mark read: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1ea8a3e78cdf"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.821402-07:00",
+    "expires_at": "2026-04-30T08:18:48.821398-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "J763zhHB": {
+    "token": "J763zhHB",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1ea8a3e78cdf",
+      "title": "Reply: Fwd: MCP test mail merge \u2014 Joshua",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1ea8a3e78cdf"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.822567-07:00",
+    "expires_at": "2026-04-30T08:18:48.822563-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Als7Ccc4": {
+    "token": "Als7Ccc4",
+    "kind": "approve_send",
+    "label": "Approve send: MCP test \u2014 small attachment",
+    "payload": {
+      "draft_id": "r-2578267480175176534",
+      "thread_id": "19dc1d720b803623"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.823689-07:00",
+    "expires_at": "2026-04-30T08:18:48.823685-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "ddesEK77": {
+    "token": "ddesEK77",
+    "kind": "schedule_send",
+    "label": "Schedule send: MCP test \u2014 small attachment",
+    "payload": {
+      "draft_id": "r-2578267480175176534",
+      "thread_id": "19dc1d720b803623",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.824827-07:00",
+    "expires_at": "2026-04-30T08:18:48.824823-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "e3ReIzEU": {
+    "token": "e3ReIzEU",
+    "kind": "mark_read",
+    "label": "Mark read: MCP test \u2014 small attachment",
+    "payload": {
+      "thread_id": "19dc1d720b803623"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.825994-07:00",
+    "expires_at": "2026-04-30T08:18:48.825990-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "KJu__OCS": {
+    "token": "KJu__OCS",
+    "kind": "mark_as_task",
+    "label": "Mark as task: MCP test \u2014 small attachment",
+    "payload": {
+      "thread_id": "19dc1d720b803623",
+      "title": "Reply: MCP test \u2014 small attachment",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1d720b803623"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.827379-07:00",
+    "expires_at": "2026-04-30T08:18:48.827368-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "-_GDVAEC": {
+    "token": "-_GDVAEC",
+    "kind": "approve_send",
+    "label": "Approve send: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "draft_id": "r6353867643181663504",
+      "thread_id": "19dc1d6b8ae1d55a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.828646-07:00",
+    "expires_at": "2026-04-30T08:18:48.828640-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "-NTEMLZd": {
+    "token": "-NTEMLZd",
+    "kind": "schedule_send",
+    "label": "Schedule send: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "draft_id": "r6353867643181663504",
+      "thread_id": "19dc1d6b8ae1d55a",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.829891-07:00",
+    "expires_at": "2026-04-30T08:18:48.829886-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "1ehPLHDT": {
+    "token": "1ehPLHDT",
+    "kind": "mark_read",
+    "label": "Mark read: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "thread_id": "19dc1d6b8ae1d55a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.831006-07:00",
+    "expires_at": "2026-04-30T08:18:48.831002-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "l56XI7yw": {
+    "token": "l56XI7yw",
+    "kind": "mark_as_task",
+    "label": "Mark as task: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "thread_id": "19dc1d6b8ae1d55a",
+      "title": "Reply: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1d6b8ae1d55a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.832152-07:00",
+    "expires_at": "2026-04-30T08:18:48.832148-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "55g113MG": {
+    "token": "55g113MG",
+    "kind": "approve_send",
+    "label": "Approve send: Fwd: Claude Data | Due Outs",
+    "payload": {
+      "draft_id": "r8806304223727677502",
+      "thread_id": "19da7f87e063c2cb"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.833266-07:00",
+    "expires_at": "2026-04-30T08:18:48.833262-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "ry0VKaoU": {
+    "token": "ry0VKaoU",
+    "kind": "schedule_send",
+    "label": "Schedule send: Fwd: Claude Data | Due Outs",
+    "payload": {
+      "draft_id": "r8806304223727677502",
+      "thread_id": "19da7f87e063c2cb",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.834386-07:00",
+    "expires_at": "2026-04-30T08:18:48.834382-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "fzaMQ65n": {
+    "token": "fzaMQ65n",
+    "kind": "mark_read",
+    "label": "Mark read: Fwd: Claude Data | Due Outs",
+    "payload": {
+      "thread_id": "19da7f87e063c2cb"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.835543-07:00",
+    "expires_at": "2026-04-30T08:18:48.835540-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "4n0PTPUR": {
+    "token": "4n0PTPUR",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Fwd: Claude Data | Due Outs",
+    "payload": {
+      "thread_id": "19da7f87e063c2cb",
+      "title": "Reply: Fwd: Claude Data | Due Outs",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19da7f87e063c2cb"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.836677-07:00",
+    "expires_at": "2026-04-30T08:18:48.836673-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "gIue5orX": {
+    "token": "gIue5orX",
+    "kind": "accept_meeting",
+    "label": "Accept: Office",
+    "payload": {
+      "event_id": "1ekana509v2s3gel9uqkuk3kvk_20260429",
+      "response": "accepted"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.837846-07:00",
+    "expires_at": "2026-04-30T08:18:48.837842-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "ZVzqyJc3": {
+    "token": "ZVzqyJc3",
+    "kind": "decline_meeting",
+    "label": "Decline: Office",
+    "payload": {
+      "event_id": "1ekana509v2s3gel9uqkuk3kvk_20260429",
+      "response": "declined"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.838992-07:00",
+    "expires_at": "2026-04-30T08:18:48.838989-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "iRaLDyY9": {
+    "token": "iRaLDyY9",
+    "kind": "suggest_new_time",
+    "label": "Suggest new time: Office",
+    "payload": {
+      "event_id": "1ekana509v2s3gel9uqkuk3kvk_20260429",
+      "current_start_iso": "2026-04-29",
+      "current_end_iso": "2026-04-30"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.840098-07:00",
+    "expires_at": "2026-04-30T08:18:48.840094-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "iMc79vRY": {
+    "token": "iMc79vRY",
+    "kind": "accept_meeting",
+    "label": "Accept: Daily ISOC Briefing",
+    "payload": {
+      "event_id": "i2top9kjbqrr58buodhpcohg79_20260429T140000Z",
+      "response": "accepted"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.841212-07:00",
+    "expires_at": "2026-04-30T08:18:48.841209-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "hzcvFARk": {
+    "token": "hzcvFARk",
+    "kind": "decline_meeting",
+    "label": "Decline: Daily ISOC Briefing",
+    "payload": {
+      "event_id": "i2top9kjbqrr58buodhpcohg79_20260429T140000Z",
+      "response": "declined"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.842337-07:00",
+    "expires_at": "2026-04-30T08:18:48.842334-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "rh8jTj1H": {
+    "token": "rh8jTj1H",
+    "kind": "suggest_new_time",
+    "label": "Suggest new time: Daily ISOC Briefing",
+    "payload": {
+      "event_id": "i2top9kjbqrr58buodhpcohg79_20260429T140000Z",
+      "current_start_iso": "2026-04-29T07:00:00-07:00",
+      "current_end_iso": "2026-04-29T07:30:00-07:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:18:48.843472-07:00",
+    "expires_at": "2026-04-30T08:18:48.843469-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "NodmWAbd": {
+    "token": "NodmWAbd",
+    "kind": "approve_send",
+    "label": "Approve send: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "draft_id": "r-6038370768050544355",
+      "thread_id": "19dd98b857de96e2"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.566520-07:00",
+    "expires_at": "2026-04-30T08:20:30.566487-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "h_3X2LXF": {
+    "token": "h_3X2LXF",
+    "kind": "schedule_send",
+    "label": "Schedule send: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "draft_id": "r-6038370768050544355",
+      "thread_id": "19dd98b857de96e2",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.569723-07:00",
+    "expires_at": "2026-04-30T08:20:30.569713-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "fLb_ij73": {
+    "token": "fLb_ij73",
+    "kind": "mark_read",
+    "label": "Mark read: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "thread_id": "19dd98b857de96e2"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.572152-07:00",
+    "expires_at": "2026-04-30T08:20:30.572144-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "OHYM1BzJ": {
+    "token": "OHYM1BzJ",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "thread_id": "19dd98b857de96e2",
+      "title": "Reply: Re: Allo trial \ud83d\udcde",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd98b857de96e2"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.574371-07:00",
+    "expires_at": "2026-04-30T08:20:30.574364-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "RPH13HwZ": {
+    "token": "RPH13HwZ",
+    "kind": "approve_send",
+    "label": "Approve send: Receipt",
+    "payload": {
+      "draft_id": "r-5424907974747491229",
+      "thread_id": "19dd0bc990cebab5"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.576329-07:00",
+    "expires_at": "2026-04-30T08:20:30.576322-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "LwZlSIsA": {
+    "token": "LwZlSIsA",
+    "kind": "schedule_send",
+    "label": "Schedule send: Receipt",
+    "payload": {
+      "draft_id": "r-5424907974747491229",
+      "thread_id": "19dd0bc990cebab5",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.578552-07:00",
+    "expires_at": "2026-04-30T08:20:30.578546-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Pzmf4Fdf": {
+    "token": "Pzmf4Fdf",
+    "kind": "mark_read",
+    "label": "Mark read: Receipt",
+    "payload": {
+      "thread_id": "19dd0bc990cebab5"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.580461-07:00",
+    "expires_at": "2026-04-30T08:20:30.580456-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "1srSRJT4": {
+    "token": "1srSRJT4",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Receipt",
+    "payload": {
+      "thread_id": "19dd0bc990cebab5",
+      "title": "Reply: Receipt",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd0bc990cebab5"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.582188-07:00",
+    "expires_at": "2026-04-30T08:20:30.582184-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "7sR4uI-V": {
+    "token": "7sR4uI-V",
+    "kind": "approve_send",
+    "label": "Approve send: Invoice",
+    "payload": {
+      "draft_id": "r3720954625183420822",
+      "thread_id": "19dd0b95baec0957"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.583930-07:00",
+    "expires_at": "2026-04-30T08:20:30.583925-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "H6c8zOUf": {
+    "token": "H6c8zOUf",
+    "kind": "schedule_send",
+    "label": "Schedule send: Invoice",
+    "payload": {
+      "draft_id": "r3720954625183420822",
+      "thread_id": "19dd0b95baec0957",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.585690-07:00",
+    "expires_at": "2026-04-30T08:20:30.585686-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "yaaIwM6f": {
+    "token": "yaaIwM6f",
+    "kind": "mark_read",
+    "label": "Mark read: Invoice",
+    "payload": {
+      "thread_id": "19dd0b95baec0957"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.587336-07:00",
+    "expires_at": "2026-04-30T08:20:30.587333-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Vc4HHKrF": {
+    "token": "Vc4HHKrF",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Invoice",
+    "payload": {
+      "thread_id": "19dd0b95baec0957",
+      "title": "Reply: Invoice",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd0b95baec0957"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.588921-07:00",
+    "expires_at": "2026-04-30T08:20:30.588917-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "0KnxdYMd": {
+    "token": "0KnxdYMd",
+    "kind": "approve_send",
+    "label": "Approve send: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "draft_id": "r1090858304838601783",
+      "thread_id": "19dd026da5302f1a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.590562-07:00",
+    "expires_at": "2026-04-30T08:20:30.590558-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "i1uzXhu7": {
+    "token": "i1uzXhu7",
+    "kind": "schedule_send",
+    "label": "Schedule send: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "draft_id": "r1090858304838601783",
+      "thread_id": "19dd026da5302f1a",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.592177-07:00",
+    "expires_at": "2026-04-30T08:20:30.592172-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "qnCLk1ep": {
+    "token": "qnCLk1ep",
+    "kind": "mark_read",
+    "label": "Mark read: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "thread_id": "19dd026da5302f1a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.593794-07:00",
+    "expires_at": "2026-04-30T08:20:30.593790-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "wKwpEDv_": {
+    "token": "wKwpEDv_",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "thread_id": "19dd026da5302f1a",
+      "title": "Reply: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd026da5302f1a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.595290-07:00",
+    "expires_at": "2026-04-30T08:20:30.595286-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "LJ7m87kd": {
+    "token": "LJ7m87kd",
+    "kind": "approve_send",
+    "label": "Approve send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r-2266693715774185419",
+      "thread_id": "19dc1f91a00bb3c1"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.596793-07:00",
+    "expires_at": "2026-04-30T08:20:30.596789-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "ShvAHW07": {
+    "token": "ShvAHW07",
+    "kind": "schedule_send",
+    "label": "Schedule send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r-2266693715774185419",
+      "thread_id": "19dc1f91a00bb3c1",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.598345-07:00",
+    "expires_at": "2026-04-30T08:20:30.598341-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "nw2CmpcN": {
+    "token": "nw2CmpcN",
+    "kind": "mark_read",
+    "label": "Mark read: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1f91a00bb3c1"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.599857-07:00",
+    "expires_at": "2026-04-30T08:20:30.599853-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "gxatZ8CD": {
+    "token": "gxatZ8CD",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1f91a00bb3c1",
+      "title": "Reply: Fwd: MCP test mail merge \u2014 Joshua",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1f91a00bb3c1"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.601356-07:00",
+    "expires_at": "2026-04-30T08:20:30.601352-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Boxnire0": {
+    "token": "Boxnire0",
+    "kind": "approve_send",
+    "label": "Approve send: Regression: string attachment",
+    "payload": {
+      "draft_id": "r-5293346539890147039",
+      "thread_id": "19dc1f91662a064c"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.602865-07:00",
+    "expires_at": "2026-04-30T08:20:30.602861-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Ag-fTor7": {
+    "token": "Ag-fTor7",
+    "kind": "schedule_send",
+    "label": "Schedule send: Regression: string attachment",
+    "payload": {
+      "draft_id": "r-5293346539890147039",
+      "thread_id": "19dc1f91662a064c",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.604339-07:00",
+    "expires_at": "2026-04-30T08:20:30.604335-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "UCZG-RfU": {
+    "token": "UCZG-RfU",
+    "kind": "mark_read",
+    "label": "Mark read: Regression: string attachment",
+    "payload": {
+      "thread_id": "19dc1f91662a064c"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.605772-07:00",
+    "expires_at": "2026-04-30T08:20:30.605769-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "B8RvChrQ": {
+    "token": "B8RvChrQ",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Regression: string attachment",
+    "payload": {
+      "thread_id": "19dc1f91662a064c",
+      "title": "Reply: Regression: string attachment",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1f91662a064c"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.607217-07:00",
+    "expires_at": "2026-04-30T08:20:30.607214-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "q0OMQ5Yf": {
+    "token": "q0OMQ5Yf",
+    "kind": "approve_send",
+    "label": "Approve send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r-541986834042138288",
+      "thread_id": "19dc1ea8a3e78cdf"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.608702-07:00",
+    "expires_at": "2026-04-30T08:20:30.608698-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "85iP93Bx": {
+    "token": "85iP93Bx",
+    "kind": "schedule_send",
+    "label": "Schedule send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r-541986834042138288",
+      "thread_id": "19dc1ea8a3e78cdf",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.610123-07:00",
+    "expires_at": "2026-04-30T08:20:30.610119-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "dEGtiGac": {
+    "token": "dEGtiGac",
+    "kind": "mark_read",
+    "label": "Mark read: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1ea8a3e78cdf"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.611502-07:00",
+    "expires_at": "2026-04-30T08:20:30.611499-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "HeP12krg": {
+    "token": "HeP12krg",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1ea8a3e78cdf",
+      "title": "Reply: Fwd: MCP test mail merge \u2014 Joshua",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1ea8a3e78cdf"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.612869-07:00",
+    "expires_at": "2026-04-30T08:20:30.612866-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "12f4aboz": {
+    "token": "12f4aboz",
+    "kind": "approve_send",
+    "label": "Approve send: MCP test \u2014 small attachment",
+    "payload": {
+      "draft_id": "r-7826813291381200213",
+      "thread_id": "19dc1d720b803623"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.614275-07:00",
+    "expires_at": "2026-04-30T08:20:30.614272-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "DM2f2z4u": {
+    "token": "DM2f2z4u",
+    "kind": "schedule_send",
+    "label": "Schedule send: MCP test \u2014 small attachment",
+    "payload": {
+      "draft_id": "r-7826813291381200213",
+      "thread_id": "19dc1d720b803623",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.615651-07:00",
+    "expires_at": "2026-04-30T08:20:30.615648-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "1_zH4dCF": {
+    "token": "1_zH4dCF",
+    "kind": "mark_read",
+    "label": "Mark read: MCP test \u2014 small attachment",
+    "payload": {
+      "thread_id": "19dc1d720b803623"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.616971-07:00",
+    "expires_at": "2026-04-30T08:20:30.616968-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "rKoF_W4c": {
+    "token": "rKoF_W4c",
+    "kind": "mark_as_task",
+    "label": "Mark as task: MCP test \u2014 small attachment",
+    "payload": {
+      "thread_id": "19dc1d720b803623",
+      "title": "Reply: MCP test \u2014 small attachment",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1d720b803623"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.618302-07:00",
+    "expires_at": "2026-04-30T08:20:30.618299-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "7nyJO_qy": {
+    "token": "7nyJO_qy",
+    "kind": "approve_send",
+    "label": "Approve send: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "draft_id": "r3183766883044575381",
+      "thread_id": "19dc1d6b8ae1d55a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.619717-07:00",
+    "expires_at": "2026-04-30T08:20:30.619714-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "vxYY44lW": {
+    "token": "vxYY44lW",
+    "kind": "schedule_send",
+    "label": "Schedule send: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "draft_id": "r3183766883044575381",
+      "thread_id": "19dc1d6b8ae1d55a",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.621109-07:00",
+    "expires_at": "2026-04-30T08:20:30.621105-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "oJhofMFl": {
+    "token": "oJhofMFl",
+    "kind": "mark_read",
+    "label": "Mark read: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "thread_id": "19dc1d6b8ae1d55a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.622458-07:00",
+    "expires_at": "2026-04-30T08:20:30.622455-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "XAYIcd5l": {
+    "token": "XAYIcd5l",
+    "kind": "mark_as_task",
+    "label": "Mark as task: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "thread_id": "19dc1d6b8ae1d55a",
+      "title": "Reply: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1d6b8ae1d55a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.623769-07:00",
+    "expires_at": "2026-04-30T08:20:30.623766-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "b5gswZS-": {
+    "token": "b5gswZS-",
+    "kind": "approve_send",
+    "label": "Approve send: Fwd: Claude Data | Due Outs",
+    "payload": {
+      "draft_id": "r6064745384313045504",
+      "thread_id": "19da7f87e063c2cb"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.625115-07:00",
+    "expires_at": "2026-04-30T08:20:30.625112-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Nyq6x82E": {
+    "token": "Nyq6x82E",
+    "kind": "schedule_send",
+    "label": "Schedule send: Fwd: Claude Data | Due Outs",
+    "payload": {
+      "draft_id": "r6064745384313045504",
+      "thread_id": "19da7f87e063c2cb",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.626674-07:00",
+    "expires_at": "2026-04-30T08:20:30.626664-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "baG9EBp_": {
+    "token": "baG9EBp_",
+    "kind": "mark_read",
+    "label": "Mark read: Fwd: Claude Data | Due Outs",
+    "payload": {
+      "thread_id": "19da7f87e063c2cb"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.628174-07:00",
+    "expires_at": "2026-04-30T08:20:30.628168-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "YdYvNtkU": {
+    "token": "YdYvNtkU",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Fwd: Claude Data | Due Outs",
+    "payload": {
+      "thread_id": "19da7f87e063c2cb",
+      "title": "Reply: Fwd: Claude Data | Due Outs",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19da7f87e063c2cb"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.629582-07:00",
+    "expires_at": "2026-04-30T08:20:30.629578-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "7WnyB80g": {
+    "token": "7WnyB80g",
+    "kind": "accept_meeting",
+    "label": "Accept: Office",
+    "payload": {
+      "event_id": "1ekana509v2s3gel9uqkuk3kvk_20260429",
+      "response": "accepted"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.630956-07:00",
+    "expires_at": "2026-04-30T08:20:30.630952-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "v1bx31DY": {
+    "token": "v1bx31DY",
+    "kind": "decline_meeting",
+    "label": "Decline: Office",
+    "payload": {
+      "event_id": "1ekana509v2s3gel9uqkuk3kvk_20260429",
+      "response": "declined"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.632295-07:00",
+    "expires_at": "2026-04-30T08:20:30.632292-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "rr398v4r": {
+    "token": "rr398v4r",
+    "kind": "suggest_new_time",
+    "label": "Suggest new time: Office",
+    "payload": {
+      "event_id": "1ekana509v2s3gel9uqkuk3kvk_20260429",
+      "current_start_iso": "2026-04-29",
+      "current_end_iso": "2026-04-30"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.633631-07:00",
+    "expires_at": "2026-04-30T08:20:30.633628-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "yUuzt2E3": {
+    "token": "yUuzt2E3",
+    "kind": "accept_meeting",
+    "label": "Accept: Daily ISOC Briefing",
+    "payload": {
+      "event_id": "i2top9kjbqrr58buodhpcohg79_20260429T140000Z",
+      "response": "accepted"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.634939-07:00",
+    "expires_at": "2026-04-30T08:20:30.634936-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "hmRFCwVG": {
+    "token": "hmRFCwVG",
+    "kind": "decline_meeting",
+    "label": "Decline: Daily ISOC Briefing",
+    "payload": {
+      "event_id": "i2top9kjbqrr58buodhpcohg79_20260429T140000Z",
+      "response": "declined"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.636302-07:00",
+    "expires_at": "2026-04-30T08:20:30.636299-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "VBSU9bIv": {
+    "token": "VBSU9bIv",
+    "kind": "suggest_new_time",
+    "label": "Suggest new time: Daily ISOC Briefing",
+    "payload": {
+      "event_id": "i2top9kjbqrr58buodhpcohg79_20260429T140000Z",
+      "current_start_iso": "2026-04-29T07:00:00-07:00",
+      "current_end_iso": "2026-04-29T07:30:00-07:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T08:20:30.637645-07:00",
+    "expires_at": "2026-04-30T08:20:30.637642-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "OvrdsY8K": {
+    "token": "OvrdsY8K",
+    "kind": "approve_send",
+    "label": "Approve send: Invitation: AI Dev Talk @ Wed Apr 29, 2026 8am - 9am (PDT) (",
+    "payload": {
+      "draft_id": "r-8756587594075646337",
+      "thread_id": "19dd9d9c0478ff9d"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.630543-07:00",
+    "expires_at": "2026-04-30T15:13:22.630519-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Eg7rl1aV": {
+    "token": "Eg7rl1aV",
+    "kind": "schedule_send",
+    "label": "Schedule send: Invitation: AI Dev Talk @ Wed Apr 29, 2026 8am - 9am (PDT) (",
+    "payload": {
+      "draft_id": "r-8756587594075646337",
+      "thread_id": "19dd9d9c0478ff9d",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.633795-07:00",
+    "expires_at": "2026-04-30T15:13:22.633786-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "l7GQnOOq": {
+    "token": "l7GQnOOq",
+    "kind": "mark_read",
+    "label": "Mark read: Invitation: AI Dev Talk @ Wed Apr 29, 2026 8am - 9am (PDT) (",
+    "payload": {
+      "thread_id": "19dd9d9c0478ff9d"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.636386-07:00",
+    "expires_at": "2026-04-30T15:13:22.636378-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "vRayvU2v": {
+    "token": "vRayvU2v",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Invitation: AI Dev Talk @ Wed Apr 29, 2026 8am - 9am (PDT) (",
+    "payload": {
+      "thread_id": "19dd9d9c0478ff9d",
+      "title": "Reply: Invitation: AI Dev Talk @ Wed Apr 29, 2026 8am - 9am (PDT) (",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd9d9c0478ff9d"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.639242-07:00",
+    "expires_at": "2026-04-30T15:13:22.639226-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "fbpZZLLr": {
+    "token": "fbpZZLLr",
+    "kind": "approve_send",
+    "label": "Approve send: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "draft_id": "r-8864667030995380602",
+      "thread_id": "19dd98b857de96e2"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.641923-07:00",
+    "expires_at": "2026-04-30T15:13:22.641915-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "-qVHB6EB": {
+    "token": "-qVHB6EB",
+    "kind": "schedule_send",
+    "label": "Schedule send: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "draft_id": "r-8864667030995380602",
+      "thread_id": "19dd98b857de96e2",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.644237-07:00",
+    "expires_at": "2026-04-30T15:13:22.644230-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "W78UBXPP": {
+    "token": "W78UBXPP",
+    "kind": "mark_read",
+    "label": "Mark read: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "thread_id": "19dd98b857de96e2"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.646541-07:00",
+    "expires_at": "2026-04-30T15:13:22.646535-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "DE0hNuE9": {
+    "token": "DE0hNuE9",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Re: Allo trial \ud83d\udcde",
+    "payload": {
+      "thread_id": "19dd98b857de96e2",
+      "title": "Reply: Re: Allo trial \ud83d\udcde",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd98b857de96e2"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.648755-07:00",
+    "expires_at": "2026-04-30T15:13:22.648749-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "rjDim8a-": {
+    "token": "rjDim8a-",
+    "kind": "approve_send",
+    "label": "Approve send: Receipt",
+    "payload": {
+      "draft_id": "r7913663478285972129",
+      "thread_id": "19dd0bc990cebab5"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.650869-07:00",
+    "expires_at": "2026-04-30T15:13:22.650864-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "uWyWrG_-": {
+    "token": "uWyWrG_-",
+    "kind": "schedule_send",
+    "label": "Schedule send: Receipt",
+    "payload": {
+      "draft_id": "r7913663478285972129",
+      "thread_id": "19dd0bc990cebab5",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.652931-07:00",
+    "expires_at": "2026-04-30T15:13:22.652926-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "YzxfZm9M": {
+    "token": "YzxfZm9M",
+    "kind": "mark_read",
+    "label": "Mark read: Receipt",
+    "payload": {
+      "thread_id": "19dd0bc990cebab5"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.655135-07:00",
+    "expires_at": "2026-04-30T15:13:22.655123-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "jV1Lohdr": {
+    "token": "jV1Lohdr",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Receipt",
+    "payload": {
+      "thread_id": "19dd0bc990cebab5",
+      "title": "Reply: Receipt",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd0bc990cebab5"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.657163-07:00",
+    "expires_at": "2026-04-30T15:13:22.657156-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "BC5PAPED": {
+    "token": "BC5PAPED",
+    "kind": "approve_send",
+    "label": "Approve send: Invoice",
+    "payload": {
+      "draft_id": "r2252467900705376595",
+      "thread_id": "19dd0b95baec0957"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.659174-07:00",
+    "expires_at": "2026-04-30T15:13:22.659168-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "RkCqeSBt": {
+    "token": "RkCqeSBt",
+    "kind": "schedule_send",
+    "label": "Schedule send: Invoice",
+    "payload": {
+      "draft_id": "r2252467900705376595",
+      "thread_id": "19dd0b95baec0957",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.661127-07:00",
+    "expires_at": "2026-04-30T15:13:22.661123-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Z_XU5z0M": {
+    "token": "Z_XU5z0M",
+    "kind": "mark_read",
+    "label": "Mark read: Invoice",
+    "payload": {
+      "thread_id": "19dd0b95baec0957"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.662925-07:00",
+    "expires_at": "2026-04-30T15:13:22.662921-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "dclsW42O": {
+    "token": "dclsW42O",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Invoice",
+    "payload": {
+      "thread_id": "19dd0b95baec0957",
+      "title": "Reply: Invoice",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd0b95baec0957"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.664765-07:00",
+    "expires_at": "2026-04-30T15:13:22.664761-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Fy_rJf9H": {
+    "token": "Fy_rJf9H",
+    "kind": "approve_send",
+    "label": "Approve send: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "draft_id": "r3459180886317225352",
+      "thread_id": "19dd026da5302f1a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.666586-07:00",
+    "expires_at": "2026-04-30T15:13:22.666582-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Hm0uHTpK": {
+    "token": "Hm0uHTpK",
+    "kind": "schedule_send",
+    "label": "Schedule send: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "draft_id": "r3459180886317225352",
+      "thread_id": "19dd026da5302f1a",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.668397-07:00",
+    "expires_at": "2026-04-30T15:13:22.668393-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "1-7lrL4Y": {
+    "token": "1-7lrL4Y",
+    "kind": "mark_read",
+    "label": "Mark read: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "thread_id": "19dd026da5302f1a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.670136-07:00",
+    "expires_at": "2026-04-30T15:13:22.670131-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "LEHg6AKF": {
+    "token": "LEHg6AKF",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+    "payload": {
+      "thread_id": "19dd026da5302f1a",
+      "title": "Reply: Let\u2019s explore the benefits of Payroll inside of QuickBooks",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dd026da5302f1a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.671883-07:00",
+    "expires_at": "2026-04-30T15:13:22.671880-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "lExns_qB": {
+    "token": "lExns_qB",
+    "kind": "approve_send",
+    "label": "Approve send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r9192668788313992756",
+      "thread_id": "19dc1f91a00bb3c1"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.673598-07:00",
+    "expires_at": "2026-04-30T15:13:22.673594-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "I5IJ83EV": {
+    "token": "I5IJ83EV",
+    "kind": "schedule_send",
+    "label": "Schedule send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r9192668788313992756",
+      "thread_id": "19dc1f91a00bb3c1",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.675303-07:00",
+    "expires_at": "2026-04-30T15:13:22.675299-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "LVo1x4Nc": {
+    "token": "LVo1x4Nc",
+    "kind": "mark_read",
+    "label": "Mark read: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1f91a00bb3c1"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.676947-07:00",
+    "expires_at": "2026-04-30T15:13:22.676944-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "cRr0VAvn": {
+    "token": "cRr0VAvn",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1f91a00bb3c1",
+      "title": "Reply: Fwd: MCP test mail merge \u2014 Joshua",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1f91a00bb3c1"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.678603-07:00",
+    "expires_at": "2026-04-30T15:13:22.678600-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "W44SrmOW": {
+    "token": "W44SrmOW",
+    "kind": "approve_send",
+    "label": "Approve send: Regression: string attachment",
+    "payload": {
+      "draft_id": "r-7955060072823356521",
+      "thread_id": "19dc1f91662a064c"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.680345-07:00",
+    "expires_at": "2026-04-30T15:13:22.680341-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "YK7Bh_MD": {
+    "token": "YK7Bh_MD",
+    "kind": "schedule_send",
+    "label": "Schedule send: Regression: string attachment",
+    "payload": {
+      "draft_id": "r-7955060072823356521",
+      "thread_id": "19dc1f91662a064c",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.682058-07:00",
+    "expires_at": "2026-04-30T15:13:22.682054-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "lw3t096A": {
+    "token": "lw3t096A",
+    "kind": "mark_read",
+    "label": "Mark read: Regression: string attachment",
+    "payload": {
+      "thread_id": "19dc1f91662a064c"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.683690-07:00",
+    "expires_at": "2026-04-30T15:13:22.683687-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "wlNsS8t6": {
+    "token": "wlNsS8t6",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Regression: string attachment",
+    "payload": {
+      "thread_id": "19dc1f91662a064c",
+      "title": "Reply: Regression: string attachment",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1f91662a064c"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.685319-07:00",
+    "expires_at": "2026-04-30T15:13:22.685316-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "z4U-qzbL": {
+    "token": "z4U-qzbL",
+    "kind": "approve_send",
+    "label": "Approve send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r-7972562201337519447",
+      "thread_id": "19dc1ea8a3e78cdf"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.686942-07:00",
+    "expires_at": "2026-04-30T15:13:22.686939-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "xtFScmaf": {
+    "token": "xtFScmaf",
+    "kind": "schedule_send",
+    "label": "Schedule send: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "draft_id": "r-7972562201337519447",
+      "thread_id": "19dc1ea8a3e78cdf",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.688566-07:00",
+    "expires_at": "2026-04-30T15:13:22.688562-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Zt3SzsRr": {
+    "token": "Zt3SzsRr",
+    "kind": "mark_read",
+    "label": "Mark read: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1ea8a3e78cdf"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.690207-07:00",
+    "expires_at": "2026-04-30T15:13:22.690204-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "3RPTbsyf": {
+    "token": "3RPTbsyf",
+    "kind": "mark_as_task",
+    "label": "Mark as task: Fwd: MCP test mail merge \u2014 Joshua",
+    "payload": {
+      "thread_id": "19dc1ea8a3e78cdf",
+      "title": "Reply: Fwd: MCP test mail merge \u2014 Joshua",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1ea8a3e78cdf"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.691810-07:00",
+    "expires_at": "2026-04-30T15:13:22.691807-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "zshowWkm": {
+    "token": "zshowWkm",
+    "kind": "approve_send",
+    "label": "Approve send: MCP test \u2014 small attachment",
+    "payload": {
+      "draft_id": "r-9090714664756184533",
+      "thread_id": "19dc1d720b803623"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.693442-07:00",
+    "expires_at": "2026-04-30T15:13:22.693439-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "iRDXeL5W": {
+    "token": "iRDXeL5W",
+    "kind": "schedule_send",
+    "label": "Schedule send: MCP test \u2014 small attachment",
+    "payload": {
+      "draft_id": "r-9090714664756184533",
+      "thread_id": "19dc1d720b803623",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.695024-07:00",
+    "expires_at": "2026-04-30T15:13:22.695021-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Ow7xizzp": {
+    "token": "Ow7xizzp",
+    "kind": "mark_read",
+    "label": "Mark read: MCP test \u2014 small attachment",
+    "payload": {
+      "thread_id": "19dc1d720b803623"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.696591-07:00",
+    "expires_at": "2026-04-30T15:13:22.696588-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "7G8ICNlx": {
+    "token": "7G8ICNlx",
+    "kind": "mark_as_task",
+    "label": "Mark as task: MCP test \u2014 small attachment",
+    "payload": {
+      "thread_id": "19dc1d720b803623",
+      "title": "Reply: MCP test \u2014 small attachment",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1d720b803623"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.698222-07:00",
+    "expires_at": "2026-04-30T15:13:22.698219-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "x-sX6QE4": {
+    "token": "x-sX6QE4",
+    "kind": "approve_send",
+    "label": "Approve send: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "draft_id": "r-5783510013199247757",
+      "thread_id": "19dc1d6b8ae1d55a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.699794-07:00",
+    "expires_at": "2026-04-30T15:13:22.699791-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "prquU4Uq": {
+    "token": "prquU4Uq",
+    "kind": "schedule_send",
+    "label": "Schedule send: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "draft_id": "r-5783510013199247757",
+      "thread_id": "19dc1d6b8ae1d55a",
+      "default_send_at_local": "09:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.701341-07:00",
+    "expires_at": "2026-04-30T15:13:22.701338-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "2NGXlov9": {
+    "token": "2NGXlov9",
+    "kind": "mark_read",
+    "label": "Mark read: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "thread_id": "19dc1d6b8ae1d55a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.702902-07:00",
+    "expires_at": "2026-04-30T15:13:22.702899-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "O0M9vROo": {
+    "token": "O0M9vROo",
+    "kind": "mark_as_task",
+    "label": "Mark as task: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+    "payload": {
+      "thread_id": "19dc1d6b8ae1d55a",
+      "title": "Reply: MCP Test Doc \u2014 Email as PDF (2026-04-24)",
+      "link": "https://mail.google.com/mail/u/0/#inbox/19dc1d6b8ae1d55a"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.704506-07:00",
+    "expires_at": "2026-04-30T15:13:22.704503-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "F5SmjDMg": {
+    "token": "F5SmjDMg",
+    "kind": "accept_meeting",
+    "label": "Accept: Office",
+    "payload": {
+      "event_id": "1ekana509v2s3gel9uqkuk3kvk_20260429",
+      "response": "accepted"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.706070-07:00",
+    "expires_at": "2026-04-30T15:13:22.706066-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "dTRBwuj4": {
+    "token": "dTRBwuj4",
+    "kind": "decline_meeting",
+    "label": "Decline: Office",
+    "payload": {
+      "event_id": "1ekana509v2s3gel9uqkuk3kvk_20260429",
+      "response": "declined"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.707673-07:00",
+    "expires_at": "2026-04-30T15:13:22.707670-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "KewUQEBV": {
+    "token": "KewUQEBV",
+    "kind": "suggest_new_time",
+    "label": "Suggest new time: Office",
+    "payload": {
+      "event_id": "1ekana509v2s3gel9uqkuk3kvk_20260429",
+      "current_start_iso": "2026-04-29",
+      "current_end_iso": "2026-04-30"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.709245-07:00",
+    "expires_at": "2026-04-30T15:13:22.709242-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "gq5ZHeu8": {
+    "token": "gq5ZHeu8",
+    "kind": "accept_meeting",
+    "label": "Accept: Daily ISOC Briefing",
+    "payload": {
+      "event_id": "i2top9kjbqrr58buodhpcohg79_20260429T140000Z",
+      "response": "accepted"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.710809-07:00",
+    "expires_at": "2026-04-30T15:13:22.710806-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "8cDQ03Ct": {
+    "token": "8cDQ03Ct",
+    "kind": "decline_meeting",
+    "label": "Decline: Daily ISOC Briefing",
+    "payload": {
+      "event_id": "i2top9kjbqrr58buodhpcohg79_20260429T140000Z",
+      "response": "declined"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.712377-07:00",
+    "expires_at": "2026-04-30T15:13:22.712374-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Ey0Elbrg": {
+    "token": "Ey0Elbrg",
+    "kind": "suggest_new_time",
+    "label": "Suggest new time: Daily ISOC Briefing",
+    "payload": {
+      "event_id": "i2top9kjbqrr58buodhpcohg79_20260429T140000Z",
+      "current_start_iso": "2026-04-29T07:00:00-07:00",
+      "current_end_iso": "2026-04-29T07:30:00-07:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.713999-07:00",
+    "expires_at": "2026-04-30T15:13:22.713996-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "GE4uvnxo": {
+    "token": "GE4uvnxo",
+    "kind": "accept_meeting",
+    "label": "Accept: AI Dev Talk",
+    "payload": {
+      "event_id": "511krg288ts8t65aopg6e55p50",
+      "response": "accepted"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.715594-07:00",
+    "expires_at": "2026-04-30T15:13:22.715591-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "GRijuVqi": {
+    "token": "GRijuVqi",
+    "kind": "decline_meeting",
+    "label": "Decline: AI Dev Talk",
+    "payload": {
+      "event_id": "511krg288ts8t65aopg6e55p50",
+      "response": "declined"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.717152-07:00",
+    "expires_at": "2026-04-30T15:13:22.717149-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "iVovkfc3": {
+    "token": "iVovkfc3",
+    "kind": "suggest_new_time",
+    "label": "Suggest new time: AI Dev Talk",
+    "payload": {
+      "event_id": "511krg288ts8t65aopg6e55p50",
+      "current_start_iso": "2026-04-29T08:00:00-07:00",
+      "current_end_iso": "2026-04-29T09:00:00-07:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.718750-07:00",
+    "expires_at": "2026-04-30T15:13:22.718748-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "pI9j-qbw": {
+    "token": "pI9j-qbw",
+    "kind": "accept_meeting",
+    "label": "Accept: Drive \u2192 Natomas Charter (Sacramento)",
+    "payload": {
+      "event_id": "dh5h9dr2t7l7d110kptobfljtg",
+      "response": "accepted"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.720532-07:00",
+    "expires_at": "2026-04-30T15:13:22.720525-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "Qrf6olld": {
+    "token": "Qrf6olld",
+    "kind": "decline_meeting",
+    "label": "Decline: Drive \u2192 Natomas Charter (Sacramento)",
+    "payload": {
+      "event_id": "dh5h9dr2t7l7d110kptobfljtg",
+      "response": "declined"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.722217-07:00",
+    "expires_at": "2026-04-30T15:13:22.722213-07:00",
+    "executed_at": null,
+    "result": null
+  },
+  "9ybe61Zt": {
+    "token": "9ybe61Zt",
+    "kind": "suggest_new_time",
+    "label": "Suggest new time: Drive \u2192 Natomas Charter (Sacramento)",
+    "payload": {
+      "event_id": "dh5h9dr2t7l7d110kptobfljtg",
+      "current_start_iso": "2026-04-29T14:25:00-07:00",
+      "current_end_iso": "2026-04-29T17:15:00-07:00"
+    },
+    "status": "pending",
+    "created_at": "2026-04-29T15:13:22.723746-07:00",
+    "expires_at": "2026-04-30T15:13:22.723743-07:00",
+    "executed_at": null,
+    "result": null
+  }
+}

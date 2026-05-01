@@ -1,0 +1,594 @@
+{
+  "per_diem:NY:new york:2026": {
+    "value": {
+      "city": "New York",
+      "state": "NY",
+      "fiscal_year": 2026,
+      "lodging_usd": 320.0,
+      "meals_usd": 79.0,
+      "incidentals_usd": 5.0,
+      "source": "GSA fallback (no API key)"
+    },
+    "fetched_at": "2026-04-29T04:28:31.574222+00:00",
+    "ttl_seconds": 86400
+  },
+  "fx:EUR:USD": {
+    "value": 1.07,
+    "fetched_at": "2026-04-29T04:28:31.575942+00:00",
+    "ttl_seconds": 86400
+  },
+  "weather:san francisco, ca": {
+    "value": {
+      "location_label": "San Francisco, CA",
+      "fetched_at": "2026-04-29T08:13:30.853704-07:00",
+      "sunrise": "05:33 AM",
+      "sunset": "07:53 PM",
+      "high_f": 69,
+      "low_f": 46,
+      "summary": "clear and pleasant \u00b7 High 69\u00b0F \u00b7 Low 46\u00b0F",
+      "hourly": [
+        {
+          "hour_local": "00:00",
+          "temp_f": 53,
+          "feels_like_f": 50,
+          "condition": "clear",
+          "icon": "\u2600\ufe0f",
+          "description": "Sunny",
+          "precip_chance_pct": 0,
+          "wind_mph": 7
+        },
+        {
+          "hour_local": "03:00",
+          "temp_f": 49,
+          "feels_like_f": 46,
+          "condition": "clear",
+          "icon": "\u2600\ufe0f",
+          "description": "Sunny",
+          "precip_chance_pct": 0,
+          "wind_mph": 4
+        },
+        {
+          "hour_local": "06:00",
+          "temp_f": 47,
+          "feels_like_f": 44,
+          "condition": "clear",
+          "icon": "\u2600\ufe0f",
+          "description": "Sunny",
+          "precip_chance_pct": 0,
+          "wind_mph": 4
+        },
+        {
+          "hour_local": "09:00",
+          "temp_f": 58,
+          "feels_like_f": 53,
+          "condition": "clear",
+          "icon": "\u2600\ufe0f",
+          "description": "Sunny",
+          "precip_chance_pct": 0,
+          "wind_mph": 3
+        },
+        {
+          "hour_local": "12:00",
+          "temp_f": 63,
+          "feels_like_f": 63,
+          "condition": "clear",
+          "icon": "\u2600\ufe0f",
+          "description": "Sunny",
+          "precip_chance_pct": 0,
+          "wind_mph": 4
+        },
+        {
+          "hour_local": "15:00",
+          "temp_f": 67,
+          "feels_like_f": 67,
+          "condition": "clear",
+          "icon": "\u2600\ufe0f",
+          "description": "Sunny",
+          "precip_chance_pct": 0,
+          "wind_mph": 3
+        },
+        {
+          "hour_local": "18:00",
+          "temp_f": 55,
+          "feels_like_f": 53,
+          "condition": "mostly_cloudy",
+          "icon": "\u26c5",
+          "description": "Mostly cloudy",
+          "precip_chance_pct": 0,
+          "wind_mph": 4
+        },
+        {
+          "hour_local": "21:00",
+          "temp_f": 49,
+          "feels_like_f": 47,
+          "condition": "cloudy",
+          "icon": "\u2601\ufe0f",
+          "description": "Cloudy",
+          "precip_chance_pct": 0,
+          "wind_mph": 6
+        }
+      ]
+    },
+    "fetched_at": "2026-04-29T08:13:30.853765-07:00",
+    "ttl_seconds": 3600
+  },
+  "news:https://feeds.bbci.co.uk/news/world/rss.xml": {
+    "value": [
+      {
+        "title": "Oil price briefly hits $120 after reports of 'extended' Iran blockade",
+        "url": "https://www.bbc.com/news/articles/cj4pxr0gr02o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The price of crude oil has swung sharply as uncertainty over the war in the Middle East continues.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/2891/live/ab550cf0-43b7-11f1-a5aa-c74cdbf526ae.jpg",
+        "thumb_color": "#0d6470",
+        "published_at": "2026-04-29T20:24:29+00:00"
+      },
+      {
+        "title": "Comey surrenders over charge of threatening Trump's life in Instagram post",
+        "url": "https://www.bbc.com/news/articles/c70vzj1nrddo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "Prosecutors say a 2025 seashell photo posted by the former FBI director was a call for violence against Trump.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/7e34/live/becbd370-43fa-11f1-b55d-0f258dce1735.jpg",
+        "thumb_color": "#9a6b00",
+        "published_at": "2026-04-29T20:24:48+00:00"
+      },
+      {
+        "title": "Hungary's next PM says frozen EU funds will be paid out soon",
+        "url": "https://www.bbc.com/news/articles/c392ln77w30o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "P\u00e9ter Magyar meets EU leaders in Brussels, for the first time since his Tisza party won a landslide election.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/6a63/live/e2f57d60-43ef-11f1-ac78-2112837ce2aa.jpg",
+        "thumb_color": "#2d6e3e",
+        "published_at": "2026-04-29T19:51:54+00:00"
+      },
+      {
+        "title": "New images show suspect taking selfies before Washington press dinner shooting",
+        "url": "https://www.bbc.com/news/articles/cm2p99n35z4o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "Prosecutors argue Cole Tomas Allen should remain in custody until trial on a charge of attempted assassination of President Donald Trump.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/436a/live/fdd8dfa0-43e0-11f1-ab33-71d613cbf6ef.jpg",
+        "thumb_color": "#1a4f8c",
+        "published_at": "2026-04-29T16:06:00+00:00"
+      },
+      {
+        "title": "Seven lawsuits filed against OpenAI by families of Canada mass-shooting victims",
+        "url": "https://www.bbc.com/news/articles/c99l03k0ly4o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The lawsuits, filed in California, accuse OpenAI and Sam Altman of negligence and abetting a mass shooting by failing to flag the suspect's ChatGPT activity.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/e96e/live/7cdb3bb0-43da-11f1-bd52-e755d604ece4.png",
+        "thumb_color": "#a23a3a",
+        "published_at": "2026-04-29T19:51:55+00:00"
+      },
+      {
+        "title": "Russia scales back Moscow Victory Day parade, blaming threat from Ukraine",
+        "url": "https://www.bbc.com/news/articles/c794wp4yy93o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "Russia says the annual commemoration of Soviet victory in World War Two will not feature military vehicles or cadets.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/fbc2/live/41490690-43c1-11f1-ac78-2112837ce2aa.jpg",
+        "thumb_color": "#9a6b00",
+        "published_at": "2026-04-29T13:01:57+00:00"
+      },
+      {
+        "title": "Stranded whale ferried out of German waters in barge",
+        "url": "https://www.bbc.com/news/articles/clyp559l06no?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The final operation to save the whale is being closely followed, after the failure of earlier attempts.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/3820/live/bb9b4ea0-43e7-11f1-9113-1988573e8ff7.jpg",
+        "thumb_color": "#1a4f8c",
+        "published_at": "2026-04-29T17:06:23+00:00"
+      },
+      {
+        "title": "Madagascar detains French national over alleged plot to stir unrest",
+        "url": "https://www.bbc.com/news/articles/c7v96615e99o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "Malagasy prosecuters used a Whatsapp group as evidence for the detained individuals alleged crimes.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/7b5d/live/92b26890-43ea-11f1-9113-1988573e8ff7.jpg",
+        "thumb_color": "#0d6470",
+        "published_at": "2026-04-29T17:03:16+00:00"
+      },
+      {
+        "title": "France urges citizens to leave Mali after rebel attacks",
+        "url": "https://www.bbc.com/news/articles/cp3pdgvpn27o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The UK has issued similar advice, telling citizens who stay, that they do so at their own risk.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/6c37/live/7c87c880-43ae-11f1-9d89-8526d1435c1c.jpg",
+        "thumb_color": "#7a3a8c",
+        "published_at": "2026-04-29T16:46:38+00:00"
+      },
+      {
+        "title": "France investigates reappearance of website linked to Pelicot crimes",
+        "url": "https://www.bbc.com/news/articles/c0m2ndp2042o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "Authorities say the Coco platform has been linked to sexual abuse of children, drug offences, rape and murder.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/df11/live/3fa31000-43c7-11f1-aec0-b189b12f3c07.jpg",
+        "thumb_color": "#2d6e3e",
+        "published_at": "2026-04-29T15:10:55+00:00"
+      },
+      {
+        "title": "US Supreme Court limits use of race in drawing electoral maps",
+        "url": "https://www.bbc.com/news/articles/clyw3p7xv4wo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The decision will make it more difficult to successfully challenge legislative maps for diluting the voting power of racial minorities.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/27bf/live/55a10400-2d08-11f1-903b-c7d082edabea.jpg",
+        "thumb_color": "#9a6b00",
+        "published_at": "2026-04-29T15:05:55+00:00"
+      },
+      {
+        "title": "Former US officials criticise Pentagon silence on deadly Iran school attack",
+        "url": "https://www.bbc.com/news/articles/cwy2482pn0lo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "In the two months since the deadly strike, the US defence department has said only that the incident is under investigation.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/3dd5/live/94401ea0-4354-11f1-b55d-0f258dce1735.jpg",
+        "thumb_color": "#5a3a8c",
+        "published_at": "2026-04-29T02:01:50+00:00"
+      },
+      {
+        "title": "Global forest loss slows but El Ni\u00f1o fires could threaten progress",
+        "url": "https://www.bbc.com/news/articles/c78q5pygn66o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The loss of tropical rainforests eased last year, according to new analysis, but scientists warn they are still disappearing rapidly.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/6cb5/live/51be1d40-43ed-11f1-ac78-2112837ce2aa.jpg",
+        "thumb_color": "#5a3a8c",
+        "published_at": "2026-04-29T13:26:08+00:00"
+      },
+      {
+        "title": "Israeli 'double-tap' strike kills three rescue workers in Lebanon, officials say",
+        "url": "https://www.bbc.com/news/articles/cvgz5rgv4n3o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "They are among nine people killed in successive attacks on Tuesday, which Israel's military says targeted a Hezbollah commander.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/8665/live/4ce6f8b0-43ab-11f1-bd52-e755d604ece4.jpg",
+        "thumb_color": "#5a3a8c",
+        "published_at": "2026-04-29T15:30:50+00:00"
+      },
+      {
+        "title": "Comey charged with threatening Trump's life in Instagram post",
+        "url": "https://www.bbc.com/news/articles/cvgz4rvlem5o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The new case stems from a 2025 seashell photo posted by the former FBI director that the justice department says calls for violence against Trump.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/ec6b/live/49b65430-4395-11f1-ac78-2112837ce2aa.jpg",
+        "thumb_color": "#9a6b00",
+        "published_at": "2026-04-29T00:24:05+00:00"
+      },
+      {
+        "title": "Irish government announces further fuel supports after protests",
+        "url": "https://www.bbc.com/news/articles/cvgzd22w5ewo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The Irish government has announced further fuel supports for a number of sectors after nationwide protests in recent weeks.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/f34d/live/df3db410-351e-11f1-9f76-8dbe71e83b07.jpg",
+        "thumb_color": "#5a3a8c",
+        "published_at": "2026-04-29T12:48:45+00:00"
+      },
+      {
+        "title": "Robert Mugabe's son to be deported from South Africa over firearms offence",
+        "url": "https://www.bbc.com/news/articles/czx2lxevvljo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The 28-year-old was arrested in February after a man had been shot at his home in Johannesburg.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/fc56/live/0dc03f70-43c4-11f1-a0e9-f392511be4c3.jpg",
+        "thumb_color": "#7a3a8c",
+        "published_at": "2026-04-29T14:09:59+00:00"
+      },
+      {
+        "title": "Kim Jong Un praises troops who 'self-blasted' to avoid capture by Ukraine",
+        "url": "https://www.bbc.com/news/articles/cddp7pzqdvjo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "It confirms suspicions that North Korean soldiers are being told to detonate their grenades to kill themselves.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/52d1/live/ca131a80-436a-11f1-bd5c-f7e837bf2c66.jpg",
+        "thumb_color": "#7a3a8c",
+        "published_at": "2026-04-29T01:47:51+00:00"
+      },
+      {
+        "title": "Two dead after small plane crashes into Australia airport hangar",
+        "url": "https://www.bbc.com/news/articles/ce9pzlvyvejo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The aircraft burst into flames after it crashed at Parafield Airport in Adelaide.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/5cbc/live/9c7895d0-43c6-11f1-aec0-b189b12f3c07.jpg",
+        "thumb_color": "#a23a3a",
+        "published_at": "2026-04-29T09:08:07+00:00"
+      },
+      {
+        "title": "Trump's face to feature on commemorative US passports",
+        "url": "https://www.bbc.com/news/articles/cr5pn1ngerpo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The passports will be released as part of the 250th anniversary of the US Declaration of Independence.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/0846/live/a6c8e900-4352-11f1-bd52-e755d604ece4.jpg",
+        "thumb_color": "#1a4f8c",
+        "published_at": "2026-04-28T23:41:00+00:00"
+      },
+      {
+        "title": "Tupac's family files wrongful death lawsuit in LA",
+        "url": "https://www.bbc.com/news/articles/c0l28d517gjo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The suit seeks to uncover several \"co-conspirators\" who may have been involved in the star's death.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/41a5/live/302db840-43aa-11f1-9d89-8526d1435c1c.jpg",
+        "thumb_color": "#5a3a8c",
+        "published_at": "2026-04-29T12:04:58+00:00"
+      },
+      {
+        "title": "Japan zoo staffer allegedly dumps wife's body inside incinerator",
+        "url": "https://www.bbc.com/news/articles/cm2p3gn3yzno?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The zoo has had to delay its reopening after a maintenance break, as police investigate the staff member's claim.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/2e0f/live/3e3733b0-43b6-11f1-b55d-0f258dce1735.jpg",
+        "thumb_color": "#0d6470",
+        "published_at": "2026-04-29T06:42:29+00:00"
+      },
+      {
+        "title": "Endangered antelopes flown to Kenya from Czech zoo in 'historic homecoming'",
+        "url": "https://www.bbc.com/news/articles/c202l3gzvp7o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The mountain bongo is a rare antelope endemic to Kenyan highland forests, with less than 100 in the wild.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/8e25/live/c6eba8b0-439f-11f1-a886-afa88c1499c0.jpg",
+        "thumb_color": "#5a3a8c",
+        "published_at": "2026-04-29T09:37:23+00:00"
+      },
+      {
+        "title": "Outrage after Indian man carries his sister's skeleton to a bank to prove her death",
+        "url": "https://www.bbc.com/news/articles/clypl5jrjqlo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "A video from Odisha state of Jitu Munda taking the remains to the bank went viral this week, leading to anger.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/31e5/live/53abc270-43ab-11f1-9d89-8526d1435c1c.jpg",
+        "thumb_color": "#7a3a8c",
+        "published_at": "2026-04-29T08:54:15+00:00"
+      },
+      {
+        "title": "US regulator to review Disney broadcast licences after Jimmy Kimmel joke about Melania Trump",
+        "url": "https://www.bbc.com/news/articles/c4g0zwxl3k0o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The move comes as the White House pressures Disney-owned ABC to fire Kimmel after he called Melania an \"expectant widow\".",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/e841/live/16698870-4347-11f1-bd52-e755d604ece4.jpg",
+        "thumb_color": "#7a3a8c",
+        "published_at": "2026-04-28T19:48:49+00:00"
+      },
+      {
+        "title": "Musk accuses Altman of stealing a charity as courtroom battle begins",
+        "url": "https://www.bbc.com/news/articles/cz027nyz529o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The case over OpenAI's history and public commitments could have major implications for the future of AI.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/28ec/live/9d22f0c0-4330-11f1-ac78-2112837ce2aa.jpg",
+        "thumb_color": "#9a6b00",
+        "published_at": "2026-04-29T10:12:46+00:00"
+      },
+      {
+        "title": "Indian billionaire's son offers to save Escobar's hippos",
+        "url": "https://www.bbc.com/news/articles/cr7prm4ke8do?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "Anant Ambani - son of Asia's richest man Mukesh Ambani - says he can take care of the animals roaming free since the drug lord's death.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/30eb/live/5edb17e0-431f-11f1-89cc-ff708b4a3776.jpg",
+        "thumb_color": "#2d6e3e",
+        "published_at": "2026-04-28T16:44:06+00:00"
+      },
+      {
+        "title": "Four key takeaways from Jerome Powell's final rate decision as Fed chair",
+        "url": "https://www.bbc.com/news/articles/c62rm4zk3kgo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "Powell's news conference after holding rates covered the US-Israel war with Iran, inflation, legal attacks, and the Fed's independence.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/dfd7/live/ddeb2720-43ea-11f1-9113-1988573e8ff7.jpg",
+        "thumb_color": "#2d6e3e",
+        "published_at": "2026-04-29T20:01:26+00:00"
+      },
+      {
+        "title": "Comey's seashell post got him indicted. But experts are sceptical the government can win",
+        "url": "https://www.bbc.com/news/articles/clyp70l1egeo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "Acting AG Todd Blanche said the case was investigated for months, adding \"it's serious when you threaten the president.\"",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/5293/live/218ec610-440b-11f1-8343-8378511e4aa9.png",
+        "thumb_color": "#4a5a6c",
+        "published_at": "2026-04-29T20:18:28+00:00"
+      },
+      {
+        "title": "Syria trial seen as first step on long road for Assad's victims",
+        "url": "https://www.bbc.com/news/articles/cn5pzw4gn1no?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "There were highly charged scenes as former senior regime official, Atef Najib, appeared before a Damascus court.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/fef2/live/eee65730-43e9-11f1-ac78-2112837ce2aa.jpg",
+        "thumb_color": "#5a3a8c",
+        "published_at": "2026-04-29T20:11:04+00:00"
+      },
+      {
+        "title": "'Numbskull, moron and too stupid': Trump and Powell's biggest clashes",
+        "url": "https://www.bbc.com/news/articles/c7v952p61dgo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "How the US President Donald Trump and Federal Reserve chair Jerome Powell came to blows.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/6ec3/live/fb8a4270-43e5-11f1-bd52-e755d604ece4.jpg",
+        "thumb_color": "#a23a3a",
+        "published_at": "2026-04-29T16:12:08+00:00"
+      },
+      {
+        "title": "Russian paramilitaries carried out air strikes in Mali as rebels advanced, footage shows",
+        "url": "https://www.bbc.com/news/articles/cvgz409r5l3o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "Last weekend's attacks came as the Africa Corps withdrew from a key base in northern Mali.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/b830/live/420f5c40-439f-11f1-b55d-0f258dce1735.png",
+        "thumb_color": "#1a4f8c",
+        "published_at": "2026-04-29T11:24:47+00:00"
+      },
+      {
+        "title": "In five charts - How UAE's exit could affect Opec's influence over the oil price",
+        "url": "https://www.bbc.com/news/articles/c70vjpny0dno?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The BBC takes a look in charts at what the UAE's departure could mean for the oil cartel and more widely.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/1989/live/7cc9b4e0-43ed-11f1-bd52-e755d604ece4.jpg",
+        "thumb_color": "#0d6470",
+        "published_at": "2026-04-29T16:37:08+00:00"
+      },
+      {
+        "title": "Faisal Islam: Why the UAE's exit from Opec is a big deal",
+        "url": "https://www.bbc.com/news/articles/cj4pxyklw1jo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "It will have little effect on the current oil blockades, but it could change everything afterwards.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/f4fa/live/1d2d8520-4316-11f1-8d32-27ce5a537ca2.jpg",
+        "thumb_color": "#4a5a6c",
+        "published_at": "2026-04-28T15:55:46+00:00"
+      },
+      {
+        "title": "A faraway conflict threatens livelihoods in India's glass hub",
+        "url": "https://www.bbc.com/news/articles/ce8pdv86359o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "Supply disruptions due to Middle East tensions have pushed up costs in India\u2019s glass industry, putting workers at risk.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/1789/live/15b92b30-42fa-11f1-9516-81393c122a1a.jpg",
+        "thumb_color": "#1a4f8c",
+        "published_at": "2026-04-28T23:27:44+00:00"
+      },
+      {
+        "title": "Five takeaways from the King's historic address to Congress",
+        "url": "https://www.bbc.com/news/articles/c8jvl3x19v9o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "There were some lines in the speech that may have buoyed Democrats \u2013 and raised eyebrows in the White House.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/1ce6/live/05fc6d20-4380-11f1-b927-49e1f65be0b5.jpg",
+        "thumb_color": "#a23a3a",
+        "published_at": "2026-04-29T08:48:08+00:00"
+      },
+      {
+        "title": "US political violence generates a familiar cycle - this time it's in overdrive",
+        "url": "https://www.bbc.com/news/articles/cje4eeyq27lo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "In modern America, it seems violence of this kind has become an ever-present storm that can strike anywhere and at any moment.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/d3fd/live/9b1f9760-42c7-11f1-ac78-2112837ce2aa.jpg",
+        "thumb_color": "#9a6b00",
+        "published_at": "2026-04-28T00:19:49+00:00"
+      },
+      {
+        "title": "Watch: There's a ceasefire in Lebanon - but the fighting hasn't stopped",
+        "url": "https://www.bbc.com/news/videos/cpdpql7d839o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "Israel and Hezbollah are still fighting in Lebanon despite a US-brokered ceasefire that began 12 days ago.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/a36b/live/fdf2dbd0-43d6-11f1-bf3e-3d07e81b01ce.jpg",
+        "thumb_color": "#2d6e3e",
+        "published_at": "2026-04-29T14:41:26+00:00"
+      },
+      {
+        "title": "'If it wasn't for us, you'd be speaking French': King and Trump joke at dinner",
+        "url": "https://www.bbc.com/news/videos/c332ng27x1jo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The King and the US president exchanged several jokes during their speeches at a state banquet.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/1d63/live/a6477a00-43c0-11f1-a0e9-f392511be4c3.jpg",
+        "thumb_color": "#4a5a6c",
+        "published_at": "2026-04-29T11:41:37+00:00"
+      },
+      {
+        "title": "Why has the UAE left Opec - and why does this matter?",
+        "url": "https://www.bbc.com/news/videos/cz92wdvwek8o?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The United Arab Emirates (UAE) is quitting oil cartel Opec after nearly 60 years of membership.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/809a/live/556ee020-43b4-11f1-bd52-e755d604ece4.jpg",
+        "thumb_color": "#4a5a6c",
+        "published_at": "2026-04-29T10:24:54+00:00"
+      },
+      {
+        "title": "Should Jimmy Kimmel be fired for telling a joke?",
+        "url": "https://www.bbc.com/news/videos/c87qg28rx8jo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "BBC's Regan Morris reports from outside the comedian's show on Hollywood Boulevard, Los Angeles.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/5e8b/live/50fa4df0-4372-11f1-b55d-0f258dce1735.jpg",
+        "thumb_color": "#2d6e3e",
+        "published_at": "2026-04-29T04:15:42+00:00"
+      },
+      {
+        "title": "Watch: Elderly woman rescued by robot from Ukraine's frontline",
+        "url": "https://www.bbc.com/news/videos/cpqpjw1zdvjo?at_medium=RSS&at_campaign=rss",
+        "source": "BBC News",
+        "snippet": "The Ukrainian army spotted the woman using a drone and sent the machine to her rescue as she was trying to leave her war-torn village.",
+        "thumb_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/1ba9/live/21274a60-434a-11f1-b55d-0f258dce1735.jpg",
+        "thumb_color": "#a23a3a",
+        "published_at": "2026-04-28T21:58:17+00:00"
+      }
+    ],
+    "fetched_at": "2026-04-29T15:13:22.626577-07:00",
+    "ttl_seconds": 1800
+  },
+  "weather:4600 blackrock dr, sacramento, ca 95835": {
+    "value": {
+      "location_label": "4600 Blackrock Dr, Sacramento, CA 95835",
+      "fetched_at": "2026-04-29T15:12:59.499622-07:00",
+      "sunrise": "06:10 AM",
+      "sunset": "07:56 PM",
+      "high_f": 85,
+      "low_f": 51,
+      "summary": "clear and pleasant \u00b7 High 85\u00b0F \u00b7 Low 51\u00b0F",
+      "hourly": [
+        {
+          "hour_local": "00:00",
+          "temp_f": 59,
+          "feels_like_f": 59,
+          "condition": "clear",
+          "icon": "\u2600\ufe0f",
+          "description": "Sunny",
+          "precip_chance_pct": 0,
+          "wind_mph": 3
+        },
+        {
+          "hour_local": "03:00",
+          "temp_f": 54,
+          "feels_like_f": 53,
+          "condition": "clear",
+          "icon": "\u2600\ufe0f",
+          "description": "Sunny",
+          "precip_chance_pct": 0,
+          "wind_mph": 4
+        },
+        {
+          "hour_local": "06:00",
+          "temp_f": 52,
+          "feels_like_f": 51,
+          "condition": "clear",
+          "icon": "\u2600\ufe0f",
+          "description": "Sunny",
+          "precip_chance_pct": 0,
+          "wind_mph": 3
+        },
+        {
+          "hour_local": "09:00",
+          "temp_f": 61,
+          "feels_like_f": 61,
+          "condition": "clear",
+          "icon": "\u2600\ufe0f",
+          "description": "Sunny",
+          "precip_chance_pct": 0,
+          "wind_mph": 4
+        },
+        {
+          "hour_local": "12:00",
+          "temp_f": 73,
+          "feels_like_f": 75,
+          "condition": "clear",
+          "icon": "\u2600\ufe0f",
+          "description": "Sunny",
+          "precip_chance_pct": 0,
+          "wind_mph": 6
+        },
+        {
+          "hour_local": "15:00",
+          "temp_f": 78,
+          "feels_like_f": 82,
+          "condition": "clear",
+          "icon": "\u2600\ufe0f",
+          "description": "Sunny",
+          "precip_chance_pct": 0,
+          "wind_mph": 5
+        },
+        {
+          "hour_local": "18:00",
+          "temp_f": 82,
+          "feels_like_f": 80,
+          "condition": "clear",
+          "icon": "\u2600\ufe0f",
+          "description": "Sunny",
+          "precip_chance_pct": 0,
+          "wind_mph": 2
+        },
+        {
+          "hour_local": "21:00",
+          "temp_f": 67,
+          "feels_like_f": 67,
+          "condition": "clear_night",
+          "icon": "\ud83c\udf19",
+          "description": "Clear",
+          "precip_chance_pct": 0,
+          "wind_mph": 6
+        }
+      ]
+    },
+    "fetched_at": "2026-04-29T15:12:59.499757-07:00",
+    "ttl_seconds": 3600
+  }
+}
