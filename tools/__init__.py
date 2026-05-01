@@ -3,6 +3,7 @@
 from . import access_audit as _access_audit
 from . import ap_journal as _ap_journal
 from . import ap_tree as _ap_tree
+from . import ap_wave3 as _ap_wave3
 from . import calendar as _calendar
 from . import executive_briefing as _executive_briefing
 from . import chat as _chat
@@ -74,3 +75,4 @@ def register_all(mcp) -> None:
     _handoff.register(mcp)
     _ap_journal.register(mcp)
     _ap_tree.register(mcp)
+    _ap_wave3.register(mcp)

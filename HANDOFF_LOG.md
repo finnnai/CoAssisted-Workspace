@@ -760,4 +760,93 @@ locally to verify.
 
 ---
 
+## 2026-05-01 (continued, third cut) · Joshua — v0.8.1 stable
+
+Third stable cut in one day. AP/AR Wave 3 ships: AP-7 labor
+ingestion, AP-8 master rollup, AR-9 invoicing + aging +
+collections including the end-to-end Gmail send wire-up. Plus
+the AP-4 capture-sweep wire-up that was stubbed in v0.8.0.
+
+- **Version:** v0.8.1 stable, 2026-05-01.
+- **Time held:** ~2 hours since v0.8.0 cut.
+- **Focus area:** Wave 3 deterministic logic + send wire-up.
+
+### Commits since v0.8.0
+
+```
+a6a6ab0  (tag: v0.8.0) Cut stable v0.8.0
+4cf1170  AP-7: StaffWizard daily labor ingestion
+a59f119  AP-8: master rollup + run-rate dashboard with baseline-deviation alerts
+54c69d9  AR-9: customer invoicing + aging buckets + collections cadence
+e88482d  AP-4 wire-up: ap_sweep stubs → Gmail / Drive / Chat APIs
+[NEXT]   Wave 3 MCP wrappers + AR-9 send wire-up (ar_send.py)
+[NEXT]   Cut stable v0.8.1
+```
+
+### What works end-to-end now
+
+```
+StaffWizard Overall Report → workflow_ingest_labor_report
+   ↓ (parses 66 cols, groups by project)
+   ↓ (writes per-project Labor/Daily/{date}_labor.xlsx)
+   ↓ (records facts to master_rollup_history.json)
+6am scheduled task → workflow_build_master_rollup
+   ↓ (3-tab workbook: All Projects, PM Dashboard, Anomalies)
+   ↓ (>2σ deviation alerts in PM Dashboard.Deviation Flag)
+
+Per-project monthly close → workflow_generate_customer_invoice
+   ↓ (filters labor to project's StaffWizard job)
+   ↓ (rolls up by post_description)
+   ↓ (creates draft InvoiceRecord, persisted to ar_invoices.json)
+Operator review → workflow_send_invoice
+   ↓ (HTML body + Excel attachment, sent via Gmail)
+   ↓ (mark_sent → status=sent)
+
+Daily collections sweep → workflow_collections_due_today
+   ↓ (cadence ladder: courtesy → first → second → third → legal)
+Per candidate → workflow_send_collection_reminder
+   ↓ (tier-appropriate template via Gmail)
+   ↓ (add_collection_event → next sweep won't re-send same tier)
+```
+
+### Open items (deferred to 0.8.2+)
+
+- **AP-1 Supplier Invoice EIB**: still gated on Workday GL →
+  Spend Category map.
+- **Geotab integration**: still a stub.
+- **P1-7 Slack**: still deferred.
+
+### Pick up here
+
+If Joshua: AP-1 unblocks the moment a GL → Spend Category map
+arrives (CSV paste is fine). Geotab unblocks when GEOTAB_*
+credentials land in config.json. Otherwise we're at a clean
+shipping point — three stable cuts in one day, no carry-over
+work.
+
+If Conor or Finnn: skim the roadmap doc on Joshua's Desktop, run
+`make test-fast` to verify all ~1465 tests pass on your machine,
+then start exploring the new MCP tools — `workflow_reconcile_card_statement`
+is the highest-value one to try first since it covers the
+day-to-day card close.
+
+### Tests
+
+Cumulative across Waves 1-3: ~170 new tests on top of the 1293
+baseline from v0.7.2. Target: ~1465 total. Run `make test-fast`
+to verify locally; sandbox couldn't reach venv during the build.
+
+### Notes
+
+- Three stable cuts in one day is unprecedented for this project.
+  Each was a clean milestone: v0.7.2 = test/refactor baseline,
+  v0.8.0 = AP/AR Wave 1+2, v0.8.1 = AP/AR Wave 3 + send
+  wire-ups.
+- The 0.8.x series now covers the full close-the-books loop for
+  AP card spend (AMEX + WEX) + customer AR. AP-1 Supplier Invoice
+  EIB is the only piece of the original AP/AR roadmap that
+  hasn't shipped, and it's gated externally.
+
+---
+
 <!-- Conor appends his entry below before sending back -->

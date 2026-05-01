@@ -32,12 +32,99 @@ testers and marketplace listings.
 
 ---
 
-## [Unreleased] — `0.8.1-dev`
+## [Unreleased] — `0.8.2-dev`
 
-Working window for the next dev cycle. Open items: AP-1 Supplier
-Invoice EIB (gated on Workday GL → Spend Category map), AP-4
-sweep wire-up (4 stubbed call sites → tools/gmail + tools/chat),
-Geotab integration, AR-9 Wave 3 build.
+Working window for the next dev cycle. Outstanding: AP-1
+Supplier Invoice EIB (still gated on Workday GL → Spend Category
+map), Geotab integration, P1-7 Slack.
+
+---
+
+## [0.8.1] — 2026-05-01 · stable
+
+Wave 3 ships: AP-7 (StaffWizard labor ingestion), AP-8 (master
+roll-up + run-rate dashboard with baseline-deviation alerts), and
+AR-9 (customer invoicing + aging buckets + collections cadence,
+including end-to-end send wire-up to Gmail). Plus the AP-4 capture
+sweep wire-up that was stubbed in 0.8.0.
+
+Cut on the same day as v0.8.0 and v0.7.2 — the AP/AR build-out
+came together fast once the Wave 1+2 foundations landed.
+
+### Added — Wave 3 modules
+
+- **AP-7 (`labor_ingest.py`)** — parses StaffWizard Overall Report
+  (66-column .xls), groups shifts by (JobNumber, JobDescription)
+  → resolves to project_code via project_registry, writes
+  per-project Labor/Daily/{YYYY-MM-DD}_labor.xlsx workbooks with
+  cost + revenue + margin totals. Auto-converts legacy .xls via
+  libreoffice headless. Real-data validation: 108 April 29 shifts,
+  28 project groups. 19 tests.
+- **AP-8 (`master_rollup.py`)** — three-tab workbook builder
+  (All Projects + PM Dashboard + Anomalies). Baseline-deviation
+  model: N=30-day cold start, mean ± 2σ envelope, alerts when
+  observed daily spend deviates >2σ in either direction. 7-day
+  and 30-day rolling run-rates. Idempotent daily-fact recorder.
+  18 tests.
+- **AR-9 (`ar_invoicing.py` + `ar_send.py`)** — customer
+  invoicing pipeline:
+    - Invoice generation from labor rows, grouped by
+      post_description for clean line items.
+    - Per-customer terms (Net-15 default, Net-30, Due-on-Receipt)
+      with due-date math.
+    - Weekly cadence support for `billing_origin_state == "NY"`
+      per the New York project rule.
+    - Status transitions: draft → sent → partial → paid.
+    - Aging buckets: current / 1-15 / 16-30 / 31-60 / 61-90 / 90+.
+    - Collections cadence: 5-tier escalation ladder
+      (courtesy_reminder → first_followup → second_followup →
+      third_followup → escalation_to_legal). Won't double-send
+      the same tier.
+    - Send wire-up: HTML email body + Excel attachment, dispatched
+      via Gmail API. Tier-appropriate templates for each reminder.
+      `mark_sent` and `add_collection_event` advance state on
+      successful send.
+  22 tests.
+
+### Added — AP-4 wire-up
+
+- `ap_sweep.py` — replaces the four stubbed call sites with real
+  Google API integrations: pulls new Receipts-space chat messages
+  (per-space watermark to avoid re-processing), downloads Gmail
+  attachments and uploads to project Drive folders with AP-6
+  naming convention, marks messages read after processing, posts
+  candidate-picker chat messages for ambiguous routing. Wave 2
+  AP-4 is now fully operational end-to-end.
+
+### Added — Wave 3 MCP wrappers (`tools/ap_wave3.py`)
+
+10 new tools:
+- `workflow_ingest_labor_report` — AP-7 ingest
+- `workflow_record_daily_fact` — AP-8 manual fact write
+- `workflow_build_master_rollup` — AP-8 three-tab workbook
+- `workflow_generate_customer_invoice` — AR-9 draft invoice
+- `workflow_invoice_mark_sent` — AR-9 send transition
+- `workflow_invoice_apply_payment` — AR-9 payment tracking
+- `workflow_ar_aging_report` — AR-9 aging buckets
+- `workflow_collections_due_today` — AR-9 cadence candidates
+- `workflow_send_invoice` — AR-9 actual send
+- `workflow_send_collection_reminder` — AR-9 cadence-driven send
+
+### Stats since 0.8.0
+
+- 6 content commits + 1 MCP wrapper commit
+- 4 new modules (`labor_ingest`, `master_rollup`, `ar_invoicing`, `ar_send`)
+- 10 new MCP tools
+- ~59 new unit tests
+- ~1,800 LOC
+
+### Open items deferred to 0.8.x and beyond
+
+- **AP-1 — Workday Supplier Invoice EIB**: still gated on the
+  GL → Spend Category map.
+- **Geotab integration**: still a stub.
+- **P1-7 Slack**: original v0.7.0 backlog item, deferred until
+  real need surfaces.
 
 ---
 

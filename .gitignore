@@ -21,6 +21,9 @@ gl_memo_index.json
 gl_merchant_map.json
 cost_center_map.json
 ap_tree_audit.json
+ap_sweep_watermark.json
+master_rollup_history.json
+ar_invoices.json
 
 # Logs
 logs/

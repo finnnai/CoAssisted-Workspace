@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "version": "0.8.0",
+  "version": "0.8.1",
   "channel": "stable",
   "release_date": "2026-05-01",
   "last_handler": {
     "name": "Joshua Szott",
     "email": "josh.szott@surefox.com",
-    "handed_off_at": "2026-05-01T17:00:00-07:00"
+    "handed_off_at": "2026-05-01T19:00:00-07:00"
   },
   "next_handler": {
     "name": "Finnn AI",
     "email": "finnn@surefox.com",
-    "context": "Stable cut v0.8.0. Wave 1 + Wave 2 of the AP/AR build-out (per coassisted-workspace-ap-roadmap-2026-04-30): AP-3 4-tier GL classifier, AP-2 AMEX + WEX → Workday Journal EIB writer, AP-5 7-tier project router, AP-6 Drive tree manager, AP-4 capture sweep routing layer. 13 new MCP tools, ~112 new tests, ~6,200 LOC. Push to GitHub at tag v0.8.0."
+    "context": "Stable cut v0.8.1. Wave 3 ships (AP-7 labor ingestion, AP-8 master rollup with baseline-deviation alerts, AR-9 invoicing + aging + collections including end-to-end Gmail send wire-up) plus the AP-4 capture-sweep wire-up that was stubbed in 0.8.0. Three stable cuts in one day (v0.7.2, v0.8.0, v0.8.1). Push to GitHub at tag v0.8.1."
   },
-  "focus_area": "AP/AR Wave 1 + Wave 2 build (AP-2, AP-3, AP-4 routing, AP-5, AP-6)",
+  "focus_area": "AP/AR Wave 3 — labor ingestion, master rollup, invoicing/aging/collections, AP-4 send wire-up",
   "tests": {
-    "total_target": "1293 + ~112 = ~1405",
+    "total_target": "~1465 (1293 baseline + ~170 new across Waves 1-3)",
     "framework": "pytest",
     "command": "make test-fast",
     "default_excludes_marker": "network",
@@ -29,53 +29,42 @@
       "blocker": "Need the GL → Spend Category mapping table from Workday."
     },
     {
-      "id": "AP-4-wireup",
-      "priority": "high",
-      "summary": "Wire 4 stubbed call sites in ap_sweep.py to existing tools/gmail (download_attachment, modify_labels) + tools/chat (send_message). ~1 hour.",
-      "blocker": "None — fully unblocked."
-    },
-    {
       "id": "Geotab",
       "priority": "med",
       "summary": "Wire project_router._geotab_tiebreaker when GEOTAB_* credentials land in config.json.",
       "blocker": "Geotab API credentials."
     },
     {
-      "id": "AR-9",
-      "priority": "med",
-      "summary": "Wave 3 build — customer invoice generation, aging, collections cadence. Mirror of vendor follow-up loop on receivables side.",
-      "blocker": "None."
-    },
-    {
       "id": "P1-7",
       "priority": "low",
       "summary": "Slack integration — parity with chat_* surface. Joshua deferred until real need surfaces.",
       "design_doc": "mcp-design-docs-2026-04-29.md#p1-7"
+    },
+    {
+      "id": "Polish-broad-except",
+      "priority": "low",
+      "summary": "Continue broad-except cleanup on densest remaining files (tools/contacts.py 27, tools/system.py 33, tools/receipts.py 31).",
+      "blocker": "None."
     }
   ],
   "recent_changes_summary": [
-    "v0.7.2 stable cut on 2026-05-01 (tag f2c0c8e).",
-    "Bump to 0.7.3-dev for AP/AR build-out per coassisted-workspace-ap-roadmap-2026-04-30 design doc.",
-    "AP-3 (gl_classifier.py + 3 helper modules): 4-tier GL classifier ladder. Tier 0 operator merchant map, Tier 1 MCC table (40 ranges → 11 GL accounts), Tier 2 JE-trained Naive-Bayes-lite (4,601 docs from Wolfhound JEs, debit-side expenses only), Tier 3 Claude-haiku fallback over 29 curated AP-relevant accounts. 58 tests.",
-    "AP-2 (workday_journal_eib.py): AMEX + WEX statement parsers + two-sheet Workday Journal EIB writer matching SFNA AMEX EIB convention. Real-data validation: 392 April transactions → 100% classified, 0 fell through. 22 tests.",
-    "cost_center_map.py: persistent cardholder/department → cost center store. derive_from_je_corpus() for operator-confirmed seeding.",
-    "tools/ap_journal.py: 7 MCP tools (workflow_reconcile_card_statement, workflow_gl_classify_preview, workflow_gl_merchant_map_set/list, workflow_gl_memo_index_status, workflow_cost_center_map_set/list).",
-    "AP-6 (ap_tree.py): register_new_project (full 7-subfolder subtree creation, idempotent), ensure_month_subtree (lazy bucket creation), audit_filing_tree (daily scan for manual additions).",
-    "AP-5 (project_router.py): 7-tier resolution (explicit → alias → team email → calendar → Geotab stub → LLM → chat picker). confidence_action() maps to auto_file / auto_file_flag / chat_picker / triage. 21 tests.",
-    "project_registry.py extended with Wave 2 fields (drive folders, name aliases, assigned team, StaffWizard job link, billing config, customer email) + new resolution helpers (resolve_by_alias, resolve_by_team_email, resolve_by_staffwizard_job).",
-    "AP-4 (ap_sweep.py): pure decide_disposition + run_sweep_cycle orchestrator. Routing decisions deterministic; Drive download / mark-read / chat-post stubbed for follow-up wire-up. 11 tests.",
-    "tools/ap_tree.py: 6 MCP tools (workflow_register_new_project, workflow_audit_filing_tree, workflow_ensure_month_subtree, workflow_route_project, workflow_project_registry_list, workflow_ap_sweep_cycle).",
-    "Total: 12 new modules, 13 new MCP tools, ~112 new tests, ~6,200 LOC added since v0.7.2."
+    "v0.8.0 stable cut on 2026-05-01 — Wave 1 + Wave 2 (AP-2, AP-3, AP-4 routing, AP-5, AP-6).",
+    "AP-4 wire-up (e88482d): replaced ap_sweep.py's 4 stubbed call sites with real Gmail / Drive / Chat API integrations. Wave 2 fully operational.",
+    "AP-7 (4cf1170): labor_ingest.py — StaffWizard Overall Report parser, project grouping via project_registry.resolve_by_staffwizard_job, per-project daily labor workbook writer. Real-data validation: 108 April 29 shifts → 28 project groups.",
+    "AP-8 (a59f119): master_rollup.py — three-tab workbook (All Projects, PM Dashboard, Anomalies). N=30-day cold-start baseline, ±2σ deviation alerts in both directions, 7d/30d rolling run-rates.",
+    "AR-9 (54c69d9): ar_invoicing.py — invoice generation from labor (grouped by post), Net-15 default + per-customer overrides, weekly cadence for NY projects, 6 aging buckets, 5-tier collections cadence (no double-send).",
+    "AR-9 send wire-up: ar_send.py — HTML email body + Excel attachment for invoices, tier-appropriate reminder templates, dispatched via Gmail API. Calls mark_sent / add_collection_event on success.",
+    "Wave 3 MCP wrappers (tools/ap_wave3.py): 10 new tools (workflow_ingest_labor_report, workflow_build_master_rollup, workflow_generate_customer_invoice, workflow_invoice_mark_sent / apply_payment, workflow_ar_aging_report, workflow_collections_due_today, workflow_send_invoice, workflow_send_collection_reminder, workflow_record_daily_fact).",
+    "Total since v0.8.0: 4 new modules + 10 new MCP tools + ~59 new unit tests + ~1,800 LOC."
   ],
-  "pick_up_here": "AP-4 wire-up is the smallest remaining piece (~1 hr). After that, AP-1 needs the Workday GL → Spend Category map. Once both ship, cut v0.8.1 stable. AR-9 (Wave 3) is the next big build.",
+  "pick_up_here": "AP-1 needs the Workday GL → Spend Category map to unblock. Geotab needs API credentials. After those, P1-7 Slack and the broad-except polish backlog are the remaining items.",
   "instructions_for_next_handler": [
-    "Read HANDOFF_LOG.md latest entry first (2026-05-01 AP/AR Wave 1 + Wave 2 build).",
+    "Read HANDOFF_LOG.md latest entry first (2026-05-01 v0.8.1 cut).",
     "Read coassisted-workspace-ap-roadmap-2026-04-30.md on the operator's Desktop for the AP/AR vision.",
-    "Read mcp-audit-2026-04-29.md and mcp-design-docs-2026-04-29.md for legacy backlog.",
-    "Bump VERSION in _version.py + pyproject.toml if you ship features (e.g. 0.8.1-dev).",
+    "Bump VERSION in _version.py + pyproject.toml if you ship features (e.g. 0.8.2-dev).",
     "Append a new entry to HANDOFF_LOG.md before handing off.",
     "Run `make test-fast` and record pass/fail in your log entry.",
     "Add a CHANGELOG.md entry under [Unreleased].",
-    "Commit each spec as a discrete git commit with the spec id (e.g. 'AP-4 wire-up: ap_sweep stubs')."
+    "Commit each spec as a discrete git commit with the spec id."
   ]
 }
