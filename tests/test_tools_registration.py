@@ -27,9 +27,16 @@ import pytest
 # Discover tool modules dynamically so adding a new tools/<name>.py is
 # automatically covered.
 TOOLS_DIR = Path(__file__).resolve().parent.parent / "tools"
+# `workflows` is a backwards-compat re-export shim (P1-1 split). Its
+# register() delegates to the 5 category modules — including it here would
+# double-count every workflow tool. The 5 split modules are scanned directly.
+_SHIM_MODULES = {"workflows"}
+
 TOOL_MODULES = sorted(
     p.stem for p in TOOLS_DIR.glob("*.py")
-    if p.stem != "__init__" and not p.stem.startswith("_")
+    if p.stem != "__init__"
+    and not p.stem.startswith("_")
+    and p.stem not in _SHIM_MODULES
 )
 
 

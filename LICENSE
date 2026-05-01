@@ -1,91 +1,32 @@
-CoAssisted Workspace — Proprietary License
-================================================================================
+MIT License
 
-Copyright © 2026 Finnn Ai. All rights reserved.
+Copyright © 2026 CoAssisted Workspace
 
-This software and accompanying documentation (the "Software") are the
-proprietary intellectual property of Finnn Ai (the "Author") and are
-protected by copyright laws and international treaty provisions.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-PERMITTED USE
---------------------------------------------------------------------------------
-You are granted a non-exclusive, non-transferable, revocable license to:
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-  1. Install and run the Software on machines you personally own or operate,
-     for your own personal or internal business productivity use.
-
-  2. View the source code for the purpose of understanding what the Software
-     does on your machine and verifying its security and privacy properties.
-
-  3. Make local modifications to the Software for your own personal use,
-     provided such modifications are not redistributed.
-
-PROHIBITED ACTIONS
---------------------------------------------------------------------------------
-Without prior written permission from the Author, you may NOT:
-
-  1. Redistribute the Software, in source or compiled form, in whole or in
-     part, to any third party.
-
-  2. Sell, sublicense, lease, rent, or otherwise commercially exploit the
-     Software or any modified version of it.
-
-  3. Remove, obscure, or alter any copyright notices, license-key validation
-     code, license file, build identifiers, or other proprietary markings
-     contained in the Software.
-
-  4. Use the Software, or any portion of it, as the basis for a competing
-     product or service offered to third parties.
-
-  5. Use the names "CoAssisted Workspace", "CoAssisted", or "Workplace
-     Pilot" (the predecessor name), any associated logos, or any
-     confusingly similar branding to identify a derivative or competing
-     product.
-
-  6. Reverse-engineer, decompile, or disassemble compiled portions of the
-     Software except to the extent that such activity is expressly
-     permitted by applicable law notwithstanding this restriction.
-
-LICENSE KEYS
---------------------------------------------------------------------------------
-Where the Software validates a license key (the "Key") to unlock paid-tier
-features, the Key is granted on a per-user, per-machine basis. Sharing,
-distributing, or disclosing your Key to any third party voids your license
-and may result in revocation without refund.
-
-NO WARRANTY
---------------------------------------------------------------------------------
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN
-ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
 THIRD-PARTY COMPONENTS
 --------------------------------------------------------------------------------
 The Software depends on third-party libraries (Google API client, Pydantic,
-FastMCP, googlemaps SDK, etc.) which are licensed under their respective
-open-source licenses. Those licenses apply to those components only and do
-not extend to the Software itself.
+FastMCP, googlemaps SDK, Anthropic SDK, etc.) which are licensed under their
+own open-source licenses. Those licenses apply to those components only.
 
 The Software interoperates with services trademarked by third parties
-(Google Workspace, Anthropic Claude, Apple macOS, etc.). The Author makes
-no claim to those trademarks. References to those services are descriptive
-and indicate compatibility only.
-
-TERMINATION
---------------------------------------------------------------------------------
-This license terminates automatically if you breach any of its terms. Upon
-termination, you must cease all use of the Software and destroy all copies
-in your possession.
-
-CONTACT
---------------------------------------------------------------------------------
-For permission requests, commercial licensing, or other inquiries, contact:
-
-    Finnn Ai
-    finnn@surefox.com
-
-================================================================================
-By installing or using the Software, you accept the terms of this license.
+(Google Workspace, Anthropic Claude, Apple macOS, etc.). Trademarks belong
+to their respective owners; references are descriptive and indicate
+compatibility only.

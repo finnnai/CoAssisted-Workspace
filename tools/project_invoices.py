@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# © 2026 CoAssisted Workspace. Licensed under MIT.
 # See LICENSE file for terms. Removing or altering this header is prohibited.
 """Project-invoice extractor — extends the receipt pipeline for AP-style work.
 
@@ -38,6 +38,8 @@ import project_registry as _pr
 import receipts as _r
 import sender_classifier as _sc
 import vendor_followups as _vf
+import review_queue as _rq
+import vendor_response_history as _vrh_history
 from logging_util import log
 from errors import format_error
 
@@ -236,6 +238,161 @@ class ExtractProjectReceiptsInput(BaseModel):
     skip_low_confidence: bool = Field(default=False)
 
 
+class SweepAwaitingInfoInput(BaseModel):
+    """Input for workflow_sweep_awaiting_info."""
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+
+    older_than_days: Optional[int] = Field(
+        default=None, ge=1,
+        description=(
+            "If set, also CLEAR entries with request_sent_at older than this. "
+            "Default None = list-only, no clearing."
+        ),
+    )
+    channel: Optional[str] = Field(
+        default=None,
+        description="Filter to one channel: 'gmail' or 'chat'. None = both.",
+    )
+    project_code: Optional[str] = Field(
+        default=None,
+        description="Filter to one project code (e.g. 'ALPHA'). None = all.",
+    )
+    dry_run: Optional[bool] = Field(
+        default=None,
+        description=(
+            "If True (default when older_than_days is set, to be safe), "
+            "report what WOULD be cleared without actually clearing. Set "
+            "False to apply."
+        ),
+    )
+
+
+class ListReviewQueueInput(BaseModel):
+    """Input for workflow_list_review_queue."""
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+
+    project_code: Optional[str] = Field(
+        default=None,
+        description="Filter to one project code (e.g. 'ALPHA'). None = all.",
+    )
+    promote: Optional[list[str]] = Field(
+        default=None,
+        description=(
+            "If set, list of content_keys to PROMOTE: clears them from the "
+            "review queue and marks the underlying awaiting_info entry "
+            "resolved. The sheet row should already be updated (the medium-"
+            "confidence path applies the field updates in place); this is "
+            "the human's 'approve' action."
+        ),
+    )
+    forget: Optional[list[str]] = Field(
+        default=None,
+        description=(
+            "If set, list of content_keys to remove from the review queue "
+            "without promotion (rejected). Leaves the awaiting_info entry "
+            "alone — reminders continue."
+        ),
+    )
+
+
+class SnoozeAwaitingInfoInput(BaseModel):
+    """Input for workflow_snooze_awaiting_info."""
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+
+    content_key: str = Field(
+        ..., min_length=1,
+        description="content_key of the awaiting_info entry to snooze.",
+    )
+    until_date: str = Field(
+        ..., min_length=1,
+        description=(
+            "ISO 8601 timestamp or date — '2026-05-15' or "
+            "'2026-05-15T09:00:00-07:00'. Reminders pause until this passes."
+        ),
+    )
+    reason: Optional[str] = Field(
+        default=None,
+        description="Optional human-readable reason (logged to the trail).",
+    )
+
+
+class UnsnoozeAwaitingInfoInput(BaseModel):
+    """Input for workflow_unsnooze_awaiting_info."""
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+
+    content_key: str = Field(..., min_length=1)
+
+
+class BulkResolveAwaitingInfoInput(BaseModel):
+    """Input for workflow_bulk_resolve_awaiting_info."""
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+
+    content_keys: list[str] = Field(
+        ..., min_length=1,
+        description="content_keys to mark resolved in one call.",
+    )
+    reason: Optional[str] = Field(
+        default=None,
+        description="Optional reason logged to each entry's trail.",
+    )
+
+
+class BulkPromoteReviewQueueInput(BaseModel):
+    """Input for workflow_bulk_promote_review_queue."""
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+
+    content_keys: list[str] = Field(
+        ..., min_length=1,
+        description="content_keys in the review queue to approve in one call.",
+    )
+
+
+class GetEscalationTrailInput(BaseModel):
+    """Input for workflow_get_escalation_trail."""
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+
+    content_key: str = Field(..., min_length=1)
+    format: str = Field(
+        default="json",
+        description="'json' for raw events, 'text' for a one-line-per-event human view.",
+    )
+
+    promote: Optional[list[str]] = Field(
+        default=None,
+        description=(
+            "If set, list of content_keys to PROMOTE: clears them from the "
+            "review queue and marks the underlying awaiting_info entry "
+            "resolved. The sheet row should already be updated (the medium-"
+            "confidence path applies the field updates in place); this is "
+            "the human's 'approve' action."
+        ),
+    )
+    forget: Optional[list[str]] = Field(
+        default=None,
+        description=(
+            "If set, list of content_keys to remove from the review queue "
+            "without promotion (rejected). Leaves the awaiting_info entry "
+            "alone — reminders continue."
+        ),
+    )
+    channel: Optional[str] = Field(
+        default=None,
+        description="Filter to one channel: 'gmail' or 'chat'. None = both.",
+    )
+    project_code: Optional[str] = Field(
+        default=None,
+        description="Filter to one project code (e.g. 'ALPHA'). None = all.",
+    )
+    dry_run: Optional[bool] = Field(
+        default=None,
+        description=(
+            "If True (default when older_than_days is set, to be safe), "
+            "report what WOULD be cleared without actually clearing. Set "
+            "False to apply."
+        ),
+    )
+
+
 # --------------------------------------------------------------------------- #
 # Service shortcuts
 # --------------------------------------------------------------------------- #
@@ -338,14 +495,31 @@ def _share_sheet_with_email(
 
 def _resolve_chat_sender_email(
     sender_dict: Optional[dict],
+    space_name: Optional[str] = None,
 ) -> Optional[str]:
-    """Resolve a Chat sender resource (e.g. 'users/12345...') to an email
-    via People API. Used by the auto-share feature so receipts submitted
-    via chat can grant the submitter sheet access.
+    """Resolve a Chat sender resource (e.g. 'users/12345...') to an email.
 
-    Returns None if resolution fails. Process-cached.
+    Two-tier strategy:
+      1. People API `people.get` on the user resource — works for users in
+         your own Workspace org.
+      2. dm_email_cache sidecar lookup by `space_name` — works for users
+         in other orgs (subsidiary domains, external vendors), populated
+         every time `chat_send_dm` resolves an email to a space.
+
+    Used by the auto-share feature so receipts submitted via chat (from
+    any org) can grant the submitter sheet access.
+
+    Returns None if both tiers fail. Process-cached per user resource.
     """
     if not sender_dict:
+        # Even with no sender_dict, the sidecar may know the space's other
+        # party — useful when scanning a DM with anonymized sender info.
+        if space_name:
+            try:
+                import dm_email_cache as _dmc
+                return _dmc.lookup_by_space(space_name)
+            except Exception:
+                pass
         return None
     name = sender_dict.get("name") or ""
     if not name or not name.startswith("users/"):
@@ -353,8 +527,10 @@ def _resolve_chat_sender_email(
     if not hasattr(_resolve_chat_sender_email, "_cache"):
         _resolve_chat_sender_email._cache = {}
     cache = _resolve_chat_sender_email._cache  # type: ignore[attr-defined]
-    if name in cache:
+    if name in cache and cache[name]:
         return cache[name]
+
+    # Tier 1 — People API.
     try:
         person_resource = "people/" + name.split("/", 1)[1]
         people_svc = gservices.people()
@@ -369,6 +545,18 @@ def _resolve_chat_sender_email(
                 return val
     except Exception as e:
         log.warning("People API email lookup failed for %s: %s", name, e)
+
+    # Tier 2 — DM email sidecar (catches cross-org users).
+    if space_name:
+        try:
+            import dm_email_cache as _dmc
+            sidecar_email = _dmc.lookup_by_space(space_name)
+            if sidecar_email:
+                cache[name] = sidecar_email
+                return sidecar_email
+        except Exception as e:
+            log.warning("dm_email_cache lookup failed for %s: %s", space_name, e)
+
     cache[name] = None
     return None
 
@@ -502,30 +690,62 @@ def _ensure_needs_review_sheet() -> tuple[str, str]:
     return sheet_id, NEEDS_REVIEW_SHEET
 
 
+_SOURCE_ID_PREFIXES = ("gmail:", "chat:", "drive:", "src:")
+
+
+def _looks_like_source_id(cell: str) -> bool:
+    """True if a cell value matches a known source_id shape.
+
+    Used by `_existing_invoice_keys` so dedup keeps working even when a row
+    is column-shifted (e.g. an extra empty cell prepended, schema drift over
+    time). Schema-position-based lookup misses those rows; pattern-based
+    discovery catches them regardless of which column they landed in.
+    """
+    if not isinstance(cell, str) or not cell:
+        return False
+    return any(cell.startswith(p) for p in _SOURCE_ID_PREFIXES)
+
+
+def _looks_like_content_key(cell: str) -> bool:
+    """True if a cell value matches the content-key shape: a pipe-separated
+    string of at least 3 segments (vendor|invoice_number|total or
+    merchant|date|total|last_4). Trades a tiny risk of false positives for
+    full robustness against column shifts.
+    """
+    if not isinstance(cell, str) or "|" not in cell:
+        return False
+    parts = cell.split("|")
+    return len(parts) >= 3 and all(p == "" or p.strip() for p in parts)
+
+
 def _existing_invoice_keys(sheet_id: str) -> tuple[set[str], set[str]]:
-    """Return (source_ids, content_keys) already logged. For dedup."""
+    """Return (source_ids, content_keys) already logged in this sheet.
+
+    Pattern-based scan: looks at EVERY cell in the row and picks out
+    anything matching a known source_id prefix or content_key shape. This
+    makes dedup resilient to column-shift bugs (and historical schema
+    drift) — a row's source_id is recognized whether it's at the
+    "correct" column or one column over because of a leading empty.
+    """
     try:
         sheets = _sheets()
-        # AA covers up to 27 columns (PROJECT_SHEET_COLUMNS).
+        # AB covers up to 28 columns — one extra to catch any cell that
+        # overflowed past PROJECT_SHEET_COLUMNS due to a column shift.
         resp = sheets.spreadsheets().values().get(
-            spreadsheetId=sheet_id, range="A2:AA",
+            spreadsheetId=sheet_id, range="A2:AB",
         ).execute()
         rows = resp.get("values", []) or []
     except Exception:
         return set(), set()
 
-    # Look up indices once from the schema so column shifts (like the
-    # doc_type insertion) don't silently break dedup.
-    sid_idx = _pi.PROJECT_SHEET_COLUMNS.index("source_id")
-    ck_idx = _pi.PROJECT_SHEET_COLUMNS.index("content_key")
-
     source_ids: set[str] = set()
     content_keys: set[str] = set()
     for row in rows:
-        if len(row) > sid_idx and row[sid_idx]:
-            source_ids.add(row[sid_idx])
-        if len(row) > ck_idx and row[ck_idx]:
-            content_keys.add(row[ck_idx])
+        for cell in row:
+            if _looks_like_source_id(cell):
+                source_ids.add(cell)
+            elif _looks_like_content_key(cell):
+                content_keys.add(cell)
     return source_ids, content_keys
 
 
@@ -554,8 +774,8 @@ def _load_brand_voice() -> str:
         p = Path(__file__).resolve().parent.parent / _BRAND_VOICE_PATH
         if p.exists():
             return p.read_text(encoding="utf-8")[:4000]  # cap prompt cost
-    except Exception:
-        pass
+    except (OSError, UnicodeDecodeError) as e:
+        log.debug("brand-voice load failed: %s", e)
     return ""
 
 
@@ -605,7 +825,8 @@ def _project_picker_block() -> str:
     Returns empty string when no projects are registered."""
     try:
         rows = _pr.list_all(active_only=True)
-    except Exception:
+    except Exception as e:
+        log.warning("_project_picker_block: project registry unavailable: %s", e)
         return ""
     if not rows:
         return ""
@@ -3229,6 +3450,8 @@ def register(mcp) -> None:
                 "replies_found": 0,
                 "rows_updated": 0,
                 "rows_promoted": 0,
+                "rows_held_for_review": 0,
+                "rows_low_confidence": 0,
                 "rows_still_awaiting": 0,
                 "errors": 0,
             }
@@ -3238,19 +3461,32 @@ def register(mcp) -> None:
                 ck = rec.get("content_key")
                 channel = rec.get("channel")
                 request_sent_at = rec.get("request_sent_at") or ""
+                latest_reply_ts = rec.get("latest_reply_ts")
 
-                reply_body = None
+                reply_body: Optional[str] = None
+                reply_ts_iso: Optional[str] = None
+                reply_message: Optional[dict] = None
                 try:
                     if channel == "gmail":
-                        reply_body = _find_gmail_reply_body(
+                        found = _find_gmail_reply(
                             thread_id=rec["thread_id"],
                             sent_at_iso=request_sent_at,
+                            after_ts_iso=latest_reply_ts,
                         )
+                        if found:
+                            reply_body = found["body"]
+                            reply_ts_iso = found["internal_ts_iso"]
+                            reply_message = found["message"]
                     elif channel == "chat":
                         reply_body = _find_chat_reply_body(
                             space_name=rec["thread_id"],
-                            sent_at_iso=request_sent_at,
+                            sent_at_iso=latest_reply_ts or request_sent_at,
                         )
+                        # Chat doesn't currently surface message timestamps
+                        # back to us — leave reply_ts_iso None so we don't
+                        # advance latest_reply_ts (next sweep will re-find
+                        # this same reply, but the dedup is best-effort
+                        # for chat for now).
                 except Exception as e:
                     log.warning("reply lookup failed for %s: %s", ck, e)
                     results["errors"] += 1
@@ -3261,32 +3497,143 @@ def register(mcp) -> None:
                     continue
 
                 results["replies_found"] += 1
+                fields = rec.get("fields_requested") or []
 
                 # Parse the reply for the requested fields.
-                fields = rec.get("fields_requested") or []
                 parsed = _parse_vendor_reply(reply_body, fields)
+                # Confidence classifier — pure function, no LLM call.
+                # Empty parse → "low" automatically.
+                confidence = _pi.score_reply_confidence(
+                    parsed or {}, fields, reply_body,
+                )
+
+                # Advance latest_reply_ts so the next sweep doesn't reprocess
+                # this same message (regardless of confidence outcome).
+                if reply_ts_iso:
+                    _vf.update_latest_reply_ts(ck, reply_ts_iso)
+
+                # P1-4: log the (request_sent_at, replied_at) pair so the
+                # vendor's median reply latency can adapt next reminder
+                # cadence. Only record when the vendor's email is known
+                # (chat replies aren't keyed by email).
+                vendor_email = rec.get("vendor_email")
+                if (vendor_email and reply_ts_iso and confidence != "low"):
+                    try:
+                        _vrh_history.record_response_pair(
+                            vendor_email,
+                            request_sent_at,
+                            reply_ts_iso,
+                        )
+                    except Exception as e:
+                        log.warning("vendor_response_history log failed for "
+                                    "%s: %s", ck, e)
+
+                ack_sent = False
+                ack_err = None
+                promoted = False
+                review_queued = False
+                attachments_saved: list[dict] = []
+
+                if confidence == "low":
+                    # Vendor sent a deferral or didn't answer the ask.
+                    # Don't update the row, don't touch the awaiting_info
+                    # entry's reminder counter — the existing reminder
+                    # cadence will handle the next nudge.
+                    results["rows_low_confidence"] += 1
+                    updates.append({
+                        "content_key": ck,
+                        "vendor_name": rec.get("vendor_name"),
+                        "parsed": parsed or {},
+                        "confidence": confidence,
+                        "promoted_to_open": False,
+                        "queued_for_review": False,
+                        "attachments_saved": [],
+                        "ack_sent": False,
+                        "ack_error": None,
+                    })
+                    continue
+
+                # MEDIUM or HIGH — apply the field updates to the sheet row.
                 if not parsed:
+                    # Defensive: should not reach here if confidence != low,
+                    # but guard anyway.
                     results["rows_still_awaiting"] += 1
                     continue
 
-                # Update the sheet row in place.
                 try:
                     promoted = _apply_reply_update(rec, parsed)
                 except Exception as e:
                     log.warning("apply_reply_update failed for %s: %s", ck, e)
                     results["errors"] += 1
                     continue
-
                 results["rows_updated"] += 1
-                ack_sent = False
-                ack_err = None
+
+                # Pull any attachments from the reply into the project's
+                # Reply Attachments folder. Gmail-only — chat replies don't
+                # have inline file attachments today.
+                if channel == "gmail" and reply_message and rec.get("project_code"):
+                    try:
+                        attachments_saved = _archive_reply_attachments_to_project(
+                            payload=reply_message.get("payload") or {},
+                            gmail_svc=_gmail(),
+                            message_id=reply_message.get("id") or "",
+                            project_code=rec.get("project_code") or "",
+                            vendor_name=rec.get("vendor_name"),
+                        )
+                    except Exception as e:
+                        log.warning(
+                            "reply-attachment archive failed for %s: %s",
+                            ck, e,
+                        )
+
+                if confidence == "medium":
+                    # Apply the partial update but leave AWAITING_INFO open.
+                    # Queue for human review so it's visible.
+                    results["rows_held_for_review"] += 1
+                    try:
+                        _rq.add_for_review(
+                            content_key=ck,
+                            vendor_name=rec.get("vendor_name"),
+                            vendor_email=rec.get("vendor_email"),
+                            project_code=rec.get("project_code"),
+                            fields_requested=fields,
+                            parsed_fields=parsed,
+                            confidence="medium",
+                            reply_excerpt=reply_body[:500],
+                            sheet_id=rec.get("sheet_id"),
+                            row_number=rec.get("row_number"),
+                        )
+                        review_queued = True
+                    except Exception as e:
+                        log.warning("review_queue add failed for %s: %s",
+                                    ck, e)
+
+                    updates.append({
+                        "content_key": ck,
+                        "vendor_name": rec.get("vendor_name"),
+                        "parsed": parsed,
+                        "confidence": confidence,
+                        "promoted_to_open": promoted,
+                        "queued_for_review": review_queued,
+                        "attachments_saved": attachments_saved,
+                        "ack_sent": False,
+                        "ack_error": None,
+                    })
+                    continue
+
+                # HIGH confidence path — promote + mark resolved + ack.
                 if promoted:
                     results["rows_promoted"] += 1
                     _vf.mark_resolved(ck)
+                    # If we'd previously queued this for review and the
+                    # vendor sent a follow-up that promoted to high, clear
+                    # the review entry — it's resolved.
+                    try:
+                        _rq.mark_promoted(ck)
+                    except Exception:
+                        pass
 
-                    # Send acknowledgement on the same channel/thread —
-                    # they replied with the missing info, the loop is
-                    # closing, so confirm it landed.
+                    # Acknowledge on the same channel/thread.
                     try:
                         ack_inv = _pi.ExtractedInvoice(
                             vendor=rec.get("vendor_name"),
@@ -3296,8 +3643,6 @@ def register(mcp) -> None:
                             currency=parsed.get("currency"),
                             project_code=rec.get("project_code"),
                         )
-                        # Audience: gmail recipient w/ vendor email = vendor;
-                        # internal DM/chat = employee. Conservative default.
                         ack_audience = (
                             "employee" if channel == "chat"
                             else "vendor"
@@ -3334,13 +3679,20 @@ def register(mcp) -> None:
                         log.warning("ack send failed for %s: %s", ck, e)
                         ack_err = str(e)
                 else:
+                    # Quality guard didn't pass even though confidence was
+                    # high — fields parsed but the ExtractedInvoice still
+                    # fails validation (e.g. total parsed but >$250k cap).
+                    # Leave it AWAITING_INFO; it'll surface again next sweep.
                     results["rows_still_awaiting"] += 1
 
                 updates.append({
                     "content_key": ck,
                     "vendor_name": rec.get("vendor_name"),
                     "parsed": parsed,
+                    "confidence": confidence,
                     "promoted_to_open": promoted,
+                    "queued_for_review": False,
+                    "attachments_saved": attachments_saved,
                     "ack_sent": ack_sent,
                     "ack_error": ack_err,
                 })
@@ -3355,6 +3707,340 @@ def register(mcp) -> None:
             )
         except Exception as e:
             return format_error("workflow_process_vendor_replies", e)
+
+    # ------------------------------------------------------------------ #
+    @mcp.tool(
+        name="workflow_sweep_awaiting_info",
+        annotations={
+            "title": "List + optionally clear stale awaiting_info entries",
+            "readOnlyHint": False,
+            "destructiveHint": True,
+            "idempotentHint": False,
+            "openWorldHint": False,
+        },
+    )
+    async def workflow_sweep_awaiting_info(params: SweepAwaitingInfoInput) -> str:
+        """List vendor follow-up entries that are still pending a reply.
+        Optionally bulk-clear entries older than N days.
+
+        Returns a JSON summary with: total_open, by_channel, entries (each
+        with age_days, vendor, project, fields_requested, last_action), and
+        if `older_than_days` is set, what was cleared (or what WOULD be
+        cleared if `dry_run=True`).
+
+        Default behavior is list-only (no clearing). When `older_than_days`
+        is set, dry_run defaults to True for safety — pass dry_run=False
+        to actually clear.
+        """
+        try:
+            entries = _vf.list_open(channel=params.channel)
+            now = _dt.datetime.now(_dt.timezone.utc)
+
+            def _age_days(iso: Optional[str]) -> Optional[float]:
+                if not iso:
+                    return None
+                try:
+                    dt = _dt.datetime.fromisoformat(iso)
+                    if dt.tzinfo is None:
+                        dt = dt.replace(tzinfo=_dt.timezone.utc)
+                    return (now - dt).total_seconds() / 86400.0
+                except Exception:
+                    return None
+
+            # Apply project filter
+            if params.project_code:
+                entries = [
+                    e for e in entries
+                    if e.get("project_code") == params.project_code
+                ]
+
+            # Annotate with age
+            annotated = []
+            for e in entries:
+                age = _age_days(e.get("request_sent_at"))
+                annotated.append({
+                    "content_key": e.get("content_key"),
+                    "channel": e.get("channel"),
+                    "vendor": e.get("vendor_name") or e.get("vendor_email"),
+                    "project_code": e.get("project_code"),
+                    "fields_requested": e.get("fields_requested", []),
+                    "request_sent_at": e.get("request_sent_at"),
+                    "age_days": round(age, 1) if age is not None else None,
+                    "reminder_count": e.get("reminder_count", 0),
+                    "last_reminder_at": e.get("last_reminder_at"),
+                })
+
+            # Group counts
+            by_channel = {}
+            for e in annotated:
+                ch = e["channel"] or "unknown"
+                by_channel[ch] = by_channel.get(ch, 0) + 1
+
+            result = {
+                "total_open": len(annotated),
+                "by_channel": by_channel,
+                "entries": annotated,
+            }
+
+            # Clearing path
+            if params.older_than_days is not None:
+                # Default dry_run=True for safety unless explicitly False
+                effective_dry = (
+                    params.dry_run if params.dry_run is not None else True
+                )
+                stale = [
+                    e for e in annotated
+                    if e["age_days"] is not None
+                    and e["age_days"] >= params.older_than_days
+                ]
+                if effective_dry:
+                    result["would_clear"] = [e["content_key"] for e in stale]
+                    result["would_clear_count"] = len(stale)
+                    result["dry_run"] = True
+                else:
+                    cleared = []
+                    for e in stale:
+                        if _vf.forget(e["content_key"]):
+                            cleared.append(e["content_key"])
+                    result["cleared"] = cleared
+                    result["cleared_count"] = len(cleared)
+                    result["dry_run"] = False
+
+            return json.dumps(result, indent=2, default=str)
+        except Exception as e:
+            return format_error("workflow_sweep_awaiting_info", e)
+
+    # ------------------------------------------------------------------ #
+    @mcp.tool(
+        name="workflow_list_review_queue",
+        annotations={
+            "title": "List medium-confidence vendor replies awaiting human review",
+            "readOnlyHint": False,
+            "destructiveHint": True,
+            "idempotentHint": False,
+            "openWorldHint": False,
+        },
+    )
+    async def workflow_list_review_queue(
+        params: ListReviewQueueInput,
+    ) -> str:
+        """List entries in the review queue (medium-confidence vendor replies
+        that updated the row in place but didn't auto-promote).
+
+        Optionally bulk-approve (`promote`) or bulk-reject (`forget`)
+        specific entries by content_key. Promote calls _vf.mark_resolved
+        on the matching awaiting_info entry — moving it out of the
+        outstanding-asks list.
+
+        Returns a JSON summary of: open queue, what was promoted, what
+        was forgotten.
+        """
+        try:
+            acted = {"promoted": [], "forgotten": []}
+
+            # Apply promote actions first so the listed open queue reflects
+            # the post-action state.
+            if params.promote:
+                for ck in params.promote:
+                    if _rq.mark_promoted(ck):
+                        _vf.mark_resolved(ck)
+                        acted["promoted"].append(ck)
+
+            if params.forget:
+                for ck in params.forget:
+                    if _rq.forget(ck):
+                        acted["forgotten"].append(ck)
+
+            entries = _rq.list_open(project_code=params.project_code)
+
+            return json.dumps(
+                {
+                    "total_open": len(entries),
+                    "entries": entries,
+                    "acted": acted,
+                },
+                indent=2,
+                default=str,
+            )
+        except Exception as e:
+            return format_error("workflow_list_review_queue", e)
+
+    # ------------------------------------------------------------------ #
+    @mcp.tool(
+        name="workflow_snooze_awaiting_info",
+        annotations={
+            "title": "Pause reminders for an awaiting_info entry until a date",
+            "readOnlyHint": False,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    )
+    async def workflow_snooze_awaiting_info(
+        params: SnoozeAwaitingInfoInput,
+    ) -> str:
+        """Pause reminders for the matching entry until `until_date`.
+        While snoozed, the entry is excluded from due_for_reminder().
+        Records a SNOOZED event in the entry's escalation trail.
+        Pass workflow_unsnooze_awaiting_info to clear early."""
+        try:
+            ok = _vf.snooze(
+                params.content_key, params.until_date, params.reason,
+            )
+            return json.dumps({
+                "content_key": params.content_key,
+                "snoozed": ok,
+                "snoozed_until": params.until_date if ok else None,
+                "reason": params.reason if ok else None,
+            }, indent=2)
+        except ValueError as e:
+            return format_error("workflow_snooze_awaiting_info", e)
+        except Exception as e:
+            return format_error("workflow_snooze_awaiting_info", e)
+
+    # ------------------------------------------------------------------ #
+    @mcp.tool(
+        name="workflow_unsnooze_awaiting_info",
+        annotations={
+            "title": "Clear snooze on an awaiting_info entry — reminders resume",
+            "readOnlyHint": False,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    )
+    async def workflow_unsnooze_awaiting_info(
+        params: UnsnoozeAwaitingInfoInput,
+    ) -> str:
+        """Clear the snoozed_until field on an entry so reminders resume.
+        No-op if the entry doesn't exist or wasn't snoozed."""
+        try:
+            ok = _vf.unsnooze(params.content_key)
+            return json.dumps({
+                "content_key": params.content_key,
+                "unsnoozed": ok,
+            }, indent=2)
+        except Exception as e:
+            return format_error("workflow_unsnooze_awaiting_info", e)
+
+    # ------------------------------------------------------------------ #
+    @mcp.tool(
+        name="workflow_bulk_resolve_awaiting_info",
+        annotations={
+            "title": "Resolve many awaiting_info entries in one call",
+            "readOnlyHint": False,
+            "destructiveHint": True,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    )
+    async def workflow_bulk_resolve_awaiting_info(
+        params: BulkResolveAwaitingInfoInput,
+    ) -> str:
+        """Mark multiple entries resolved in one operation. Each
+        successful resolution appends a RESOLVED event (and the
+        provided `reason`, if any) to that entry's trail.
+        Returns per-entry result so the caller can see partial success."""
+        try:
+            results = []
+            for ck in params.content_keys:
+                ok = _vf.mark_resolved(ck)
+                if ok and params.reason:
+                    _vf.append_event(ck, {
+                        "action": "RESOLVED_REASON",
+                        "reason": params.reason,
+                    })
+                results.append({"content_key": ck, "resolved": bool(ok)})
+            return json.dumps({
+                "total": len(results),
+                "resolved": sum(1 for r in results if r["resolved"]),
+                "results": results,
+            }, indent=2)
+        except Exception as e:
+            return format_error("workflow_bulk_resolve_awaiting_info", e)
+
+    # ------------------------------------------------------------------ #
+    @mcp.tool(
+        name="workflow_bulk_promote_review_queue",
+        annotations={
+            "title": "Promote many review-queue entries (approve + resolve) in one call",
+            "readOnlyHint": False,
+            "destructiveHint": True,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    )
+    async def workflow_bulk_promote_review_queue(
+        params: BulkPromoteReviewQueueInput,
+    ) -> str:
+        """For each content_key: clear the review_queue entry and mark
+        the underlying awaiting_info resolved (same as a per-entry
+        promote in workflow_list_review_queue, but bulk).
+        Returns per-entry success."""
+        try:
+            results = []
+            for ck in params.content_keys:
+                promoted = False
+                if _rq.mark_promoted(ck):
+                    if _vf.mark_resolved(ck):
+                        _vf.append_event(ck, {
+                            "action": "REVIEW_QUEUE_PROMOTED",
+                        })
+                        promoted = True
+                results.append({"content_key": ck, "promoted": promoted})
+            return json.dumps({
+                "total": len(results),
+                "promoted": sum(1 for r in results if r["promoted"]),
+                "results": results,
+            }, indent=2)
+        except Exception as e:
+            return format_error("workflow_bulk_promote_review_queue", e)
+
+    # ------------------------------------------------------------------ #
+    @mcp.tool(
+        name="workflow_get_escalation_trail",
+        annotations={
+            "title": "Get the timeline of events for an awaiting_info entry",
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+    )
+    async def workflow_get_escalation_trail(
+        params: GetEscalationTrailInput,
+    ) -> str:
+        """Return the chronological list of events recorded for an
+        awaiting_info entry: ASK, REMINDER tier N, SNOOZED, UNSNOOZED,
+        RESOLVED, REVIEW_QUEUE_PROMOTED, etc.
+
+        format='json' returns the raw event list. format='text' returns
+        a compact one-line-per-event human view ('2026-04-12 ASK · ...
+        2026-04-19 R1 · 2026-04-24 R2 · 2026-04-30 RESOLVED')."""
+        try:
+            events = _vf.get_trail(params.content_key)
+            if params.format == "text":
+                if not events:
+                    return f"(no events for {params.content_key})"
+                parts = []
+                for ev in events:
+                    ts = (ev.get("ts") or "")[:10]  # YYYY-MM-DD
+                    action = ev.get("action", "?")
+                    if action == "REMINDER":
+                        parts.append(f"{ts} R{ev.get('tier','?')}")
+                    elif action == "SNOOZED":
+                        until = (ev.get("until") or "")[:10]
+                        parts.append(f"{ts} SNOOZED→{until}")
+                    else:
+                        parts.append(f"{ts} {action}")
+                return " · ".join(parts)
+            # json mode
+            return json.dumps({
+                "content_key": params.content_key,
+                "events": events,
+            }, indent=2)
+        except Exception as e:
+            return format_error("workflow_get_escalation_trail", e)
 
 
 # --------------------------------------------------------------------------- #
@@ -3469,6 +4155,75 @@ def _archive_gmail_attachments_to_project(
         except Exception as e:
             log.warning("attachment archive failed for %s: %s", archive_name, e)
     return links
+
+
+def _archive_reply_attachments_to_project(
+    *,
+    payload: dict,
+    gmail_svc,
+    message_id: str,
+    project_code: str,
+    vendor_name: Optional[str],
+    field_mime_hints: Optional[dict] = None,
+) -> list[dict]:
+    """Pull PDF/image attachments from a vendor reply message into the
+    project's Reply Attachments subtree. Returns a list of
+    {filename, drive_link, mime_type} dicts for inclusion in the row's
+    Attachments column.
+
+    Path: AP Submissions/Reply Attachments/<PROJECT>/<vendor>/<filename>.
+
+    `field_mime_hints` is reserved for the caller to filter by expected
+    type (e.g. only PDFs for W-9). When None, accepts any PDF or image
+    — current behavior. The mapping is plumbed through but not yet
+    enforced; once the row knows which field the attachment is for,
+    callers can pass {"w9": ["application/pdf"]} etc.
+    """
+    parts = _gmail_attachment_parts(payload)
+    if not parts:
+        return []
+    try:
+        folder_id = _drive_layout.ensure_reply_attachments_folder(
+            project_code, vendor_name,
+        )
+    except Exception as e:
+        log.warning("could not ensure reply-attachments folder: %s", e)
+        return []
+
+    saved: list[dict] = []
+    for part in parts:
+        content, mime, original_name = _download_gmail_attachment(
+            gmail_svc, message_id, part,
+        )
+        if not content:
+            continue
+        # Optional mime gate (off by default — accepts PDFs + images).
+        if field_mime_hints:
+            allowed = set()
+            for v in field_mime_hints.values():
+                allowed.update((m or "").lower() for m in (v or []))
+            if allowed and mime.lower() not in allowed:
+                continue
+        # Preserve filename if present; otherwise generate a stable one.
+        if not original_name:
+            ext = (".pdf" if mime == "application/pdf"
+                   else "." + (mime.split("/", 1)[1] if "/" in mime else "bin"))
+            original_name = f"reply_{message_id[:10]}{ext}"
+        try:
+            link = _drive_layout.archive_to_project_folder(
+                folder_id, content, mime, original_name,
+            )
+        except Exception as e:
+            log.warning("reply-attachment archive failed for %s: %s",
+                        original_name, e)
+            continue
+        if link:
+            saved.append({
+                "filename": original_name,
+                "drive_link": link,
+                "mime_type": mime,
+            })
+    return saved
 
 
 def _extract_body_text(payload: dict) -> str:
@@ -4209,8 +4964,12 @@ def _scan_chat_for_project_receipts(
             sender = None
         # Also resolve the sender's email — used by the auto-share path
         # so the bot can grant the submitter access to the project sheet.
+        # Pass the space_name so the sidecar fallback can resolve the
+        # other party's email when People API can't (cross-org case).
         try:
-            submitter_email = _resolve_chat_sender_email(msg.get("sender"))
+            submitter_email = _resolve_chat_sender_email(
+                msg.get("sender"), space_name=params.chat_space_id,
+            )
         except Exception:
             submitter_email = None
 
@@ -4302,10 +5061,24 @@ def _iso_to_epoch_ms(iso: str) -> int:
         return 0
 
 
-def _find_gmail_reply_body(*, thread_id: str, sent_at_iso: str) -> Optional[str]:
-    """Walk a Gmail thread for any message that arrived AFTER our request
-    AND is not from us (the authenticated user). Returns the message body
-    (text/plain preferred) or None if no qualifying reply exists yet.
+def _find_gmail_reply(
+    *,
+    thread_id: str,
+    sent_at_iso: str,
+    after_ts_iso: Optional[str] = None,
+) -> Optional[dict]:
+    """Walk a Gmail thread for the OLDEST vendor reply that arrived after
+    `sent_at_iso` AND after `after_ts_iso` (if provided) AND is not from us.
+
+    Returns a dict with the full message + body, or None if no qualifying
+    reply exists yet. The dict shape:
+        {"message": <gmail message resource>,
+         "body": <plain text body>,
+         "internal_ts_ms": <int>,
+         "internal_ts_iso": <ISO string>}
+
+    Walks oldest-to-newest so the dedup loop in the orchestrator processes
+    one reply per sweep — earliest unseen first.
     """
     try:
         gmail = _gmail()
@@ -4317,6 +5090,9 @@ def _find_gmail_reply_body(*, thread_id: str, sent_at_iso: str) -> Optional[str]
         return None
 
     sent_ms = _iso_to_epoch_ms(sent_at_iso)
+    after_ms = _iso_to_epoch_ms(after_ts_iso) if after_ts_iso else 0
+    cutoff_ms = max(sent_ms, after_ms)
+
     me_email = ""
     try:
         prof = gmail.users().getProfile(userId="me").execute()
@@ -4324,14 +5100,14 @@ def _find_gmail_reply_body(*, thread_id: str, sent_at_iso: str) -> Optional[str]
     except Exception:
         pass
 
+    candidates = []
     for m in (thread.get("messages") or []):
         try:
             internal_ms = int(m.get("internalDate") or 0)
         except (TypeError, ValueError):
             internal_ms = 0
-        if internal_ms <= sent_ms:
+        if internal_ms <= cutoff_ms:
             continue
-        # Skip messages we sent ourselves.
         headers = {
             h["name"].lower(): h["value"]
             for h in (m.get("payload", {}).get("headers") or [])
@@ -4339,14 +5115,37 @@ def _find_gmail_reply_body(*, thread_id: str, sent_at_iso: str) -> Optional[str]
         from_addr = (headers.get("from", "") or "").lower()
         if me_email and me_email in from_addr:
             continue
-        # Reject messages stamped with our own bot-footer marker — those are
-        # other automated outbounds, not vendor replies.
         body = _extract_body_text(m.get("payload") or {})
         if _r.BOT_FOOTER_MARKER.lower() in (body or "").lower():
             continue
         if body and body.strip():
-            return body
-    return None
+            candidates.append((internal_ms, m, body))
+
+    if not candidates:
+        return None
+    # Oldest unseen reply wins — the orchestrator advances latest_reply_ts
+    # after acting on it, so the next sweep picks up the next one.
+    candidates.sort(key=lambda t: t[0])
+    ts_ms, msg, body = candidates[0]
+    iso = _dt.datetime.fromtimestamp(
+        ts_ms / 1000, tz=_dt.timezone.utc,
+    ).isoformat()
+    return {
+        "message": msg,
+        "body": body,
+        "internal_ts_ms": ts_ms,
+        "internal_ts_iso": iso,
+    }
+
+
+def _find_gmail_reply_body(*, thread_id: str, sent_at_iso: str) -> Optional[str]:
+    """Backwards-compat wrapper around _find_gmail_reply.
+
+    Returns just the body string. Callers that need the full message
+    (e.g. for attachments) should use _find_gmail_reply directly.
+    """
+    found = _find_gmail_reply(thread_id=thread_id, sent_at_iso=sent_at_iso)
+    return found["body"] if found else None
 
 
 def _find_chat_reply_body(*, space_name: str, sent_at_iso: str) -> Optional[str]:
@@ -4396,8 +5195,11 @@ def _find_chat_reply_body(*, space_name: str, sent_at_iso: str) -> Optional[str]
                 resolved = _resolve_chat_sender_display(sender) or ""
                 if resolved and me_email.split("@")[0] in resolved.lower():
                     continue
-            except Exception:
-                pass
+            except Exception as e:
+                # Best-effort sender skip — falls through to keep this msg
+                # as a candidate. Logged at debug since the resolve helper
+                # has its own error handling.
+                log.debug("chat sender resolve failed: %s", e)
         return text
     return None
 
@@ -4411,7 +5213,7 @@ def _parse_vendor_reply(reply_body: str, fields_requested: list[str]) -> Optiona
     """
     try:
         import llm
-    except Exception:
+    except ImportError:
         return None
     ok, _ = llm.is_available()
     if not ok:

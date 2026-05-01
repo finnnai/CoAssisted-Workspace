@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# © 2026 CoAssisted Workspace. Licensed under MIT.
 # See LICENSE file for terms.
 """Vendor info-request tracker — sidecar store for outstanding follow-ups.
 
@@ -86,10 +86,88 @@ def _email_wait_hours(reminder_count: int) -> int:
     before the 1st reminder (24h). When it equals MAX_REMINDERS, no more
     reminders should fire — we return a very large number as a guard,
     though due_for_reminder() also short-circuits via the cap check.
+
+    P1-4: This is the COLD-START fallback. When per-vendor history is
+    available (>= COLD_START_THRESHOLD recorded replies),
+    _adaptive_email_wait_hours() overrides this with a value derived
+    from the vendor's median reply latency.
     """
     if reminder_count >= len(EMAIL_REMINDER_HOURS_LADDER):
         return 10 ** 9  # effectively "never"
     return EMAIL_REMINDER_HOURS_LADDER[reminder_count]
+
+
+def _adaptive_email_wait_hours(
+    vendor_email: Optional[str],
+    reminder_count: int,
+) -> int:
+    """P1-4: per-vendor wait time. Pulls the vendor's median reply
+    latency from vendor_response_history.py and maps it to a tier.
+    Falls back to the constant ladder when there's no history yet."""
+    default = _email_wait_hours(reminder_count)
+    if not vendor_email:
+        return default
+    try:
+        import vendor_response_history as _vrh
+        return _vrh.adaptive_wait_hours(vendor_email, default)
+    except Exception:
+        return default
+
+
+# --------------------------------------------------------------------------- #
+# Day-of-week + holiday push (P1-4)
+# --------------------------------------------------------------------------- #
+
+
+_HOLIDAYS_PATH = _PROJECT_ROOT / "us_federal_holidays.json"
+_HOLIDAYS_CACHE: Optional[set[str]] = None
+
+
+def _load_holidays() -> set[str]:
+    """Load the bundled US federal holiday set (2026-2030). Cached after
+    first load. Returns an empty set if the file is missing — falls back
+    to weekend-only push."""
+    global _HOLIDAYS_CACHE
+    if _HOLIDAYS_CACHE is not None:
+        return _HOLIDAYS_CACHE
+    out: set[str] = set()
+    try:
+        with _HOLIDAYS_PATH.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+        for k, v in data.items():
+            if k.startswith("_"):
+                continue
+            for d in v:
+                out.add(d)
+    except Exception:
+        pass
+    _HOLIDAYS_CACHE = out
+    return out
+
+
+def _is_business_day(date: _dt.date) -> bool:
+    """True if date is Mon-Fri AND not a US federal holiday."""
+    if date.weekday() >= 5:  # 5=Sat, 6=Sun
+        return False
+    if date.isoformat() in _load_holidays():
+        return False
+    return True
+
+
+def _next_business_day_at_9am(reference: _dt.datetime) -> _dt.datetime:
+    """Return the next business-day 9am local from `reference`. If
+    reference itself falls on a non-business day, advance day-by-day
+    until we hit a Mon-Fri non-holiday at 9am local."""
+    candidate = reference
+    # Always set to 9am local on the candidate date
+    candidate = candidate.replace(hour=9, minute=0, second=0, microsecond=0)
+    # If the original moment was already past 9am on a business day, stay
+    # there; otherwise push to next business day at 9am.
+    if reference > candidate and _is_business_day(reference.date()):
+        return reference  # already past 9am on a business day → don't push
+    while not _is_business_day(candidate.date()):
+        candidate = candidate + _dt.timedelta(days=1)
+    return candidate
 
 
 def _now_iso() -> str:
@@ -171,6 +249,24 @@ def register_request(
         "project_code": project_code,
         "chat_thread_name": chat_thread_name,
         "resolved_at": None,
+        # P0-2: tracks the timestamp of the newest vendor reply we've already
+        # processed, so the next sweep skips messages we already acted on.
+        # Initially equal to request_sent_at — anything before this is "us".
+        "latest_reply_ts": None,
+        # P1-5: snooze + escalation trail.
+        # `snoozed_until` is an ISO timestamp; while now < snoozed_until,
+        # due_for_reminder() skips this entry. Cleared by unsnooze().
+        # `events` accumulates timeline records (ASK / REMINDER tier N /
+        # SNOOZED / UNSNOOZED / RESOLVED), each with a timestamp + payload.
+        "snoozed_until": None,
+        "events": [
+            {
+                "ts": _now_iso(),
+                "action": "ASK",
+                "channel": channel,
+                "fields": list(fields_requested or []),
+            },
+        ],
     }
     data[content_key] = rec
     _save(data)
@@ -215,6 +311,17 @@ def due_for_reminder() -> list[dict]:
     for rec in _load().values():
         if rec.get("resolved_at"):
             continue
+        # P1-5: skip snoozed entries until their snoozed_until passes.
+        snoozed = rec.get("snoozed_until")
+        if snoozed:
+            try:
+                snz_dt = _dt.datetime.fromisoformat(snoozed)
+                if snz_dt.tzinfo is None:
+                    snz_dt = snz_dt.replace(tzinfo=_dt.timezone.utc)
+                if now < snz_dt.astimezone():
+                    continue
+            except ValueError:
+                pass  # bad ISO — fall through and treat as not snoozed
         rcount = int(rec.get("reminder_count", 0))
         if rcount >= MAX_REMINDERS:
             continue
@@ -232,10 +339,23 @@ def due_for_reminder() -> list[dict]:
         if rec.get("channel") == "chat":
             wait_hours = CHAT_REMINDER_HOURS
         else:
-            wait_hours = _email_wait_hours(rcount)
+            # P1-4: per-vendor adaptive wait, falls back to the constant
+            # ladder when the vendor has no history yet.
+            wait_hours = _adaptive_email_wait_hours(
+                rec.get("vendor_email"), rcount,
+            )
         elapsed_hours = (now - last_dt).total_seconds() / 3600.0
-        if elapsed_hours >= wait_hours:
-            out.append(dict(rec))
+        if elapsed_hours < wait_hours:
+            continue
+        # P1-4: push to next business day at 9am local if the moment we'd
+        # send a reminder lands on a weekend or US federal holiday. Email
+        # to a vendor at Sat 11am is noisy; better to wait until Mon 9am.
+        if rec.get("channel") == "gmail":
+            target = last_dt + _dt.timedelta(hours=wait_hours)
+            scheduled = _next_business_day_at_9am(target)
+            if now < scheduled:
+                continue
+        out.append(dict(rec))
     out.sort(key=lambda r: r.get("request_sent_at") or "")
     return out
 
@@ -253,9 +373,108 @@ def record_reminder(content_key: str) -> Optional[dict]:
         return None
     rec["reminder_count"] = int(rec.get("reminder_count", 0)) + 1
     rec["last_reminder_at"] = _now_iso()
+    rec.setdefault("events", []).append({
+        "ts": rec["last_reminder_at"],
+        "action": "REMINDER",
+        "tier": rec["reminder_count"],
+    })
     data[content_key] = rec
     _save(data)
     return dict(rec)
+
+
+def snooze(
+    content_key: str,
+    until_date: str,
+    reason: Optional[str] = None,
+) -> bool:
+    """Pause reminders for this entry until until_date (ISO 8601).
+    Records a SNOOZED event in the entry's timeline. Returns True if
+    the entry exists and was updated, False otherwise."""
+    if not content_key or not until_date:
+        return False
+    # Validate ISO format (will raise if malformed; caller should catch)
+    try:
+        _dt.datetime.fromisoformat(until_date)
+    except ValueError:
+        raise ValueError(f"until_date must be ISO 8601: {until_date!r}")
+    data = _load()
+    rec = data.get(content_key)
+    if not rec or rec.get("resolved_at"):
+        return False
+    rec["snoozed_until"] = until_date
+    rec.setdefault("events", []).append({
+        "ts": _now_iso(),
+        "action": "SNOOZED",
+        "until": until_date,
+        "reason": reason,
+    })
+    data[content_key] = rec
+    _save(data)
+    return True
+
+
+def unsnooze(content_key: str) -> bool:
+    """Clear snoozed_until on an entry. Returns True if the entry was
+    snoozed and is now clear; False otherwise (no entry, or wasn't snoozed)."""
+    if not content_key:
+        return False
+    data = _load()
+    rec = data.get(content_key)
+    if not rec or not rec.get("snoozed_until"):
+        return False
+    rec["snoozed_until"] = None
+    rec.setdefault("events", []).append({
+        "ts": _now_iso(),
+        "action": "UNSNOOZED",
+    })
+    data[content_key] = rec
+    _save(data)
+    return True
+
+
+def append_event(content_key: str, event: dict) -> bool:
+    """Append an arbitrary event to an entry's timeline. Caller is
+    responsible for the event shape; ts is set automatically if missing.
+    Returns True on success, False if the entry doesn't exist."""
+    if not content_key or not event:
+        return False
+    data = _load()
+    rec = data.get(content_key)
+    if not rec:
+        return False
+    ev = dict(event)
+    ev.setdefault("ts", _now_iso())
+    rec.setdefault("events", []).append(ev)
+    data[content_key] = rec
+    _save(data)
+    return True
+
+
+def get_trail(content_key: str) -> list[dict]:
+    """Return the events timeline for an entry (oldest first).
+    Empty list if the entry doesn't exist or has no events yet."""
+    rec = _load().get(content_key)
+    if not rec:
+        return []
+    return list(rec.get("events", []))
+
+
+def update_latest_reply_ts(content_key: str, ts_iso: str) -> bool:
+    """Mark which reply timestamp we last processed for an entry.
+
+    Subsequent sweeps will skip messages older than this. Used by
+    workflow_process_vendor_replies to dedup multi-message threads.
+    Returns True if the entry exists and was updated, False otherwise.
+    """
+    if not content_key or not ts_iso:
+        return False
+    data = _load()
+    if content_key not in data:
+        return False
+    data[content_key]["latest_reply_ts"] = ts_iso
+    _save(data)
+    return True
 
 
 def mark_resolved(content_key: str) -> bool:
@@ -267,6 +486,10 @@ def mark_resolved(content_key: str) -> bool:
     if not rec or rec.get("resolved_at"):
         return False
     rec["resolved_at"] = _now_iso()
+    rec.setdefault("events", []).append({
+        "ts": rec["resolved_at"],
+        "action": "RESOLVED",
+    })
     data[content_key] = rec
     _save(data)
     return True

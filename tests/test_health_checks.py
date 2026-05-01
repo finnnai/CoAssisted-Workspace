@@ -162,3 +162,32 @@ def test_check_unit_tests_handles_missing_tests_dir(monkeypatch, tmp_path):
     r = system._check_unit_tests()
     assert r["status"] == "warn"
     assert "tests" in r["details"].lower()
+
+
+# --------------------------------------------------------------------------- #
+# P2-1 — config validator should skip _-prefixed comment keys
+# --------------------------------------------------------------------------- #
+
+
+def test_config_validator_ignores_underscore_prefixed_keys(tmp_path, monkeypatch):
+    """Keys starting with '_' are project-convention inline comments and
+    should not be flagged as 'Unknown keys'."""
+    import json as _json
+    import config as _config
+    import tools.system as _ts
+
+    cfg_path = tmp_path / "config.json"
+    cfg_path.write_text(_json.dumps({
+        "default_timezone": "America/Los_Angeles",
+        "_attachments_comment": "this is a comment, should be ignored",
+        "_other_comment": "ditto",
+        "anthropic_api_key": "sk-ant-test",
+    }))
+
+    # Point _check_config at our temp config by patching the module file path
+    monkeypatch.setattr(_config, "__file__", str(tmp_path / "config.py"))
+    # Also touch the file so existence check passes
+    (tmp_path / "config.py").write_text("# placeholder\n")
+
+    res = _ts._check_config()
+    assert res["status"] == "pass", f"expected pass, got: {res}"

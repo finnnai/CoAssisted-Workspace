@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# © 2026 CoAssisted Workspace. Licensed under MIT.
 # See LICENSE file for terms. Removing or altering this header is prohibited.
 """User-configurable defaults loaded from config.json.
 
@@ -43,9 +43,11 @@ _DEFAULTS: dict[str, Any] = {
     "crm_window_days": 60,             # window for Sent/Received tallies on contacts
     "log_sent_emails_to_contacts": True,  # append activity notes to contact biographies
     # Attachments larger than this auto-upload to Drive and are shared via link
-    # rather than inlined. Prevents stdio BrokenPipeErrors on Cowork's MCP channel
-    # and bypasses corporate mail filters that block .tar.gz / .zip.
-    "large_attachment_threshold_kb": 500,
+    # rather than inlined. Set to 22000 (~22MB) so anything within Gmail's
+    # per-message ceiling sends as a real attachment. Files above 22MB still
+    # route via Drive. Lower this if stdio BrokenPipeErrors recur on the
+    # Cowork MCP channel or corporate mail filters start bouncing large files.
+    "large_attachment_threshold_kb": 22000,
     # Hard cap on inline base64 returned in MCP responses (download tools).
     # Anything bigger MUST use save_to_path. Default 5MB — under stdio buffer limits
     # AND keeps context window manageable.

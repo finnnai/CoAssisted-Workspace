@@ -36,3 +36,14 @@ env/
 .idea/
 *.swp
 .DS_Store
+
+# Backup files (created during interactive edits)
+*.bak.*
+brand-voice.md.bak.*
+
+# Pytest cache
+.pytest_cache/
+pytest-cache-files-*/
+
+# Health reports (rotating)
+logs/health_reports/

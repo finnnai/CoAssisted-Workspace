@@ -1,155 +1,161 @@
 # Brand Voice Guidelines
 
-_Auto-generated from your last 90 days of sent mail. Do not hand-edit
+_Auto-generated from your last 180 days of sent mail. Do not hand-edit
 above the divider — re-run `refresh_brand_voice.py` to regenerate. Hand-edits
 below the divider are preserved._
 
-**Generated:** 2026-04-24 19:50 PDT
-**Source:** 14 sent emails (scanned 21, kept 14)
-**Date range:** 2026-04-23T15:44:04Z → 2026-04-25T01:37:07Z
+**Generated:** 2026-04-29 21:50 PDT
+**Source:** 702 sent emails (scanned 782, kept 702)
+**Date range:** 2025-11-04T15:33:55Z → 2026-04-29T19:32:00Z
 **Mode:** LLM analysis (claude-sonnet-4-6)
 
 ---
 
-# Brand-Voice Style Guide
+# Brand Voice Guide — Joshua Szott
 
 ---
 
 ## 1. Voice in One Paragraph
 
-This is the voice of a technically fluent builder who respects the reader's time above all else. Messages are dense with useful information and almost entirely free of social padding — no "Hope you're doing well," no "Please don't hesitate to reach out." The tone is collegial and direct, like a trusted colleague dropping something on your desk with a sticky note rather than a formal memo. There's a quiet confidence: instructions are given without over-explaining, caveats are precise rather than apologetic, and the occasional dry aside ("Delete at will," "Ping me with anything weird") signals warmth without performing it.
+Joshua writes like a busy executive who respects everyone's time, including his own. His emails are short, direct, and conversational — closer to a spoken thought than a composed letter. He doesn't warm up or wind down; he gets to the point in the first sentence and stops when the point is made. There's an underlying confidence that doesn't need to announce itself: he doesn't over-explain, doesn't hedge excessively, and doesn't perform enthusiasm. When he's warm, it's brief and genuine ("that is amazing news!"). When he's operational, he's almost terse ("Received."). The overall effect is someone who is always moving and trusts the reader to keep up.
 
 ---
 
 ## 2. Tone & Formality
 
-**Spectrum position:** Casual-professional. Closer to Slack than to a business letter, but never sloppy.
+**Position on the spectrum:** Casual-professional. Not corporate, not informal. Closer to how a trusted colleague talks than how a press release reads.
 
-- Greetings exist but are minimal: `Hi there`, `Hi Josh`, `Josh —`
-- No titles, no last names, no "Dear"
-- Technical terms are used without apology or definition: `MCP server`, `OAuth credentials`, `tarball`, `threading + headers logic`
-- Apologies are brief and functional: *"Apologies for the spam"* — one clause, not a paragraph
-- Warmth appears in small doses via word choice (`Ping me`, `anything weird`, `Delete at will`) rather than explicit friendliness
-- The register stays consistent whether writing to one person or a group
+- He uses first names without preamble: *"Hey Tom,"* / *"Hey Shannon,"* / *"Bill, thank you…"* / *"Tait, we will see…"* / *"AJ, that is amazing news!"*
+- He doesn't open with pleasantries like "I hope this finds you well." He acknowledges the other person's action and moves on: *"Bill, thank you for the quick response last week. I would love a chance to connect when you are free this week."*
+- He softens requests slightly with "I would love" or "I was wondering" but never buries the ask: *"I was wondering if there was an export of invoices or their details."*
+- He can be blunt without being harsh: *"just because someone wrote it on a timecard doesnt mean it happend."*
+- With external contacts he's slightly warmer but still brief: *"Chris, great to e-meet you. Moving is tough, just relocated back here to the city."*
 
 ---
 
 ## 3. Sentence Rhythm
 
-**Typical pattern:** Short declarative opener → compact supporting detail → one-line action item or closer.
+**Typical length:** Short to medium. Most sentences are one clause. Multi-clause sentences appear when he's explaining context, but they rarely exceed two clauses.
 
-- Opening sentences are often a single clause that names the thing being shared: *"Sharing the Google Workspace MCP."* / *"Latest build with all the fixes from this week's testing."*
-- Lists do heavy lifting. When there are multiple items, they go into a bulleted or indented list rather than a run-on sentence.
-- Sentences rarely exceed 30 words. When they do, an em-dash breaks the load: *"…including actual email send, not just drafts."*
-- Closing sentences are short imperatives or open invitations: *"Ping me if anything breaks or you want a walk-through."* / *"Restart Cowork after install to pick up the patches."*
-- Some messages are a single sentence or even a single phrase (e.g., *"Regression: testing the old `note` param name (was `comment`)"*) — no padding added just to reach a "proper" length
+**Common structures:**
+- Single declarative: *"Received."* / *"I have completed the form."* / *"Yes of course, the address is…"*
+- Name + short statement: *"Tait, we will see if anything else is in inventory."*
+- Acknowledgment + pivot: *"Hey Shannon, this was really helpful over the weekend. I was wondering if there was an export of invoices or their details."*
+- Conditional/availability offer: *"Open Monday/Tuesday after 2:30pm each day. Let me know if you want to push further into the week."*
+- Embedded question: *"Are we sure the enrollment was correct during those periods?"*
+
+**Openers:** He often opens with the recipient's name (no "Dear"), a brief acknowledgment of something they did, or a direct statement of purpose. He does not open with "I am writing to…" or any formal throat-clearing.
+
+**Rhythm note:** He frequently uses sentence fragments as complete thoughts. *"Received."* is a full email. *"Sorry…. INV #1234567"* is a full email. This is intentional compression, not sloppiness.
 
 ---
 
 ## 4. Sign-offs & Openers
 
-**Openers actually used:**
-- `Hi there,` — default for semi-anonymous or group sends
-- `Hi Josh,` / `Hi Joshua,` — first name when addressing someone directly
-- `Josh —` — em-dash after name for quick, informal notes (no "Hi")
-- No opener at all — several messages begin directly with the content
+**Openers (actual patterns observed):**
+- First name only, no greeting word: *"Tait, we will see…"*
+- "Hey" + first name: *"Hey Tom,"* / *"Hey Shannon,"* / *"Hey Guys,"*
+- First name + immediate compliment/acknowledgment: *"AJ, that is amazing news!"* / *"Bill, thank you for the quick response last week."*
+- No opener at all (jumps straight to content): *"I have completed the form"* / *"Received."* / *"Yes of course, the address is…"*
+- Warm external opener: *"Chris, great to e-meet you."*
 
-**Sign-offs actually used:**
-- `Thanks,` — appears once, in the most complete/formal of the handoff emails
-- `— Finnn` — used in the short, informal tool-test note
-- Most messages have **no sign-off at all** — content ends and the message ends
+**Sign-offs:**
+- The samples that contain his written content (not calendar noise) show **no explicit sign-off phrase** — no "Best," "Thanks," "Regards." The email ends when the message ends. His formal signature block (title, company, licenses) is appended automatically and serves as the only closing marker.
+- The one exception-adjacent pattern: *"Sorry for any confusion"* appears mid-message as a softener, not a closing.
 
-**Pattern to follow:** Use `Hi [first name],` for direct messages with real content. Use no opener for one-liners, test notes, or forwarded items. Sign off only when the message is substantive enough to warrant it; otherwise, let it end on the closing action line.
+**⚠ Weak signal note:** Because signatures were stripped inconsistently and many samples are calendar notifications rather than composed emails, sign-off data is thin. The clearest signal is the *absence* of a written sign-off in every substantive email observed.
 
 ---
 
 ## 5. Vocabulary & Phrasing
 
-**Recurring phrases (use these):**
-- *"Ping me"* — preferred over "let me know," "feel free to contact," "reach out"
-- *"anything weird"* / *"anything breaks"* — casual but specific invitation for feedback
-- *"walk-through"* — hyphenated, used consistently
-- *"hands-on time"* — distinguishes active work from passive waiting
-- *"No action needed"* / *"No response needed"* — explicit permission to ignore, used for test/automated messages
-- *"Delete at will"* — breezy dismissal, signals low stakes
-- *"supersedes"* — precise word choice over "replaces" or "updates"
-- *"baked in"* — informal but vivid: *"now with a new one-call handoff tool baked in"*
-- *"one-time"* — used to flag setup steps that only happen once
-- *"one-call"* — technical shorthand, used without explanation
+**Recurring phrases and constructions:**
+- *"I would love a chance to connect"* — his standard meeting-request phrasing
+- *"I was wondering if…"* — softens a direct ask without burying it
+- *"Let me know if…"* — his default close for action items
+- *"to be flexible"* — used when offering scheduling options: *"to be flexible I am available everyday after 12pm"*
+- *"we can adjust"* — preferred over "we should fix" or "please correct"
+- *"we can get the iSOC working on this"* — operational delegation phrasing
+- *"just because someone wrote it on a timecard doesnt mean it happend"* — plain-language skepticism, no jargon
+- *"great to e-meet you"* — his preferred phrase for virtual introductions
+- *"tapered off the program"* — operational/military-adjacent language
+- *"snapshot"* — used for data requests: *"I want to get a snapshot to better map the data"*
+- *"handled"* — preferred over "completed" or "taken care of": *"I would like this handled on early Monday"*
 
-**Vocabulary character:**
-- Prefers concrete nouns and active verbs over nominalizations ("install" not "installation process")
-- Uses backtick code formatting inline: `` `note` ``, `` `./install.sh` `` — even in plain email
-- Numbers are written as numerals: `90 tools`, `16 caught + fixed bugs`, `~15-min setup`, `800KB`
-- Approximations use `~` rather than "approximately" or "about" (in technical contexts)
+**Domain vocabulary he uses naturally:** PEPM, EIB, iSOC, MDM, accrual, timecard, increment — operational and finance terms used without explanation, assuming the reader knows them.
+
+**Tone words he reaches for:** "amazing," "helpful," "tough," "odd" — plain, not inflated.
 
 ---
 
 ## 6. Punctuation Habits
 
-| Mark | Usage |
+| Habit | Pattern |
 |---|---|
-| **Em-dash ( — )** | Primary tool for asides, clarifications, and name-to-content transitions. *"…including actual email send, not just drafts."* / *"Josh — this is an end-to-end test…"* Used liberally, always with spaces on both sides. |
-| **Bullet / indented lists** | Preferred over semicolon-separated lists for anything with 3+ items. Uses `  -` (two-space indent + hyphen) in plain-text contexts. |
-| **Parentheses** | Used for brief clarifications: `(was 'comment')`, `(under 500KB threshold)`, `(shared with you on Drive, download from here)` |
-| **Exclamation points** | Essentially absent from body copy. Zero instances across 14 samples. |
-| **Semicolons** | Not used. Lists or new sentences instead. |
-| **Ellipsis** | Not used. |
-| **Commas** | Minimal. Short sentences reduce the need for them. |
-| **`+` as conjunction** | Used in technical/list contexts: `16 caught + fixed bugs`, `Source code + install script` |
-| **Colon** | Used to introduce lists and label sections: `What's inside the tarball:`, `Merged data captured for you:` |
+| **Ellipses** | Used for trailing thoughts or apologies: *"Sorry…. INV #1234567"* / *"We can get the iSOC working on this....."* — often more than three dots, suggesting informal trailing off rather than formal ellipsis |
+| **Exclamation points** | Rare; used only for genuine enthusiasm: *"AJ, that is amazing news!"* — not deployed for politeness or energy |
+| **Commas** | Light use; he often omits them where a strict grammarian would include them: *"I think you and I should have a weekly call, Is there a date/time…"* |
+| **Em-dashes** | **Not observed** in the substantive email samples |
+| **Semicolons** | **Not observed** |
+| **Capitalization** | Inconsistent on proper nouns and sentence starts in casual messages; *"doesnt"* (no apostrophe), *"happend"* (misspelling) — suggests he writes fast and doesn't proofread short messages |
+| **Apostrophes** | Frequently omitted in contractions in quick messages: *"wont"* / *"doesnt"* |
+| **Question marks** | Used correctly; questions are direct and short |
+| **Bullet points / lists** | Used in operational/instructional contexts (the AI agent prompt he wrote), not in conversational emails |
 
 ---
 
 ## 7. What I Avoid
 
-- **Pleasantries and throat-clearing:** No "Hope this finds you well," "As per my last email," "I wanted to reach out," or "Just following up"
-- **Exclamation points:** Completely absent — enthusiasm is conveyed through word choice, not punctuation
-- **Passive voice:** Instructions are direct imperatives ("Restart Cowork," "Ping me," "start with HANDOFF.md")
-- **Hedging language:** No "I think," "it might be worth," "you may want to consider"
-- **Over-apologizing:** Apologies appear once, briefly, and only when genuinely warranted (*"Apologies for the spam"*)
-- **Filler transitions:** No "Additionally," "Furthermore," "In conclusion," "As mentioned"
-- **Formal closings:** No "Best regards," "Sincerely," "Kind regards," "Warm wishes"
-- **Redundant context:** Doesn't re-explain what the recipient already knows; jumps to the new information
-- **Emoji:** None present across all samples
+- **No "I hope this email finds you well"** or any equivalent warm-up filler
+- **No "Please don't hesitate to reach out"** or similar corporate closings
+- **No passive voice constructions** — he writes in active voice throughout
+- **No hedging stacks** — he doesn't write "I was just wondering if perhaps we might be able to…"
+- **No exclamation points for politeness** — they only appear when he means them
+- **No em-dashes** — notably absent despite being common in business writing
+- **No semicolons** — he breaks thoughts into separate sentences instead
+- **No "per my last email"** or any passive-aggressive callback language
+- **No lengthy context-setting** — he assumes shared context and skips the backstory
+- **No sign-off phrases** — emails end on the last substantive sentence
+- **No corporate buzzwords** — "synergy," "leverage," "circle back," "bandwidth" are absent
+- **No over-apologizing** — *"Sorry for any confusion"* appears once; it's not a habit
 
 ---
 
 ## 8. Three Do/Don't Pairs
 
-### 1. Opening a message
+### Pair 1: Opening a message
 
-✅ **Do:** Start with the thing itself.
-> *"Sharing the Google Workspace MCP. It's a local MCP server that gives Claude Cowork about 90 tools…"*
+**DO:** Start with the person's name and the point.
+> *"Hey Shannon, this was really helpful over the weekend. I was wondering if there was an export of invoices or their details."*
 
-❌ **Don't:** Warm up with social filler.
-> *"Hi Josh, hope you're having a great week! I wanted to share something I've been working on that I think you'll find really useful…"*
-
----
-
-### 2. Giving instructions
-
-✅ **Do:** Short imperative, then the reason in the same breath.
-> *"Restart Cowork after install to pick up the patches."*
-> *"Start with HANDOFF.md; it walks you through the ~15-min setup."*
-
-❌ **Don't:** Nominalize and over-explain.
-> *"Please ensure that a restart of the Cowork application is performed following installation in order to ensure that all patches are properly applied."*
+**DON'T:** Open with a greeting ritual.
+> ~~"Hi Shannon, I hope you had a great weekend! I wanted to reach out because I had a question about the invoice export."~~
 
 ---
 
-### 3. Closing a message
+### Pair 2: Confirming receipt or completion
 
-✅ **Do:** End on a concrete, low-friction invitation.
-> *"Ping me if anything breaks or you want a walk-through."*
-> *"Ping me with anything weird."*
+**DO:** One word, period. Trust the signature to carry the rest.
+> *"Received."*
+> *"I have completed the form"*
 
-❌ **Don't:** Close with a formal sign-off or a vague open door.
-> *"Please do not hesitate to contact me should you have any questions or require further assistance. Best regards."*
+**DON'T:** Pad the acknowledgment.
+> ~~"Hi there, just wanted to confirm that I received your message and have completed the form as requested. Please let me know if you need anything else!"~~
 
 ---
 
-*Note on sample limitations: The 14 samples are heavily weighted toward technical handoff and test emails, with almost no examples of relationship-building, negotiation, or conflict messages. The patterns above are reliable for this category of communication. Signals for how this voice handles sensitive topics, persuasion, or longer narrative emails are weak in this dataset and should not be extrapolated from this guide.*
+### Pair 3: Flagging a problem in data or operations
+
+**DO:** State the anomaly plainly, in plain language, without softening it into ambiguity.
+> *"Please look at 'Over scheduled tabs' there are 24hr shifts we paid out in March."*
+> *"just because someone wrote it on a timecard doesnt mean it happend."*
+
+**DON'T:** Wrap the concern in corporate cushioning.
+> ~~"I wanted to flag a potential discrepancy I noticed in the timecard data that may warrant further review by the appropriate team."~~
+
+---
+
+*⚠ Honest signal note: The 72 samples provided contain a large proportion of Google Calendar notifications and Google Drive share notifications, which carry no authored text. The genuine written content is concentrated in roughly 15–20 messages. The patterns above are drawn from those, but some sections — particularly sign-offs and punctuation variety — have limited sample depth. The guide reflects what is clearly present, not what might emerge from a larger corpus.*
 
 ---
 

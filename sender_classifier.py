@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# © 2026 CoAssisted Workspace. Licensed under MIT.
 # See LICENSE file for terms.
 """Internal vs external sender classification.
 

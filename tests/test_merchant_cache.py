@@ -320,6 +320,7 @@ def test_cache_hit_below_threshold_still_runs_paid_tiers():
     w.assert_called_once()
 
 
+@pytest.mark.network
 def test_maps_success_writes_cache():
     """After a real Maps verification, the merchant is cached for next time."""
     rec = _new_low_conf_rec(merchant="Joe's Cafe")

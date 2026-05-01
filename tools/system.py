@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# © 2026 CoAssisted Workspace. Licensed under MIT.
 # See LICENSE file for terms. Removing or altering this header is prohibited.
 """System tools — health checks, env diagnostics, version info.
 
@@ -1175,9 +1175,7 @@ def _check_config() -> CheckResult:
                 name, "warn",
                 "config.json not found — using built-in defaults.",
                 fix=(
-                    "Copy from example: cp /Users/finnnai/Claude/"
-                    "google_workspace_mcp/config.example.json /Users/finnnai/Claude/"
-                    "google_workspace_mcp/config.json"
+                    f"Copy from example: cp {path.parent}/config.example.json {path}"
                 ),
             )
         try:
@@ -1198,7 +1196,10 @@ def _check_config() -> CheckResult:
             "anthropic_api_key",       # read by llm.py
         }
         known = set(_config._DEFAULTS.keys()) | EXTRA_KNOWN_KEYS
-        used = set(user_cfg.keys())
+        # Keys starting with '_' are conventionally inline comments
+        # in this project's config files (e.g. _attachments_comment).
+        # Skip them so the validator doesn't flag intentional notes.
+        used = {k for k in user_cfg.keys() if not k.startswith('_')}
         unknown = used - known
         # Typo detection — flag keys that are close to known ones.
         suspected_typos = []

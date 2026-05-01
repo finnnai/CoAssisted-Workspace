@@ -5,7 +5,7 @@
 | Path | Time | What you get | Best for |
 |---|---|---|---|
 | 🟢 **Free** (`./install.sh --free`) | **~10 min** | All 53 free-tier tools — Workspace basics + system health + project-AP admin (register projects, see routing-rule shape) | Evaluating, casual use, marketplace single-click install |
-| 🔵 **Full** (`./install.sh`) | ~25 min | All 183 tools — adds Maps × CRM workflows, VRP routing, Receipt + Project-AP extractors, vendor follow-up loop, current-location detection | Daily-driver, sales/CSM/ops, AP automation, expense reporting |
+| 🔵 **Full** (`./install.sh`) | ~25 min | All 238 tools — adds Maps × CRM workflows, VRP routing, Receipt + Project-AP extractors, vendor follow-up loop, current-location detection | Daily-driver, sales/CSM/ops, AP automation, expense reporting |
 
 **The Free Path skips:** Maps API setup (10 Maps APIs), Anthropic API key, Route Optimization API, location services. Plenty for sending/reading mail, scheduling events, Drive/Sheets/Docs work, running `system_doctor`, and previewing the project-AP routing structure before paying. Run `./install.sh --upgrade` later to add the paid prereqs without re-doing OAuth.
 

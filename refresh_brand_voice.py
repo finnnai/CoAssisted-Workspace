@@ -87,13 +87,62 @@ def _strip_my_own_sig(prose: str) -> str:
     return prose
 
 
+def _is_google_auto_body(prose: str) -> bool:
+    """True if the body matches a Google auto-generated template pattern.
+
+    These appear in your sent folder because Google attributes them to you
+    (Drive shares, Meet links, Forms responses, etc.) but contain no prose
+    you actually wrote. They poison brand-voice analysis.
+    """
+    head = prose.strip()[:300].lower()
+    patterns = (
+        "has shared the following",
+        "shared a folder with you",
+        "shared a document with you",
+        "has invited you to edit",
+        "has invited you to view",
+        "has invited you to comment",
+        "you've been invited to",
+        "you have been invited to",
+        "this is a reminder for the upcoming event",
+        "is video calling you",
+        "join with google meet",
+        "view in google docs",
+        "view in google sheets",
+        "view in google slides",
+        "responded to your form",
+        "your form has been submitted",
+        "your meeting transcript",
+    )
+    return any(pat in head for pat in patterns)
+
+
 def fetch_sent_prose(days: int, limit: int) -> tuple[list[str], dict]:
     """Pull sent mail and return (prose_samples, metadata).
 
     metadata: {scanned, kept, oldest_iso, newest_iso}
     """
     gmail = gservices.gmail()
-    query = f"in:sent newer_than:{days}d"
+    # Exclude Calendar invites and meeting RSVPs — they appear in sent folder
+    # with you as the From address (Google auto-generates them on your behalf)
+    # but the body is template boilerplate, not authored prose. Drive shares
+    # and Meet invites are filtered downstream by body-pattern matching since
+    # they don't have a clean subject prefix. Override with
+    # BRAND_VOICE_INCLUDE_AUTO=1 to disable both gates.
+    import os as _os
+    _exclude_subject = (
+        ""
+        if _os.environ.get("BRAND_VOICE_INCLUDE_AUTO") == "1"
+        else (
+            ' -subject:"Invitation:"'
+            ' -subject:"Updated invitation:"'
+            ' -subject:"Canceled event:"'
+            ' -subject:"Accepted:"'
+            ' -subject:"Tentative:"'
+            ' -subject:"Declined:"'
+        )
+    )
+    query = f"in:sent newer_than:{days}d{_exclude_subject}"
     log.info("refresh_brand_voice: fetching %s (limit=%d)", query, limit)
 
     message_ids: list[str] = []
@@ -134,6 +183,11 @@ def fetch_sent_prose(days: int, limit: int) -> tuple[list[str], dict]:
         # Skip near-empty messages — too little signal.
         if len(clean.strip()) < 50:
             continue
+        # Skip Google auto-generated bodies (Drive shares, Meet invites,
+        # Forms responses) that pass in:sent because Google attributes them
+        # to you. They're template boilerplate, not authored prose.
+        if _is_google_auto_body(clean):
+            continue
         # Trim to a sensible per-message cap so a single huge email doesn't
         # dominate the corpus.
         samples.append(clean.strip()[:4000])
@@ -143,11 +197,15 @@ def fetch_sent_prose(days: int, limit: int) -> tuple[list[str], dict]:
         "scanned": len(message_ids),
         "kept": len(samples),
         "oldest_iso": (
-            datetime.datetime.utcfromtimestamp(min(timestamps) / 1000).isoformat() + "Z"
+            datetime.datetime.fromtimestamp(
+                min(timestamps) / 1000, tz=datetime.timezone.utc,
+            ).isoformat().replace("+00:00", "Z")
             if timestamps else None
         ),
         "newest_iso": (
-            datetime.datetime.utcfromtimestamp(max(timestamps) / 1000).isoformat() + "Z"
+            datetime.datetime.fromtimestamp(
+                max(timestamps) / 1000, tz=datetime.timezone.utc,
+            ).isoformat().replace("+00:00", "Z")
             if timestamps else None
         ),
     }

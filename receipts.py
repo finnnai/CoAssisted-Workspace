@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# © 2026 CoAssisted Workspace. Licensed under MIT.
 # See LICENSE file for terms. Removing or altering this header is prohibited.
 """Receipt extraction core — LLM-backed parsing of receipts from email, PDF, image.
 
@@ -600,7 +600,7 @@ def _shrink_image_for_vision(
     try:
         from PIL import Image
         import io
-    except Exception:
+    except ImportError:
         return image_bytes, mime_type
 
     try:

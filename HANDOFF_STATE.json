@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "version": "0.7.2-dev",
+  "channel": "dev",
+  "release_date": "2026-04-30",
+  "last_handler": {
+    "name": "Joshua Szott",
+    "email": "josh.szott@surefox.com",
+    "handed_off_at": "2026-04-30T18:54:56-07:00"
+  },
+  "next_handler": {
+    "name": "Conor Boatman",
+    "email": "Conor@staffwizard.com",
+    "context": "Updating an old version Conor had at Staffwizard. The 0.7.2-dev build adds confidence-gated vendor reply parsing (P0-2), the split workflows.py (P1-1), 1293 tests across 13 thin-wrapper modules (P0-3), snooze + bulk + escalation trail (P1-5), smarter reminder cadence (P1-4), mypy baseline (P2-2), the broad-exception audit (P1-3), and CONTRIBUTING.md."
+  },
+  "focus_area": "All 11 specs + audit + polish bundle + 2 polish rounds (broad-except cleanup file-by-file)",
+  "tests": {
+    "total": 1293,
+    "passing": 1293,
+    "failing": 0,
+    "deselected_network": 1,
+    "framework": "pytest",
+    "command": "make test-fast",
+    "default_excludes_marker": "network"
+  },
+  "open_tasks": [
+    {
+      "id": "P1-7",
+      "priority": "med",
+      "summary": "Slack integration \u2014 parity with chat_* surface",
+      "design_doc": "mcp-design-docs-2026-04-29.md#p1-7"
+    }
+  ],
+  "recent_changes_summary": [
+    "P0-1: git init + .gitignore \u2014 local version control on owner machine",
+    "P1-6: brand-voice corpus filter (Calendar invites + Drive shares + Meet invites + Forms responses) \u2014 7 tests",
+    "P2-1: config validator skips _-prefixed comment keys + fixed stale /Users/finnnai/... path in fix-hint",
+    "P1-2: network test marker + Makefile targets (test, test-fast, test-network); default suite 104s/14-failures \u2192 3s/0-failures",
+    "P0-4: workflow_sweep_awaiting_info tool \u2014 list/age/bulk-clear stale entries with dry-run safety; 7 tests",
+    "P0-2: confidence-gated vendor reply parsing \u2014 multi-msg dedup, attachment extraction, HIGH/MEDIUM/LOW branching; new review_queue.py module; new workflow_list_review_queue tool; 31 tests",
+    "Tool count: 230 \u2192 233. Test count: 1008 \u2192 1054.",
+    "Bumped to 0.7.2-dev.",
+    "P1-1: split tools/workflows.py (7898 lines) into 5 category modules + shared helpers + 133-line back-compat shim. Same 43 tools.",
+    "P0-3 partial: baseline unit tests for drive (21), calendar (23), gmail (36) = 80 new tests. 10 thin-wrapper modules remain. Pattern established (resolve_tool+run+http_error+err_assert scaffold).",
+    "P0-3 complete: 188 tests across 13 thin-wrapper modules (drive 21, calendar 23, gmail 36, handoff 2, scanner 4, tasks 12, docs 7, sheets 12, maps 13, chat 22, contacts 23, enrichment 5, system 6). All 13 P0-3 modules now have dedicated test coverage.",
+    "P1-5 complete: 5 new tools (snooze, unsnooze, bulk-resolve, bulk-promote review queue, get-trail). vendor_followups gained snoozed_until + events timeline. due_for_reminder skips snoozed. +26 tests. Total tools: 233 \u2192 238.",
+    "P1-4 complete: vendor_response_history.py + us_federal_holidays.json + adaptive wait tiers + day-of-week/holiday push. Orchestrator auto-logs response pairs on HIGH/MEDIUM. +21 tests.",
+    "P2-2: mypy added to dev workflow. Soft config in pyproject.toml. Makefile targets typecheck + typecheck-strict. Baseline: P-spec modules clean, 150 errors in 26/61 existing top-level files for incremental cleanup.",
+    "P1-3: broad-exception audit (31-of-558 sampled). 81% legit, 19% swallow-ish. Fixed all 6 sampled swallowers (2 narrowed to ImportError, 4 added log calls). Report: p1-3-exception-audit-2026-04-30.md.",
+    "Polish: bak cleanup, sweep validated 6 stale entries, mypy strict opt-in for 2 modules, 2 deprecation fixes, deeper P1-3 yields 2 more swallow-ish fixes.",
+    "Polish round 2: 12-sample sweep across chat.py + workflows_calendar.py. 10 legit, 2 fixed (find_meeting_slot getProfile fallback \u2192 log.warning; zoneinfo \u2192 narrowed). Cumulative across P1-3 + 2 rounds: 55 samples, 12 swallowers fixed."
+  ],
+  "pick_up_here": "P1-7 (Slack) is the only outstanding spec \u2014 Joshua deferred until real need surfaces. Optional ongoing polish: vendor_followups.py mypy strict (21 type-arg gaps), continued broad-except sweeps on the densest remaining files (tools/contacts.py 27, tools/system.py 33, tools/receipts.py 31). CONTRIBUTING.md is the orientation doc.",
+  "instructions_for_next_handler": [
+    "Read HANDOFF_LOG.md latest entry first.",
+    "Read mcp-audit-2026-04-29.md for top-issues backlog.",
+    "Read mcp-design-docs-2026-04-29.md for the 5 remaining specs.",
+    "Bump VERSION in _version.py + pyproject.toml if you ship features.",
+    "Append a new entry to HANDOFF_LOG.md before handing off.",
+    "Run `make test-fast` and record pass/fail in your log entry.",
+    "Add a CHANGELOG.md entry under [Unreleased].",
+    "Commit each spec as a discrete git commit with the spec id (e.g. 'P1-1: split workflows.py')."
+  ]
+}

@@ -13,6 +13,102 @@
     "surefox.com": {
       "organization": "Surefox",
       "tier": "internal"
+    },
+    "staffwizard.com": {
+      "organization": "Staffwizard"
+    },
+    "google.com": {
+      "organization": "Google"
+    },
+    "xwf.google.com": {
+      "organization": "Google"
+    },
+    "wellsfargo.com": {
+      "organization": "Wells Fargo"
+    },
+    "waymo.com": {
+      "organization": "Waymo"
+    },
+    "xenture.com": {
+      "organization": "Xenture"
+    },
+    "hubinternational.com": {
+      "organization": "HUB International"
+    },
+    "anthropic.com": {
+      "organization": "Anthropic"
+    },
+    "onesourcevirtual.com": {
+      "organization": "OneSource Virtual"
+    },
+    "mpwmarketing.com": {
+      "organization": "MPW Marketing"
+    },
+    "thirdrockmd.com": {
+      "organization": "Third Rock MD"
+    },
+    "205capital.com": {
+      "organization": "205 Capital"
+    },
+    "lssassociates.com": {
+      "organization": "LSS Associates"
+    },
+    "levitatemedia.com": {
+      "organization": "Levitate Media"
+    },
+    "travellaga.com.mx": {
+      "organization": "TravelLaga"
+    },
+    "eessinc.com": {
+      "organization": "EESS"
+    },
+    "skymetric.com": {
+      "organization": "Skymetric"
+    },
+    "empower.com": {
+      "organization": "Empower"
+    },
+    "bossecurity.com": {
+      "organization": "BOS Security"
+    },
+    "goodget.com": {
+      "organization": "Goodget"
+    },
+    "goldenvalleyus.com": {
+      "organization": "Golden Valley"
+    },
+    "munckwilson.com": {
+      "organization": "Munck Wilson"
+    },
+    "prestonwoodchristian.org": {
+      "organization": "Prestonwood Christian Academy"
+    },
+    "tax-guard.com": {
+      "organization": "Tax Guard"
+    },
+    "morganstanley.com": {
+      "organization": "Morgan Stanley"
+    },
+    "ubs.com": {
+      "organization": "UBS"
+    },
+    "marriott.com": {
+      "organization": "Marriott"
+    },
+    "ridgelinedefense.com": {
+      "organization": "Ridgeline Defense"
+    },
+    "fireflies.ai": {
+      "organization": "Fireflies"
+    },
+    "bostonproperties.com": {
+      "organization": "Boston Properties"
+    },
+    "softledger.com": {
+      "organization": "SoftLedger"
+    },
+    "gtsintelligence.com": {
+      "organization": "GTS Intelligence"
     }
   }
 }

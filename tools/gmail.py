@@ -528,10 +528,11 @@ def register(mcp) -> None:
 
         Attachment size behavior:
             Attachments larger than config.large_attachment_threshold_kb
-            (default 500KB) automatically upload to Drive, share as 'reader'
-            with every recipient, and the share link is appended to the body.
-            This avoids stdio buffer limits on the Cowork MCP channel and
-            corporate mail filters that block large .tar.gz / .zip attachments.
+            (default 22000KB / ~22MB) automatically upload to Drive, share as
+            'reader' with every recipient, and the share link is appended to
+            the body. Anything below that ships as a real Gmail attachment.
+            Lower the threshold if stdio buffer limits surface on the Cowork
+            MCP channel or corporate mail filters bounce large .tar.gz / .zip.
 
         Returns JSON with the sent message ID and thread ID, or an error string.
         """

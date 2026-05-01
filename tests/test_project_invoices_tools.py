@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import pytest
+from unittest.mock import patch
 
 from tools import project_invoices as t_pi
 from tools.project_invoices import (
@@ -18,6 +19,26 @@ from tools.project_invoices import (
     ProcessVendorRepliesInput,
     MigrateProjectSheetsToApLayoutInput,
 )
+
+
+# --------------------------------------------------------------------------- #
+# Test isolation: force the fallback path of _compose_info_request by default.
+#
+# When ANTHROPIC_API_KEY is set in the test env (e.g. you have a real key in
+# config.json), llm.is_available() returns True and these tests hit the live
+# Claude API — which (a) is slow and (b) makes assertions non-deterministic.
+# Composer tests are testing OUR composition logic, not the LLM. Tests that
+# specifically want the LLM branch can override this fixture per-test.
+# --------------------------------------------------------------------------- #
+
+
+@pytest.fixture(autouse=True)
+def _mock_llm_unavailable(monkeypatch):
+    """Patch llm.is_available so composer tests run the deterministic fallback."""
+    import llm as _llm
+    monkeypatch.setattr(_llm, "is_available", lambda: (False, "mocked-in-test"))
+    yield
+
 
 
 # --------------------------------------------------------------------------- #
@@ -323,8 +344,9 @@ def test_compose_request_includes_resolved_project(isolated_registry):
         vendor="Acme", project_code="ALPHA",
         invoice_number=None, total=None,
     )
-    msg = t_pi._compose_info_request(inv, ["invoice_number"])
-    # Either branch (LLM or fallback) must mention the project.
+    # Force the deterministic fallback path so we test composer logic, not LLM.
+    with patch("llm.is_available", return_value=(False, "test")):
+        msg = t_pi._compose_info_request(inv, ["invoice_number"])
     body = (msg.get("plain") or "") + (msg.get("html") or "")
     assert "ALPHA" in body
     assert "Project Alpha" in body
@@ -338,9 +360,11 @@ def test_compose_request_includes_picker_when_unresolved(isolated_registry):
         vendor="Acme",
         invoice_number=None, total=None,
     )
-    msg = t_pi._compose_info_request(
-        inv, ["invoice_number", "project_code"],
-    )
+    # Force the deterministic fallback path so we test composer logic, not LLM.
+    with patch("llm.is_available", return_value=(False, "test")):
+        msg = t_pi._compose_info_request(
+            inv, ["invoice_number", "project_code"],
+        )
     body = (msg.get("plain") or "") + (msg.get("html") or "")
     # Both registered codes should appear so the vendor can pick.
     assert "ALPHA" in body
@@ -1392,6 +1416,95 @@ def test_quality_empty_string_invoice_number_flagged():
         require_invoice_number=True,
     )
     assert fail == "missing_invoice_number"
+
+
+# --------------------------------------------------------------------------- #
+# Dedup robustness — pattern-based source_id / content_key recognition
+# --------------------------------------------------------------------------- #
+
+
+def test_looks_like_source_id_recognizes_known_prefixes():
+    assert t_pi._looks_like_source_id("gmail:19dc287f73016d8e")
+    assert t_pi._looks_like_source_id("chat:spaces/AAQA.../messages/abc.def")
+    assert t_pi._looks_like_source_id("drive:1aBcDeF...")
+    assert t_pi._looks_like_source_id("src:fallback-key")
+
+
+def test_looks_like_source_id_rejects_random_strings():
+    assert not t_pi._looks_like_source_id("Acme Roofing")
+    assert not t_pi._looks_like_source_id("USD")
+    assert not t_pi._looks_like_source_id("2026-04-28T06:54:08-07:00")
+    assert not t_pi._looks_like_source_id("")
+    assert not t_pi._looks_like_source_id(None)
+    assert not t_pi._looks_like_source_id(0.95)
+
+
+def test_looks_like_content_key_recognizes_pipe_format():
+    assert t_pi._looks_like_content_key("acme|inv-001|10000")
+    assert t_pi._looks_like_content_key("anthropic|4vrjkb1a-0001|5330")
+    # 4-segment receipt content key.
+    assert t_pi._looks_like_content_key("raleys|2023-12-17|24213|1234")
+
+
+def test_looks_like_content_key_rejects_non_pipe_strings():
+    assert not t_pi._looks_like_content_key("Acme Roofing")
+    assert not t_pi._looks_like_content_key("gmail:abc123")
+    assert not t_pi._looks_like_content_key("a|b")  # only 2 parts
+    assert not t_pi._looks_like_content_key("")
+    assert not t_pi._looks_like_content_key(None)
+
+
+def test_dedup_pattern_scan_handles_column_shifted_rows(monkeypatch):
+    """Simulate a sheet where some rows have a leading empty cell (the
+    real bug we hit in production). Pattern-based scan should still
+    pick up the source_ids regardless of which column they landed in.
+    """
+    # Stub out the Sheets API to return a mix of correctly-aligned
+    # and column-shifted rows.
+    fake_rows = [
+        # Apr 27 row — correctly aligned, source_id at index 22.
+        [
+            "2026-04-27T09:11:23-07:00", "invoice", "2026-04-24", "",
+            "Anthropic", "4VRJKB1A-0001", "", "Software", "50", "3.3",
+            "53.3", "USD", "TRUE", "0", "53.3", "OPEN", "3", "Due on receipt",
+            "SMOKE", "", "", "email_text", "gmail:19dc267d286849fe",
+            "", "0.85", "notes here", "anthropic|4vrjkb1a-0001|5330",
+        ],
+        # Apr 28 row — leading empty (column-shifted), source_id at index 23.
+        [
+            "", "2026-04-28T06:54:08-07:00", "invoice", "2025-11-04",
+            "2025-11-04", "AI Dev Lab", "1292", "", "Contract Labor", "",
+            "", "2242.92", "USD", "TRUE", "0", "2242.92", "OPEN", "175",
+            "Due on receipt", "SMOKE", "Conor Boatman", "13243 Springdale",
+            "chat_pdf", "chat:spaces/AAQAly0xFuE/messages/u44SEJNtWYE",
+            "", "0.95", "notes here",
+        ],
+    ]
+
+    class _FakeReq:
+        def execute(self):
+            return {"values": fake_rows}
+
+    class _FakeValues:
+        def get(self, **kwargs):
+            return _FakeReq()
+
+    class _FakeSpreadsheets:
+        def values(self):
+            return _FakeValues()
+
+    class _FakeSheets:
+        def spreadsheets(self):
+            return _FakeSpreadsheets()
+
+    monkeypatch.setattr(t_pi, "_sheets", lambda: _FakeSheets())
+
+    sids, cks = t_pi._existing_invoice_keys("fake-sheet-id")
+
+    # Both rows should be picked up despite the column shift on row 2.
+    assert "gmail:19dc267d286849fe" in sids
+    assert "chat:spaces/AAQAly0xFuE/messages/u44SEJNtWYE" in sids
+    assert "anthropic|4vrjkb1a-0001|5330" in cks
 
 
 if __name__ == "__main__":

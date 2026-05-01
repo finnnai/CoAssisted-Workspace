@@ -29,8 +29,13 @@ RELEASE_DATE  := $(shell python3 -c "import _version; print(_version.RELEASE_DAT
 # Stable releases use _version.py's RELEASE_DATE for reproducibility.
 # Dev builds always stamp today's date so sequential snapshots are
 # distinguishable.
+# Stable: VERSION is plain semver (e.g. "0.6.1"), tarball is e.g.
+#   coassisted-workspace-v0.6.1-stable-2026-05-01.tar.gz
+# Dev:    VERSION already carries the "-dev" suffix (e.g. "0.6.1-dev"), so
+#         we don't append channel again — would produce "-dev-dev-".
+#         Tarball is e.g. coassisted-workspace-v0.6.1-dev-2026-04-28.tar.gz
 STABLE_NAME   := coassisted-workspace-v$(VERSION)-stable-$(RELEASE_DATE)
-DEV_NAME      := coassisted-workspace-v$(VERSION)-dev-$(shell date +%Y-%m-%d)
+DEV_NAME      := coassisted-workspace-v$(VERSION)-$(shell date +%Y-%m-%d)
 
 # Legacy `handoff` target keeps the old date-only filename for backward
 # compatibility — same content as `dev-build` semantically.
@@ -49,8 +54,20 @@ install: ## Run the full install.sh bootstrap (idempotent)
 auth: ## Start the OAuth flow (opens browser, saves token.json)
 	@$(PY) authenticate.py
 
-test: ## Run the pytest suite
+test: ## Run the pytest suite (excludes 'network' marker by default)
 	@$(PY) -m pytest tests/ -v
+
+test-fast: ## Same as test, but quiet + with 5s per-test timeout
+	@$(PY) -m pytest tests/ --timeout=5 -q
+
+test-network: ## Run only network-marker tests (live Google/Maps/Anthropic)
+	@$(PY) -m pytest tests/ -v -m network --timeout=120
+
+typecheck: ## Run mypy. Soft config (P2-2 baseline) — see pyproject.toml [tool.mypy]
+	@$(PY) -m mypy . || true
+
+typecheck-strict: ## Run mypy without --ignore-missing-imports — surfaces every gap
+	@$(PY) -m mypy --strict --ignore-missing-imports . || true
 
 run: ## Launch the MCP server (stdio transport, foreground)
 	@$(PY) server.py
@@ -97,6 +114,15 @@ handoff: ## Build a clean .tar.gz in dist/ for sharing (excludes secrets and sta
 	@echo ""
 	@echo "  Tell the recipient: open HANDOFF.md first."
 
+handoff-receive: ## Untar a returned archive ($(ARCHIVE)) and diff vs local
+	@if [ -z "$(ARCHIVE)" ]; then \
+	  echo "Usage: make handoff-receive ARCHIVE=path/to/incoming.tar.gz"; \
+	  exit 1; \
+	fi
+	@$(PY) -c "import json, handoff_receive; \
+report = handoff_receive.receive_handoff('$(ARCHIVE)'); \
+print(json.dumps(report.to_dict(), indent=2, default=str))"
+
 version: ## Print current version + channel + release date
 	@echo "Version:       v$(VERSION)"
 	@echo "Channel:       $(CHANNEL)"
@@ -139,6 +165,10 @@ _build:
 	  --exclude='token.json' \
 	  --exclude='config.json' \
 	  --exclude='rules.json' \
+	  --exclude='awaiting_info.json' \
+	  --exclude='dm_emails.json' \
+	  --exclude='merchants.json' \
+	  --exclude='audit_log.jsonl' \
 	  --exclude='.git' \
 	  --exclude='.pytest_cache' \
 	  --exclude='dist' \
@@ -152,7 +182,7 @@ _build:
 	@echo "    Version:    v$(VERSION) ($(CHANNEL))"
 	@echo ""
 	@echo "  Sanity check (these should be MISSING from the archive):"
-	@for f in .venv logs credentials.json token.json config.json rules.json; do \
+	@for f in .venv logs credentials.json token.json config.json rules.json awaiting_info.json dm_emails.json merchants.json; do \
 	  if tar -tzf $(DIST_DIR)/$(NAME).tar.gz 2>/dev/null | grep -q "$$f"; then \
 	    echo "    ✗ LEAKED: $$f — do not ship this archive"; \
 	  else \

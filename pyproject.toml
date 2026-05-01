@@ -1,6 +1,6 @@
 [project]
 name = "coassisted-workspace"
-version = "0.7.0-dev"
+version = "0.7.2"
 # IMPORTANT: keep this in sync with _version.py — that's the single source of
 # truth for runtime, and pyproject.toml has to be hand-synced because pip
 # install reads it before _version.py is importable. Use `make bump VERSION=X.Y.Z`
@@ -26,6 +26,8 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
+    "pytest-timeout>=2.4",
+    "mypy>=1.20",
 ]
 # Install with: pip install -e ".[llm]"
 # Required for: refresh_brand_voice.py, pipeline_digest.py, the optional
@@ -73,3 +75,42 @@ packages = ["tools"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+# Default suite excludes 'network' tests (live Google/Maps/Anthropic APIs).
+# Run network tests explicitly with: make test-network OR pytest -m network
+addopts = "-m 'not network'"
+markers = [
+    "network: tests that require live network access to Google/Maps/Anthropic APIs",
+]
+
+[tool.mypy]
+# P2-2 baseline. Soft config — don't try to type-check every line of
+# code that was written before mypy existed. Goal: catch obvious bugs
+# in NEW code without drowning in legacy noise.
+python_version = "3.10"
+ignore_missing_imports = true        # Google API client + others lack stubs
+check_untyped_defs = false           # don't enforce on untyped functions
+warn_unused_ignores = true           # catch stale `# type: ignore`
+no_implicit_optional = true
+warn_redundant_casts = true
+exclude = [
+    "^\\.venv/",
+    "^build/",
+    "^dist/",
+    "^.+\\.egg-info/",
+    "^logs/",
+    "^pytest-cache-files-",
+    "^scripts/",                      # smoke scripts, often partial
+    ".+\\.bak\\.",                # backup files
+]
+
+# Strict-mode opt-in for modules with 0 baseline errors. Adding new
+# modules here is a one-line change; expand the list as files get cleaned up.
+[[tool.mypy.overrides]]
+module = [
+    "review_queue",
+    "vendor_response_history",
+]
+strict = true
+# `ignore_missing_imports` from the parent [tool.mypy] still applies.
+ignore_missing_imports = true
+

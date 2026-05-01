@@ -1035,6 +1035,18 @@ def register(mcp) -> None:
 
             log.info("chat_send_dm: sent to %s in %s", email, space_name)
 
+            # 4. Record (space_name → email) in the DM email sidecar so
+            # downstream orchestrators (auto-share, receipt extractor) can
+            # resolve cross-org sender emails without People API lookups.
+            try:
+                import dm_email_cache as _dmc
+                _dmc.record(space_name, email)
+            except Exception as _dmc_err:
+                log.warning(
+                    "chat_send_dm: dm_email_cache record failed (%s)",
+                    _dmc_err,
+                )
+
             # 4. Optional: log activity to matching saved contact.
             log_flag = (
                 params.log_to_contact

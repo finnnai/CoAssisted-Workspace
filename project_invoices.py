@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# © 2026 CoAssisted Workspace. Licensed under MIT.
 # See LICENSE file for terms.
 """Project invoice extraction — LLM-backed parsing of vendor invoices.
 
@@ -408,6 +408,85 @@ def _parse_llm_json(text: str) -> dict:
 # --------------------------------------------------------------------------- #
 # Extraction surfaces
 # --------------------------------------------------------------------------- #
+
+
+# --------------------------------------------------------------------------- #
+# Reply confidence classifier — pure function, no LLM/network deps.
+# --------------------------------------------------------------------------- #
+
+
+# Phrases that indicate the vendor is deferring rather than answering.
+# Reply-body matches against these caps confidence at "low" — even if the
+# LLM extracted some fields, a body like "I'll send the invoice tomorrow"
+# means the vendor hasn't actually answered.
+_DEFER_PHRASES = (
+    "will send",
+    "i'll send",
+    "i will send",
+    "send tomorrow",
+    "tomorrow morning",
+    "later today",
+    "later this week",
+    "by end of",
+    "by eod",
+    "by tomorrow",
+    "let me check",
+    "i'll check",
+    "checking with",
+    "have to check",
+    "get back to you",
+    "follow up",
+    "circle back",
+    "give me a day",
+    "give me a couple",
+    "in a bit",
+    "out of office",
+    "ooo until",
+    "on vacation",
+)
+
+
+def score_reply_confidence(
+    parsed: dict,
+    fields_requested: list[str],
+    reply_body: str,
+) -> str:
+    """Classify a parsed vendor reply as 'high' / 'medium' / 'low'.
+
+    Rules (deterministic — no LLM):
+      - If the reply body matches any deferral phrase ("will send", "let me
+        check", "out of office", etc.) → "low" regardless of what was
+        parsed. The vendor said they'd answer later, not now.
+      - Otherwise compute completeness = answered_count / requested_count.
+          * 1.0 → "high"
+          * >= 0.5 → "medium"
+          * < 0.5 (or 0 fields answered) → "low"
+      - Empty reply body or no fields requested → "low".
+
+    Caller decides what to do with each tier:
+      - high: apply update + promote to OPEN + clear awaiting_info
+      - medium: apply update + add to review_queue + leave AWAITING_INFO
+      - low: record_reminder + leave row alone
+    """
+    if not reply_body or not fields_requested:
+        return "low"
+
+    body_lc = reply_body.lower()
+    if any(phrase in body_lc for phrase in _DEFER_PHRASES):
+        return "low"
+
+    answered = sum(
+        1 for f in fields_requested
+        if parsed.get(f) not in (None, "", "null")
+    )
+    if answered == 0:
+        return "low"
+    completeness = answered / len(fields_requested)
+    if completeness >= 1.0:
+        return "high"
+    if completeness >= 0.5:
+        return "medium"
+    return "low"
 
 
 def extract_invoice_from_text(

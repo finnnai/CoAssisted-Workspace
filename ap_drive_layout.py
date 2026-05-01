@@ -1,4 +1,4 @@
-# © 2026 CoAssisted Workspace. Licensed for non-redistribution use only.
+# © 2026 CoAssisted Workspace. Licensed under MIT.
 # See LICENSE file for terms.
 """AP Drive layout — folder + sheet hierarchy for project-tracked spend.
 
@@ -37,6 +37,8 @@ resource on repeat invocation.
 from __future__ import annotations
 
 from typing import Optional
+
+from logging_util import log
 
 
 # Configurable root folder name. Default works out of the box; users with
@@ -160,6 +162,33 @@ def ensure_project_subfolder(
     return _ensure_folder(project_code.upper(), parent_id=employee_folder_id)
 
 
+# Top-level "Reply Attachments" tree, parallel to the per-employee tree.
+# When a vendor sends a missing W-9/COI/etc. as a reply to our follow-up,
+# we drop it under: AP Submissions/Reply Attachments/<PROJECT>/<vendor>/.
+REPLY_ATTACHMENTS_SUBFOLDER = "Reply Attachments"
+
+
+def ensure_reply_attachments_folder(
+    project_code: str,
+    vendor_name: Optional[str] = None,
+) -> str:
+    """Get or create AP Submissions/Reply Attachments/<PROJECT>/<vendor>/.
+
+    If vendor_name is empty/None, returns the project-level folder so the
+    file lands at AP Submissions/Reply Attachments/<PROJECT>/.
+    Returns the leaf folder id.
+    """
+    if not project_code:
+        raise ValueError("project_code is required")
+    root = ensure_root_folder()
+    base = _ensure_folder(REPLY_ATTACHMENTS_SUBFOLDER, parent_id=root)
+    project_folder = _ensure_folder(project_code.upper(), parent_id=base)
+    if not vendor_name:
+        return project_folder
+    safe_vendor = vendor_name.strip().replace("/", "_")[:80] or "unknown-vendor"
+    return _ensure_folder(safe_vendor, parent_id=project_folder)
+
+
 # --------------------------------------------------------------------------- #
 # Display-name resolution — "Last, First"
 # --------------------------------------------------------------------------- #
@@ -221,8 +250,11 @@ def employee_display_name(email: str) -> str:
                     name = _last_first(full)
                     _DISPLAY_NAME_CACHE[e] = name
                     return name
-    except Exception:
-        pass
+    except Exception as exc:
+        # Falls through to email-based fallback below.
+        # Logged at debug since this fallback chain is normal.
+        log.debug("display_name resolution failed for %s: %s",
+                  e, exc)
 
     # Tier 2: People API contacts search — for non-domain people.
     try:

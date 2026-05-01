@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 import tools.workflows as wf
+from tools import _workflow_helpers as _wh
 
 
 def test_haversine_known_distance():
@@ -76,8 +77,8 @@ def test_geocode_cache_hit_skips_api(monkeypatch, tmp_path):
     """Cache hit should NOT call the live Google API."""
     # Point cache at a tempfile
     cache_file = tmp_path / "geocode_cache.json"
-    monkeypatch.setattr(wf, "_geocode_cache_path", lambda: cache_file)
-    monkeypatch.setattr(wf, "_GEOCODE_CACHE", None)
+    monkeypatch.setattr(_wh, "_geocode_cache_path", lambda: cache_file)
+    monkeypatch.setattr(_wh, "_GEOCODE_CACHE", None)
 
     # Pre-populate cache
     cache_file.write_text('{"foo street": {"lat": 1.0, "lng": 2.0, '
@@ -97,8 +98,8 @@ def test_geocode_cache_hit_skips_api(monkeypatch, tmp_path):
 def test_geocode_cache_miss_calls_api(monkeypatch, tmp_path):
     """Cache miss should call the API once and persist the result."""
     cache_file = tmp_path / "geocode_cache.json"
-    monkeypatch.setattr(wf, "_geocode_cache_path", lambda: cache_file)
-    monkeypatch.setattr(wf, "_GEOCODE_CACHE", None)
+    monkeypatch.setattr(_wh, "_geocode_cache_path", lambda: cache_file)
+    monkeypatch.setattr(_wh, "_GEOCODE_CACHE", None)
 
     fake_gmaps = MagicMock()
     fake_gmaps.geocode.return_value = [{

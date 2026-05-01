@@ -15,6 +15,8 @@
 **What's in the archive:** source code, install script, example configs, starter email templates, tests, docs.
 **What's NOT in the archive:** the sender's OAuth credentials or access tokens. You'll create your own — that's by design, and it's the only safe way.
 
+**Round-trip handoff:** the archive includes `HANDOFF_LOG.md` (append-only journal of every handoff) and `HANDOFF_STATE.json` (machine-readable state). Read the latest log entry first — it tells you exactly where the previous holder left off. **Before you send the archive back, append your own entry to `HANDOFF_LOG.md`** so the next holder picks up cleanly. See *Returning the archive* near the bottom of this doc.
+
 ---
 
 ## Sending the archive (for the person doing the handoff)
@@ -154,6 +156,43 @@ Most issues are covered by the Troubleshooting section in `README.md`. The big o
 **Tools aren't appearing in Cowork** — run `./install.sh --test` to confirm the install is healthy. If tests pass but Cowork doesn't see tools, double-check the JSON config paths are absolute and point to *your* install location, and that you actually restarted Cowork.
 
 **"Permission denied (403)" on a specific tool** — the corresponding API isn't enabled in your GCP project. Re-check `GCP_SETUP.md` step 2 and confirm all 8 APIs have "Enable" turned into "Manage" in the console.
+
+---
+
+## Returning the archive
+
+If you're sending this project back to whoever handed it to you:
+
+1. **Update `HANDOFF_LOG.md`.** Append a new entry at the bottom following
+   the format already in the file. Cover what you touched, what you left
+   undone, and where the next holder should pick up.
+
+2. **Update `HANDOFF_STATE.json`.** At minimum, refresh:
+   - `last_handler` — your name + email + handed_off_at timestamp
+   - `next_handler` — back to the original sender
+   - `focus_area` — one-liner on what you worked on
+   - `tests` — run `python3 -m pytest` and record pass/fail counts
+   - `recent_changes_summary` — short bullet list
+   - `pick_up_here` — concrete next step
+   - `open_tasks` — anything you added or resolved
+
+3. **Bump `_version.py`** if you shipped real features. Convention is
+   `0.7.X-dev` for between-release work. Append a CHANGELOG entry under
+   `[Unreleased]`.
+
+4. **Run the tests.** `python3 -m pytest` — the test count should not
+   regress. If you intentionally removed tests, document why in your
+   log entry.
+
+5. **Build a fresh tarball.** `make handoff`. The Makefile excludes
+   secrets and per-machine state automatically, so you don't have to
+   scrub.
+
+6. **Send it back.** Email or share the new tarball with the original
+   sender. They'll run `make handoff-receive ARCHIVE=<your.tar.gz>` (or
+   call `workflow_receive_handoff` from Cowork) which untars it,
+   reads your manifest, and surfaces a file-level diff vs their
+   local copy so they can see exactly what you did.
 
 ---
 
