@@ -260,6 +260,12 @@ def register_actions(mcp) -> None:
                 core.mark_sent(params.entry_id)
                 sent_info = {"message_id": resp.get("id"),
                              "thread_id": resp.get("threadId")}
+                # Fire any kind-specific post-approval hooks (e.g. AR
+                # collections advancing add_collection_event). Best-
+                # effort — exceptions caught inside fire_post_approval_hooks
+                # so the approve response always returns cleanly.
+                final_rec = core.get(params.entry_id) or rec
+                core.fire_post_approval_hooks(final_rec)
             return json.dumps({
                 "entry_id": rec["id"],
                 "status": "sent" if params.send else "approved",

@@ -28,6 +28,9 @@ Example config.json:
 from __future__ import annotations
 
 import json
+import json as _json
+import os as _os
+import tempfile as _tempfile
 from pathlib import Path
 from typing import Any
 
@@ -71,6 +74,29 @@ _DEFAULTS: dict[str, Any] = {
     # - "llm"              : always run regex + LLM and merge. More accurate,
     #                        more expensive. Requires anthropic_api_key.
     "signature_parser_mode": "regex",
+    # AR collections gate — Finnn 2026-05-01 Part F.
+    # Default behavior for workflow_send_collection_reminder per cadence
+    # tier. Three modes:
+    #   "send"     — send immediately (legacy behavior; ar_send.py < v0.8.3)
+    #   "draft"    — create Gmail draft + queue in workflow_list_drafts;
+    #                operator approves via workflow_approve_draft, which
+    #                triggers the post-approval hook to advance state.
+    #   "disabled" — workflow returns "skipped"; no draft, no send.
+    #                workflow_collections_due_today still surfaces due items.
+    # Default: every tier is "draft" except escalation_to_legal which is
+    # "disabled" — the Tier-5 final-notice template is high-stakes enough
+    # that the operator wants to compose by hand. Override in config.json
+    # under the "ar" key.
+    "ar": {
+        "collections_mode": "draft",
+        "collections_mode_per_tier": {
+            "courtesy_reminder": "draft",
+            "first_followup": "draft",
+            "second_followup": "draft",
+            "third_followup": "draft",
+            "escalation_to_legal": "disabled",
+        },
+    },
     # Google Maps API key — separate from OAuth (Maps APIs use a static key).
     # Required for: 10 maps_* tools, workflow_email_with_map,
     # workflow_meeting_location_options, optional contact-address validation.
@@ -153,6 +179,33 @@ def _load() -> dict[str, Any]:
 def get(key: str, default: Any = None) -> Any:
     """Fetch a top-level config value."""
     return _load().get(key, default)
+
+
+def set(key: str, value: Any) -> None:
+    """Persist a top-level config value to config.json + invalidate cache.
+
+    Used by workflow_set_collections_mode (Finnn 2026-05-01 Part F)
+    so operators can flip the AR collections gate from chat without
+    editing config.json directly. Atomic write — same tempfile +
+    os.replace pattern the other JSON stores use.
+    """
+    cfg = dict(_load())
+    cfg[key] = value
+    config_path = _PROJECT_DIR / "config.json"
+    fd, tmp = _tempfile.mkstemp(
+        prefix="config.", suffix=".json.tmp", dir=str(_PROJECT_DIR),
+    )
+    try:
+        with _os.fdopen(fd, "w", encoding="utf-8") as f:
+            _json.dump(cfg, f, indent=2)
+        _os.replace(tmp, config_path)
+    except Exception:
+        try:
+            _os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+    reload()
 
 
 def retry_settings() -> dict[str, Any]:

@@ -926,4 +926,128 @@ of the 1293 baseline from v0.7.2. Target: ~1495 total.
 
 ---
 
+## 2026-05-01 (continued, fifth cut) · Joshua — v0.8.3 stable
+
+Fifth stable cut in one day. Same-day hot-fix on top of v0.8.2,
+closing out Finnn's three follow-up patches (Parts E/F/G). One
+of the three (Part F — AR collections kill-switch) is
+safety-critical: the legacy `send_collection_reminder` was
+auto-sending the cadence ladder without operator approval, which
+is not what an operator wants when an invoice is wrong or the
+customer has paid out-of-band. Held the cut for the same day so
+the gate ships before any production weekend run.
+
+- **Version:** v0.8.3 stable, 2026-05-01.
+- **Time held:** ~1.5 hours since v0.8.2 cut.
+- **Focus area:** Finnn 2026-05-01 follow-up patches E/F/G —
+  receipts cadence + AR collections gate + v0.8.1-upgrade bug
+  fixes.
+
+### Commits since v0.8.2
+
+```
+[v0.8.2 tag]  Cut stable v0.8.2
+[NEXT]        Bump to 0.8.3-dev
+[NEXT]        Patches E+F+G — receipts cadence + AR collections
+              gate + openpyxl/croniter deps + GL test isolation +
+              AMEX DECLINED filter
+[NEXT]        Cut stable v0.8.3
+[NEXT]        Bump to 0.8.4-dev
+```
+
+### What changed by patch
+
+- **Part E (cron cadence).** Replaced the single
+  `0 18 * * * receipts.py --sweep` entry with two:
+  `*/15 8-18 * * 1-5` (15-minute biz-hours sweep) and
+  `0 18 * * 6,0` (weekends daily). Run
+  `make install-crontab` to pick up; the timing-aware installer
+  preserves personal entries and offers to backfill missed runs
+  from today.
+- **Part F (AR collections kill-switch — safety-critical).**
+  Three-mode gate in `ar_send.send_collection_reminder`:
+    - `send` — legacy immediate-send.
+    - `draft` — Gmail draft + queued in `draft_queue` with
+      `kind="ar_collection"`. Operator approves via
+      `workflow_approve_draft`, which fires the
+      post-approval hook to advance `collection_events` on
+      the invoice.
+    - `disabled` — workflow returns `status: skipped`, no
+      draft, no send.
+  Per-tier override beats the base mode; an optional
+  `mode_override` arg on the call beats config. Default: every
+  tier `draft` except `escalation_to_legal` `disabled` (per
+  Joshua's question-3 answer — Tier-5 final-notice is
+  compose-by-hand). New post-approval hook registry in
+  `draft_queue.py` (idempotent registration, exception-swallowing
+  fire) lets `ar_send` register its own callback at import time
+  without central wiring. New `workflow_set_collections_mode`
+  MCP tool lets operators flip the gate from chat. 14 tests in
+  `tests/test_ar_collections_gate.py`.
+- **Part G1 (deps).** `openpyxl>=3.1` and `croniter>=2.0`
+  promoted from soft-deps to declared dependencies. They've been
+  required by `labor_ingest`, `master_rollup`,
+  `workday_journal_eib`, `ar_send`, `install_crontab.py`, and
+  `system_check_cron` since v0.8.0/0.8.2; were causing 17/19
+  v0.8.x test failures on a clean upgrade until manually
+  pip-installed.
+- **Part G2 (test isolation).** `isolated_classifier_state`
+  fixture in `tests/test_gl_classifier.py` now redirects
+  `gl_memo_classifier._INDEX_PATH` to a tmp path AND resets
+  the in-process `_INDEX` cache before/after each test. Prior
+  fixture only monkeypatched `lookup_by_memo`; code paths that
+  bypassed that function could pick up a real disk-resident
+  index from a prior `train_gl_memo_classifier.py` run. Belt-
+  and-suspenders.
+- **Part G3 (AMEX DECLINED filter).** Tightened the status
+  check in `workday_journal_eib._filter_for_eib`:
+  DECLINED/REVERSED rows are now unconditionally excluded
+  regardless of `include_pending`. Previously the `else`
+  branch could let DECLINED rows slip through.
+
+### Open items deferred to 0.8.x and beyond
+
+- **AP-1 Supplier Invoice EIB**: still gated on Workday GL →
+  Spend Category map.
+- **Geotab integration**: still a stub.
+- **Wave 4 quote management**: operator deciding between
+  PandaDoc (custom MCP, has proposal builder) and SignNow (in
+  registry, e-sign only).
+- **P1-7 Slack**: still deferred.
+
+### Pick up here
+
+If Joshua: same as v0.8.2 — Wave 4 quote management once the
+PandaDoc/SignNow decision lands. Also: flip
+`config.ar.collections_mode` to `"send"` per-tier as you
+develop trust in the auto-drafts (suggested ramp:
+courtesy_reminder first, escalation_to_legal last and probably
+never).
+
+If Conor or Finnn: the new `workflow_approve_draft` post-approval
+hook architecture is the model to follow for any future
+"draft + queue + approve + advance state" workflow. See the
+`_on_ar_collection_approved` registration in `ar_send.py` and
+the `register_post_approval_hook` API in `draft_queue.py`.
+
+### Tests
+
+Cumulative: ~30 new tests for Patches E/F/G on top of v0.8.2's
+~1495 target. Target for v0.8.3: ~1525 total. Run
+`make test-fast` to verify.
+
+### Notes
+
+- Five stable cuts in one day. Run sheet: v0.7.2 (test/refactor
+  baseline) → v0.8.0 (Wave 1+2) → v0.8.1 (Wave 3 + AP-4 send
+  wire-up) → v0.8.2 (Finnn ABC patch) → v0.8.3 (Finnn EFG
+  hot-fix).
+- The AR collections gate change is the operator-facing item
+  most likely to surprise downstream automations. Default is
+  safe (drafts), but anyone who built tooling assuming the
+  legacy immediate-send needs to set
+  `{"ar": {"collections_mode": "send"}}` in `config.json`.
+
+---
+
 <!-- Conor appends his entry below before sending back -->

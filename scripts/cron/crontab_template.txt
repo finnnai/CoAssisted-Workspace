@@ -5,14 +5,18 @@
 # $HOME and $VENV_PYTHON before piping into `crontab`.
 #
 # All times are in the operator's local timezone (cron uses local).
-# Schedule rationale per Finnn's 2026-05-01 patch:
+# Schedule rationale per Finnn's 2026-05-01 patch (Parts A + E):
 #   07:00 — refresh_stats     (CRM stats before the work day)
 #   07:05 — enrich_inbox      (overnight contact enrichment)
 #   07:10 — executive_briefing (morning digest, after enrichment)
 #   09:00 — vendor_reminders  (weekday-only, mid-morning so vendors see)
 #   12:00 — scanner           (midday catch-up across all sources)
 #   14:00 — vendor_replies    (parse incoming vendor responses)
-#   18:00 — receipts          (end of day expense capture)
+#   receipts:
+#     */15 8-18 * * 1-5  (every 15 min Mon-Fri biz hours — Part E v0.8.3)
+#     0 18 * * 6,0       (weekend 6 PM catchall)
+#   Worst-case latency 24h → 15 min during the day. Dedup short-circuits
+#   redundant scans so 220 fires/wk ≠ 220 Vision calls.
 #
 # Quarterly job runs separately and isn't part of the canonical
 # template — quarterly schedules don't benefit from backfill logic:
@@ -23,10 +27,11 @@
 # the path containing $HOME/<repo-name>/<entrypoint>.py).
 
 # minute hour dom mon dow  command
-0 7 * * *   $VENV_PYTHON $HOME/refresh_stats.py >> $HOME/logs/cron_refresh_stats.log 2>&1
-5 7 * * *   $VENV_PYTHON $HOME/enrich_inbox.py >> $HOME/logs/cron_enrich_inbox.log 2>&1
-10 7 * * *  $VENV_PYTHON $HOME/executive_briefing.py >> $HOME/logs/cron_executive_briefing.log 2>&1
-0 9 * * 1-5 $VENV_PYTHON $HOME/vendor_followups.py --send-due >> $HOME/logs/cron_vendor_reminders.log 2>&1
-0 12 * * *  $VENV_PYTHON $HOME/scanner.py >> $HOME/logs/cron_scanner.log 2>&1
-0 14 * * *  $VENV_PYTHON $HOME/vendor_followups.py --process-replies >> $HOME/logs/cron_vendor_replies.log 2>&1
-0 18 * * *  $VENV_PYTHON $HOME/receipts.py --sweep >> $HOME/logs/cron_receipts.log 2>&1
+0 7 * * *         $VENV_PYTHON $HOME/refresh_stats.py >> $HOME/logs/cron_refresh_stats.log 2>&1
+5 7 * * *         $VENV_PYTHON $HOME/enrich_inbox.py >> $HOME/logs/cron_enrich_inbox.log 2>&1
+10 7 * * *        $VENV_PYTHON $HOME/executive_briefing.py >> $HOME/logs/cron_executive_briefing.log 2>&1
+0 9 * * 1-5       $VENV_PYTHON $HOME/vendor_followups.py --send-due >> $HOME/logs/cron_vendor_reminders.log 2>&1
+0 12 * * *        $VENV_PYTHON $HOME/scanner.py >> $HOME/logs/cron_scanner.log 2>&1
+0 14 * * *        $VENV_PYTHON $HOME/vendor_followups.py --process-replies >> $HOME/logs/cron_vendor_replies.log 2>&1
+*/15 8-18 * * 1-5 $VENV_PYTHON $HOME/receipts.py --sweep >> $HOME/logs/cron_receipts.log 2>&1
+0 18 * * 6,0      $VENV_PYTHON $HOME/receipts.py --sweep >> $HOME/logs/cron_receipts.log 2>&1

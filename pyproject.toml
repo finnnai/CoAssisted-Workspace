@@ -1,6 +1,6 @@
 [project]
 name = "coassisted-workspace"
-version = "0.8.2"
+version = "0.8.3"
 # IMPORTANT: keep this in sync with _version.py — that's the single source of
 # truth for runtime, and pyproject.toml has to be hand-synced because pip
 # install reads it before _version.py is importable. Use `make bump VERSION=X.Y.Z`
@@ -21,6 +21,16 @@ dependencies = [
     # Pillow shrinks oversized phone-photo receipts before Claude Vision.
     # Anthropic API caps images at 5MB; phones routinely produce 6–18MB.
     "Pillow>=10.0",
+    # AP/AR Wave 1-3 modules (labor_ingest, master_rollup,
+    # workday_journal_eib, ar_send) all read/write .xlsx — Finnn 2026-05-01
+    # Part G1: caused 17/19 v0.8.x test failures on a clean upgrade until
+    # manually pip-installed.
+    "openpyxl>=3.1",
+    # croniter — Finnn 2026-05-01 Part A: install_crontab.py + Part B
+    # system_check_cron compute next-fire timestamps. Soft dep; both
+    # surfaces degrade gracefully when missing, but the timing-aware
+    # installer is materially better with it.
+    "croniter>=2.0",
 ]
 
 [project.optional-dependencies]

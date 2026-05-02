@@ -164,6 +164,35 @@ class SendCollectionReminderInput(BaseModel):
     )
     as_of: Optional[str] = Field(default=None, description="YYYY-MM-DD; defaults to today.")
     override_to: Optional[str] = Field(default=None)
+    mode_override: Optional[str] = Field(
+        default=None,
+        description=(
+            "One-shot override of config.ar.collections_mode for this "
+            "specific call. One of 'send', 'draft', 'disabled'. "
+            "Defaults to whatever config + per-tier override resolve to."
+        ),
+    )
+
+
+class SetCollectionsModeInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+    mode: Optional[str] = Field(
+        default=None,
+        description=(
+            "Set the base mode for all tiers. One of 'send', 'draft', "
+            "'disabled'. Omit to leave the base unchanged and only "
+            "update the per-tier override."
+        ),
+    )
+    tier: Optional[str] = Field(
+        default=None,
+        description=(
+            "When set with mode, applies the mode to this single tier "
+            "(in collections_mode_per_tier). Tiers: courtesy_reminder, "
+            "first_followup, second_followup, third_followup, "
+            "escalation_to_legal."
+        ),
+    )
 
 
 # =============================================================================
@@ -515,7 +544,7 @@ def register(mcp) -> None:
     @mcp.tool(
         name="workflow_send_collection_reminder",
         annotations={
-            "title": "AR-9 — send a collection reminder per cadence ladder",
+            "title": "AR-9 — send (or draft) a collection reminder",
             "readOnlyHint": False, "destructiveHint": False,
             "idempotentHint": False, "openWorldHint": True,
         },
@@ -523,13 +552,21 @@ def register(mcp) -> None:
     async def workflow_send_collection_reminder(
         params: SendCollectionReminderInput,
     ) -> str:
-        """Send a collections reminder. The cadence ladder picks the
-        tier automatically from days-past-due + which tiers have
-        already been sent (so reminders don't double-fire). Pass
-        `tier` explicitly to override.
+        """Send (or draft) a collections reminder per the configured mode.
 
-        On success, appends a collection_event so the next cadence
-        run won't re-send."""
+        Per Finnn 2026-05-01 Part F + Joshua's question-3 answer:
+        every tier defaults to "draft" (operator approves via
+        workflow_approve_draft, which advances state on send), and
+        escalation_to_legal defaults to "disabled" (operator composes
+        by hand). Override the global behavior via
+        config.ar.collections_mode + collections_mode_per_tier; override
+        per-call via the `mode_override` param.
+
+        Returns include the `mode` and a `status` string:
+            - sent      : went out via Gmail (mode=send only)
+            - drafted   : queued in workflow_list_drafts (mode=draft)
+            - skipped   : tier disabled by config (mode=disabled)
+        """
         try:
             as_of_date = _parse_date(params.as_of)
             result = ar_send.send_collection_reminder(
@@ -537,12 +574,74 @@ def register(mcp) -> None:
                 tier=params.tier,
                 as_of=as_of_date,
                 override_to=params.override_to,
+                mode_override=params.mode_override,
             )
             log.info(
-                "send_collection_reminder %s tier=%s sent=%s",
-                params.invoice_id, result.get("tier"), result.get("sent"),
+                "send_collection_reminder %s tier=%s mode=%s status=%s",
+                params.invoice_id,
+                result.get("tier"),
+                result.get("mode"),
+                result.get("status"),
             )
             return json.dumps(result, indent=2)
         except Exception as e:
             log.exception("send_collection_reminder failed")
+            return json.dumps({"status": "error", "error": str(e)})
+
+    @mcp.tool(
+        name="workflow_set_collections_mode",
+        annotations={
+            "title": "AR-9 — set the collections-mode gate",
+            "readOnlyHint": False, "destructiveHint": False,
+            "idempotentHint": True, "openWorldHint": False,
+        },
+    )
+    async def workflow_set_collections_mode(
+        params: SetCollectionsModeInput,
+    ) -> str:
+        """Update config.ar.collections_mode + collections_mode_per_tier.
+
+        Three modes: send / draft / disabled. Per Finnn 2026-05-01 Part
+        F, the safe default is 'draft' for every tier with
+        escalation_to_legal at 'disabled' (operator composes by hand).
+
+        Use `mode` alone to update the base.
+        Use `mode` + `tier` to update a single tier's per-tier override.
+        Returns the new resolved config.
+        """
+        try:
+            import config as _config_mod
+            valid = {"send", "draft", "disabled"}
+            if params.mode and params.mode not in valid:
+                return json.dumps({
+                    "status": "error",
+                    "error": f"Invalid mode {params.mode!r}; expected one of {sorted(valid)}",
+                })
+
+            ar_block = dict(_config_mod.get("ar", {}) or {})
+            per_tier = dict(ar_block.get("collections_mode_per_tier") or {})
+
+            if params.mode and not params.tier:
+                ar_block["collections_mode"] = params.mode
+            elif params.mode and params.tier:
+                per_tier[params.tier] = params.mode
+                ar_block["collections_mode_per_tier"] = per_tier
+            else:
+                return json.dumps({
+                    "status": "error",
+                    "error": "Provide `mode` (and optionally `tier`).",
+                })
+
+            _config_mod.set("ar", ar_block)
+            log.info(
+                "set_collections_mode: base=%s per_tier=%s",
+                ar_block.get("collections_mode"),
+                ar_block.get("collections_mode_per_tier"),
+            )
+            return json.dumps({
+                "status": "ok",
+                "ar": ar_block,
+            }, indent=2)
+        except Exception as e:
+            log.exception("set_collections_mode failed")
             return json.dumps({"status": "error", "error": str(e)})

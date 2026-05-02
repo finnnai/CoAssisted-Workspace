@@ -176,8 +176,17 @@ def parse_amex_csv(
         reader = csv.DictReader(f)
         for row in reader:
             status = (row.get(_AMEX_COL_STATUS) or "").strip().upper()
-            if not include_pending and status != "CLEARED":
-                continue
+            # DECLINED transactions never enter a journal — even when
+            # include_pending=True, the allowed set is {CLEARED, PENDING}.
+            # Finnn 2026-05-01 Part G3: prior code used `!= "CLEARED"`
+            # plus `include_pending` flip, which let DECLINED through
+            # when the operator passed include_pending=True.
+            if include_pending:
+                if status not in ("CLEARED", "PENDING"):
+                    continue
+            else:
+                if status != "CLEARED":
+                    continue
             txn_date = _parse_amex_date(row.get(_AMEX_COL_TXN_DATE) or "")
             if not txn_date:
                 # Without a date the line can't anchor to a posting period.

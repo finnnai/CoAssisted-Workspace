@@ -32,11 +32,117 @@ testers and marketplace listings.
 
 ---
 
-## [Unreleased] — `0.8.3-dev`
+## [Unreleased] — `0.8.4-dev`
 
 Working window for the next dev cycle. Outstanding: AP-1 Supplier
 Invoice EIB (still gated on Workday GL → Spend Category map),
-Geotab integration, P1-7 Slack.
+Geotab integration, P1-7 Slack, Wave 4 quote management +
+e-signature backend.
+
+---
+
+## [0.8.3] — 2026-05-01 · stable
+
+Hot-fix release closing out Finnn's three follow-up patches
+(Parts E/F/G) on top of v0.8.2. Same-day cut — the v0.8.1 upgrade
+left three operator-blocking issues that needed to be closed before
+the weekend, plus an AR-collections safety gap that was high enough
+priority to ship without waiting for the Friday cadence.
+
+### Added
+
+- **AR collections kill-switch — three-mode gate** (`ar_send.py`,
+  `tools/ap_wave3.py`, `config.py`). New
+  `config.ar.collections_mode` and `collections_mode_per_tier`
+  control how `workflow_send_collection_reminder` handles each
+  cadence tier. Three modes:
+    - `send` — legacy immediate-send (pre-0.8.3 behavior).
+    - `draft` — create a Gmail draft + queue in `draft_queue`
+      with `kind="ar_collection"`. Operator approves via
+      `workflow_approve_draft`, which fires the post-approval
+      hook to advance `collection_events` state on the invoice.
+    - `disabled` — the workflow returns `status: skipped` with
+      no draft, no send. `workflow_collections_due_today` still
+      surfaces due items.
+  Default: every tier `draft` except `escalation_to_legal` which
+  defaults to `disabled` (the Tier-5 final-notice template is
+  high-stakes enough that Joshua's 2026-05-01 answer was
+  compose-by-hand). Per-tier override beats the base mode; an
+  optional `mode_override` arg on the call beats config. New
+  `workflow_set_collections_mode` MCP tool lets operators flip
+  the gate from chat without editing `config.json`. 14 tests.
+- **Post-approval hook registry** (`draft_queue.py`). Module-level
+  `register_post_approval_hook(kind, callback)` and
+  `fire_post_approval_hooks(rec)` wired into
+  `workflow_approve_draft`'s success path. Idempotent
+  registration (re-registering the same callback is a no-op),
+  exception-swallowing fire (one bad hook can't break the
+  approval), bad-input rejection. The AR module registers its
+  own hook at import time — no central wiring required.
+
+### Changed
+
+- **Receipts cron cadence — 15-min business-hours sweep, daily
+  on weekends** (`scripts/cron/crontab_template.txt`, Part E).
+  Replaces the single `0 18 * * *` daily run with two entries:
+  `*/15 8-18 * * 1-5` (Mon-Fri, every 15 minutes between 8 AM
+  and 6 PM) and `0 18 * * 6,0` (Sat/Sun daily). Catches
+  receipt-bearing emails within 15 minutes during the workday
+  rather than waiting until 6 PM. Run
+  `make install-crontab` to pick up the new schedule; it will
+  preserve any personal cron entries and offer to backfill any
+  jobs whose scheduled time has already passed today.
+
+### Fixed
+
+- **`openpyxl` and `croniter` now declared dependencies**
+  (`pyproject.toml`, Part G1). Previously soft-deps for
+  `labor_ingest`, `master_rollup`, `workday_journal_eib`,
+  `ar_send`, `install_crontab.py`, and `system_check_cron` —
+  caused 17/19 v0.8.x test failures on a clean upgrade until
+  manually `pip install`-ed. Now declared in the `dependencies`
+  block so a fresh `pip install -e .` is enough.
+- **GL classifier test isolation** (`tests/test_gl_classifier.py`,
+  Part G2). The `isolated_classifier_state` fixture now
+  redirects `gl_memo_classifier._INDEX_PATH` to a tmp path AND
+  resets the in-process `_INDEX` cache before/after each test.
+  Previously, code paths that bypassed the
+  `lookup_by_memo` monkeypatch could pick up a real
+  disk-resident index from a prior run of
+  `scripts/train_gl_memo_classifier.py` and produce
+  non-deterministic results. Belt-and-suspenders isolation.
+- **AMEX DECLINED filter** (`workday_journal_eib.py`, Part G3).
+  Tightened the status check so that DECLINED, REVERSED, and
+  any other non-`CLEARED`/non-`PENDING` rows are unconditionally
+  excluded from EIB output. Previously the `include_pending`
+  toggle could accidentally pick up DECLINED rows in the
+  `else` branch.
+
+### Stats since v0.8.2
+
+- 1 commit (Parts E/F/G bundled + this stable cut + dev bump)
+- ~30 new unit tests
+- ~600 LOC
+
+### Open items deferred to 0.8.x and beyond
+
+- **AP-1 Supplier Invoice EIB**: still gated on the Workday
+  GL → Spend Category map.
+- **Geotab integration**: still a stub.
+- **P1-7 Slack**: still deferred.
+- **Wave 4 quote management + e-signature**: pending PandaDoc
+  vs SignNow vs alternative decision.
+
+### Upgrade
+
+Additive on top of v0.8.2. No breaking config changes — the new
+`config.ar` block is optional and falls back to safe defaults
+(every tier `draft`, escalation `disabled`) if absent. Existing
+`config.json` files keep working without edits. Operators who
+were relying on the old immediate-send behavior need to add
+`{"ar": {"collections_mode": "send"}}` to `config.json` to
+restore it. Run `make install-crontab` to pick up the new
+15-minute receipts cadence.
 
 ---
 

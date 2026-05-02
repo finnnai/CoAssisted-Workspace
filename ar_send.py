@@ -392,19 +392,121 @@ def send_invoice(
     }
 
 
+# =============================================================================
+# Collections-mode resolution — Finnn 2026-05-01 Part F
+# =============================================================================
+
+# The three modes — kept as constants so consumers don't sprinkle
+# string literals across the codebase.
+COLLECTIONS_MODE_SEND = "send"
+COLLECTIONS_MODE_DRAFT = "draft"
+COLLECTIONS_MODE_DISABLED = "disabled"
+
+_COLLECTIONS_MODES = frozenset(
+    [COLLECTIONS_MODE_SEND, COLLECTIONS_MODE_DRAFT, COLLECTIONS_MODE_DISABLED]
+)
+
+
+def resolve_collections_mode(tier: str) -> str:
+    """Return the configured mode for a given collection tier.
+
+    Lookup priority:
+        1. ``config.ar.collections_mode_per_tier[tier]`` if set
+        2. ``config.ar.collections_mode`` (the base default)
+        3. Hardcoded fallback: ``"draft"`` (safe-by-default)
+
+    Unknown mode strings fall back to ``"draft"`` to fail safe.
+    """
+    try:
+        import config as _config_mod
+        ar_block = _config_mod.get("ar", {}) or {}
+    except Exception:
+        return COLLECTIONS_MODE_DRAFT
+
+    if not isinstance(ar_block, dict):
+        return COLLECTIONS_MODE_DRAFT
+
+    per_tier = ar_block.get("collections_mode_per_tier") or {}
+    if isinstance(per_tier, dict) and tier in per_tier:
+        candidate = per_tier[tier]
+        if candidate in _COLLECTIONS_MODES:
+            return candidate
+
+    base = ar_block.get("collections_mode")
+    if base in _COLLECTIONS_MODES:
+        return base
+
+    return COLLECTIONS_MODE_DRAFT
+
+
+# =============================================================================
+# Post-approval hook — fires when an AR collection draft is approved + sent
+# =============================================================================
+
+def _on_ar_collection_approved(rec: dict) -> None:
+    """Hook registered with draft_queue. Advances AR state on send.
+
+    Reads ``invoice_id`` and ``tier`` from the draft's ``meta`` dict —
+    we put those there in :func:`send_collection_reminder` when
+    enqueuing in draft mode.
+    """
+    meta = (rec or {}).get("meta") or {}
+    invoice_id = meta.get("invoice_id")
+    tier = meta.get("tier")
+    if not invoice_id or not tier:
+        return
+    note = (
+        f"Approved + sent via workflow_approve_draft "
+        f"(draft_queue id={rec.get('id')})"
+    )
+    ar_invoicing.add_collection_event(invoice_id, tier, note=note)
+
+
+# Register the hook at module import. Idempotent — register_post_approval_hook
+# dedups so re-imports during tests don't double-fire.
+try:
+    import draft_queue as _draft_queue
+    _draft_queue.register_post_approval_hook(
+        "ar_collection", _on_ar_collection_approved,
+    )
+except Exception:
+    pass
+
+
+# =============================================================================
+# Public — send_collection_reminder (mode-aware)
+# =============================================================================
+
 def send_collection_reminder(
     invoice_id: str,
     *,
     tier: Optional[str] = None,
     as_of: Optional[_dt.date] = None,
     override_to: Optional[str] = None,
+    mode_override: Optional[str] = None,
 ) -> dict:
-    """Send a collection reminder to the customer.
+    """Send (or draft, or skip) a collection reminder per the configured mode.
 
-    `tier` defaults to whatever the cadence ladder says is due today
-    for this invoice. Pass an explicit tier to force a specific
-    template (rare — usually only when re-sending after a cadence
-    correction).
+    Per Finnn 2026-05-01 Part F + Joshua's question-3 answer
+    (every tier defaults to "draft", escalation_to_legal defaults to
+    "disabled"), the v0.8.3+ behavior consults ``config.ar.collections_mode``:
+
+      - ``"disabled"`` — return early with status="skipped".
+      - ``"draft"`` (default) — create a Gmail draft + queue in
+        workflow_list_drafts. Operator approves via
+        workflow_approve_draft. Post-approval hook advances AR state.
+      - ``"send"`` — send immediately (the legacy v0.8.1/v0.8.2 path).
+        Used only when the operator has explicitly opted in via config.
+
+    Args:
+        invoice_id: target invoice in ar_invoices.json
+        tier: reminder tier name; defaults to whatever the cadence
+            ladder says is due as of `as_of`.
+        as_of: cadence anchor date.
+        override_to: send to this address instead of customer_email.
+        mode_override: bypass the config mode for this one call.
+            Useful for tests + admin one-shots. Validated against the
+            three known modes; unknown values fall back to "draft".
     """
     invoice = ar_invoicing.get(invoice_id)
     if not invoice:
@@ -439,11 +541,77 @@ def send_collection_reminder(
             }
         tier = match.reminder_type
 
+    # Resolve mode: explicit override > config lookup.
+    if mode_override and mode_override in _COLLECTIONS_MODES:
+        mode = mode_override
+    else:
+        mode = resolve_collections_mode(tier)
+
+    # MODE: disabled — return early, no draft, no send. due_today still
+    # surfaces this invoice via ar_invoicing.collections_due_today.
+    if mode == COLLECTIONS_MODE_DISABLED:
+        return {
+            "sent": False,
+            "drafted": False,
+            "status": "skipped",
+            "reason": "collections_disabled",
+            "invoice_id": invoice_id,
+            "tier": tier,
+            "mode": mode,
+        }
+
     try:
         subject, html, text = render_reminder_html(invoice, tier, as_of=as_of)
     except ValueError as e:
         return {"sent": False, "error": str(e)}
 
+    # MODE: draft — enqueue via draft_queue. Operator approves via
+    # workflow_approve_draft (the hook fires add_collection_event on
+    # successful send).
+    if mode == COLLECTIONS_MODE_DRAFT:
+        try:
+            import draft_queue
+            draft_id = draft_queue.enqueue(
+                kind="ar_collection",
+                subject=subject,
+                body_plain=text,
+                body_html=html,
+                target=recipient,
+                source_ref=f"invoice:{invoice.invoice_number}",
+                meta={
+                    "invoice_id": invoice_id,
+                    "invoice_number": invoice.invoice_number,
+                    "tier": tier,
+                    "customer_name": invoice.customer_name,
+                    "outstanding": round(
+                        invoice.total - invoice.paid_amount, 2
+                    ),
+                },
+            )
+            return {
+                "sent": False,
+                "drafted": True,
+                "status": "drafted",
+                "draft_id": draft_id,
+                "invoice_id": invoice_id,
+                "tier": tier,
+                "recipient": recipient,
+                "mode": mode,
+            }
+        except Exception as e:
+            return {
+                "sent": False,
+                "drafted": False,
+                "status": "error",
+                "error": f"draft enqueue failed: {e}",
+                "invoice_id": invoice_id,
+                "tier": tier,
+                "mode": mode,
+            }
+
+    # MODE: send — legacy immediate-send path. Hook does NOT fire here
+    # because we're not going through draft_queue; we call
+    # add_collection_event inline on success.
     result = _send_email_with_attachment(
         to=recipient, subject=subject, html_body=html, text_body=text,
     )
@@ -451,13 +619,19 @@ def send_collection_reminder(
         ar_invoicing.add_collection_event(
             invoice_id,
             tier,
-            note=f"Sent to {recipient}; gmail_message_id={result.get('message_id')}",
+            note=(
+                f"Sent immediately (mode=send) to {recipient}; "
+                f"gmail_message_id={result.get('message_id')}"
+            ),
         )
     return {
         "sent": result.get("sent", False),
+        "drafted": False,
+        "status": "sent" if result.get("sent") else "error",
         "invoice_id": invoice_id,
         "recipient": recipient,
         "tier": tier,
+        "mode": mode,
         "message_id": result.get("message_id"),
         "error": result.get("error"),
     }

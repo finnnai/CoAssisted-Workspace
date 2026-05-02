@@ -50,6 +50,65 @@ STATUS_SENT = "sent"
 
 
 # --------------------------------------------------------------------------- #
+# Post-approval hook registry — Finnn 2026-05-01 Part F
+# --------------------------------------------------------------------------- #
+
+
+# Module-level registry of {kind: callable}. When a draft is approved
+# AND sent (workflow_approve_draft with send=True), the registered
+# callback for the draft's `kind` fires with the full record. Used by
+# AR collections to advance state (mark_sent, add_collection_event)
+# only after a successful send — never on draft creation, never on
+# approve-without-send.
+#
+# Hooks are best-effort: any exception in a hook is logged and
+# swallowed so it can't break the approve_draft response.
+_POST_APPROVAL_HOOKS: dict[str, list[callable]] = {}
+
+
+def register_post_approval_hook(kind: str, callback) -> None:
+    """Register a function to run after a draft of `kind` is approved+sent.
+
+    Callback signature: ``callback(rec: dict) -> None``. The full draft
+    record (with `meta` dict and `to`/`subject`/`body_plain`/etc.) is
+    passed so the callback can extract whatever context it needs.
+
+    Idempotent — calling with the same (kind, callback) twice still
+    only fires once per approval.
+    """
+    if not kind:
+        raise ValueError("kind required")
+    if not callable(callback):
+        raise TypeError("callback must be callable")
+    hooks = _POST_APPROVAL_HOOKS.setdefault(kind, [])
+    if callback not in hooks:
+        hooks.append(callback)
+
+
+def fire_post_approval_hooks(rec: dict) -> None:
+    """Dispatch any registered hooks for the record's kind.
+
+    Called by tools/draft_queue.py workflow_approve_draft after a
+    successful send. Exceptions are caught + logged; the approve
+    response always returns successfully.
+    """
+    kind = (rec or {}).get("kind") or ""
+    for callback in _POST_APPROVAL_HOOKS.get(kind, []):
+        try:
+            callback(rec)
+        except Exception:
+            # Hooks must not break approve_draft. Use module logger if
+            # available; otherwise swallow silently.
+            try:
+                import logging
+                logging.getLogger(__name__).exception(
+                    "post-approval hook for kind=%r failed", kind,
+                )
+            except Exception:
+                pass
+
+
+# --------------------------------------------------------------------------- #
 # Persistence
 # --------------------------------------------------------------------------- #
 

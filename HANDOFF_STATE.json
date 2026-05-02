@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "version": "0.8.2",
+  "version": "0.8.3",
   "channel": "stable",
   "release_date": "2026-05-01",
   "last_handler": {
     "name": "Joshua Szott",
     "email": "josh.szott@surefox.com",
-    "handed_off_at": "2026-05-01T22:00:00-07:00"
+    "handed_off_at": "2026-05-01T23:30:00-07:00"
   },
   "next_handler": {
     "name": "Finnn AI",
     "email": "finnn@surefox.com",
-    "context": "Stable cut v0.8.2. Fourth stable in one day. Closes out Finnn's 2026-05-01 patch: Tier-0.5 receipt classifier bypass (Allan's USPS-receipt bug), system_check_cron health check wired into system_doctor, timing-aware install_crontab.py with backfill prompt. Push to GitHub at tag v0.8.2."
+    "context": "Stable cut v0.8.3. Fifth stable in one day — same-day hot-fix on top of v0.8.2. Closes out Finnn's three follow-up patches (Parts E/F/G): receipts cron pushed to 15-min biz-hours sweep, AR collections kill-switch with three-mode gate (send/draft/disabled) and post-approval hook architecture, plus three v0.8.1-upgrade bug fixes (openpyxl/croniter declared deps, GL classifier test isolation, AMEX DECLINED filter tightening). Push to GitHub at tag v0.8.3."
   },
-  "focus_area": "Finnn 2026-05-01 patch — receipt classifier hardening + cron observability",
+  "focus_area": "Finnn 2026-05-01 follow-up patches E/F/G — receipts cadence + AR collections gate + upgrade-bug fixes",
   "tests": {
-    "total_target": "~1495 (1293 baseline + ~170 Wave 1-3 + ~30 Patch ABC)",
+    "total_target": "~1525 (1293 baseline + ~170 Wave 1-3 + ~30 Patch ABC + ~30 Patch EFG)",
     "framework": "pytest",
     "command": "make test-fast",
     "default_excludes_marker": "network",
@@ -48,18 +48,19 @@
     }
   ],
   "recent_changes_summary": [
-    "v0.8.1 stable cut — Wave 3 (AP-7 labor / AP-8 master rollup / AR-9 invoicing+aging+collections) + AP-4 send wire-up.",
-    "Patch C (8eb7ce7): Tier-0.5 receipt classifier bypass. Internal-sender + image/PDF + thin body + receipt-keyword → Vision direct, HIGH 0.85 confidence. Fixes Allan Renazco's USPS receipt case (subject 'test', body 'receipt', JPG attached).",
-    "Patch B: system_check_cron health check. Inspects crontab via 'crontab -l', reports next-fire times via croniter, scans cron log files for the zsh paste-test artifact ('zsh: command not found: 0') that frequently gets misread as cron failures. Wired into system_doctor.",
-    "Patch A: timing-aware install_crontab.py + scripts/cron/crontab_template.txt + bash wrapper. Pre-install table of next-fire times, backfill prompt for entries past their last fire today (default Y per question 1a). 'make install-crontab' target.",
-    "Patch D: CHANGELOG [0.8.2] entry consolidating A/B/C, plus this stable cut.",
-    "Total since v0.8.1: 4 commits, ~30 new tests, ~750 LOC."
+    "v0.8.2 stable cut — Tier-0.5 receipt classifier bypass + system_check_cron + timing-aware crontab installer.",
+    "Patch E (cron cadence): replaced single 0 18 * * * receipts entry with */15 8-18 * * 1-5 (15-min biz-hours sweep) plus 0 18 * * 6,0 (weekends daily). Run make install-crontab to pick up.",
+    "Patch F (AR collections kill-switch — safety-critical): three-mode gate in ar_send (send/draft/disabled) with per-tier override. Default: every tier 'draft' except escalation_to_legal 'disabled' (per Joshua's question-3 answer). Post-approval hook registry in draft_queue advances collection_events on approval. workflow_set_collections_mode lets operators flip from chat. 14 tests.",
+    "Patch G1: openpyxl + croniter promoted to declared dependencies in pyproject.toml. Were soft-deps, caused 17/19 v0.8.x test failures on clean upgrade.",
+    "Patch G2: gl_classifier test isolation — fixture now redirects gl_memo_classifier._INDEX_PATH to tmp + resets in-process _INDEX cache.",
+    "Patch G3: workday_journal_eib AMEX DECLINED filter tightened — DECLINED/REVERSED rows unconditionally excluded from EIB output regardless of include_pending.",
+    "Total since v0.8.2: 1 commit (E+F+G bundled), ~30 new tests, ~600 LOC."
   ],
   "pick_up_here": "Wave 4 (quote management with e-signatures) is the next strategic item. Operator deciding between PandaDoc (custom MCP) and SignNow (in registry). Once that decision lands, the deterministic quote-generation module ships in ~1 day and the signature integration is another ~1 day.",
   "instructions_for_next_handler": [
     "Read HANDOFF_LOG.md latest entry first.",
     "Read coassisted-workspace-ap-roadmap-2026-04-30.md on operator's Desktop for the AP/AR vision.",
-    "Read patch-cron-and-receipt-classifier-2026-05-01.md on operator's Desktop for the Finnn patch context.",
+    "Read patch-efg-collections-and-cron-2026-05-01.md on operator's Desktop for the Finnn E/F/G patch context.",
     "Bump VERSION in _version.py + pyproject.toml if you ship features.",
     "Append a new entry to HANDOFF_LOG.md before handing off.",
     "Run `make test-fast` and record pass/fail in your log entry.",

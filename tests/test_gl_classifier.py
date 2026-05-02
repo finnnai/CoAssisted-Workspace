@@ -36,6 +36,13 @@ def isolated_classifier_state(tmp_path, monkeypatch):
     so tests that don't need tier 2 fall straight through to tier 3.
     Tests that DO need tier 2 can monkeypatch
     `gl_memo_classifier.lookup_by_memo` themselves.
+
+    Per Finnn 2026-05-01 Part G2: also redirects `_INDEX_PATH` to a
+    nonexistent tmp path AND resets the in-process `_INDEX` cache, so
+    even code paths that bypass `lookup_by_memo` (which the
+    monkeypatch covers) can't pick up a real disk-resident index that
+    `scripts/train_gl_memo_classifier.py` may have produced on the
+    operator's machine. Belt-and-suspenders isolation.
     """
     monkeypatch.setattr(
         gl_merchant_map, "_MAP_PATH", tmp_path / "gl_merchant_map.json"
@@ -43,7 +50,12 @@ def isolated_classifier_state(tmp_path, monkeypatch):
     monkeypatch.setattr(
         gl_memo_classifier, "lookup_by_memo", lambda memo, top_k=3: []
     )
+    monkeypatch.setattr(
+        gl_memo_classifier, "_INDEX_PATH", tmp_path / "gl_memo_index.json"
+    )
+    gl_memo_classifier._reset_for_test()
     yield tmp_path
+    gl_memo_classifier._reset_for_test()
 
 
 # -----------------------------------------------------------------------------
