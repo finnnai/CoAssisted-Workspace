@@ -1,0 +1,32 @@
+# CoAssisted Workspace — canonical cron schedule
+#
+# Installed by `make install-crontab` (or
+# `scripts/cron/install_crontab.py`). The installer substitutes
+# $HOME and $VENV_PYTHON before piping into `crontab`.
+#
+# All times are in the operator's local timezone (cron uses local).
+# Schedule rationale per Finnn's 2026-05-01 patch:
+#   07:00 — refresh_stats     (CRM stats before the work day)
+#   07:05 — enrich_inbox      (overnight contact enrichment)
+#   07:10 — executive_briefing (morning digest, after enrichment)
+#   09:00 — vendor_reminders  (weekday-only, mid-morning so vendors see)
+#   12:00 — scanner           (midday catch-up across all sources)
+#   14:00 — vendor_replies    (parse incoming vendor responses)
+#   18:00 — receipts          (end of day expense capture)
+#
+# Quarterly job runs separately and isn't part of the canonical
+# template — quarterly schedules don't benefit from backfill logic:
+#   0 6 1 */3 *   $VENV_PYTHON $HOME/refresh_brand_voice.py
+#
+# Operators with custom personal cron entries are fine — the
+# installer only replaces CoAssisted-managed entries (matched by
+# the path containing $HOME/<repo-name>/<entrypoint>.py).
+
+# minute hour dom mon dow  command
+0 7 * * *   $VENV_PYTHON $HOME/refresh_stats.py >> $HOME/logs/cron_refresh_stats.log 2>&1
+5 7 * * *   $VENV_PYTHON $HOME/enrich_inbox.py >> $HOME/logs/cron_enrich_inbox.log 2>&1
+10 7 * * *  $VENV_PYTHON $HOME/executive_briefing.py >> $HOME/logs/cron_executive_briefing.log 2>&1
+0 9 * * 1-5 $VENV_PYTHON $HOME/vendor_followups.py --send-due >> $HOME/logs/cron_vendor_reminders.log 2>&1
+0 12 * * *  $VENV_PYTHON $HOME/scanner.py >> $HOME/logs/cron_scanner.log 2>&1
+0 14 * * *  $VENV_PYTHON $HOME/vendor_followups.py --process-replies >> $HOME/logs/cron_vendor_replies.log 2>&1
+0 18 * * *  $VENV_PYTHON $HOME/receipts.py --sweep >> $HOME/logs/cron_receipts.log 2>&1

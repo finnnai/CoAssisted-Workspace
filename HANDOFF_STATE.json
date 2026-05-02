@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "version": "0.8.1",
+  "version": "0.8.2",
   "channel": "stable",
   "release_date": "2026-05-01",
   "last_handler": {
     "name": "Joshua Szott",
     "email": "josh.szott@surefox.com",
-    "handed_off_at": "2026-05-01T19:00:00-07:00"
+    "handed_off_at": "2026-05-01T22:00:00-07:00"
   },
   "next_handler": {
     "name": "Finnn AI",
     "email": "finnn@surefox.com",
-    "context": "Stable cut v0.8.1. Wave 3 ships (AP-7 labor ingestion, AP-8 master rollup with baseline-deviation alerts, AR-9 invoicing + aging + collections including end-to-end Gmail send wire-up) plus the AP-4 capture-sweep wire-up that was stubbed in 0.8.0. Three stable cuts in one day (v0.7.2, v0.8.0, v0.8.1). Push to GitHub at tag v0.8.1."
+    "context": "Stable cut v0.8.2. Fourth stable in one day. Closes out Finnn's 2026-05-01 patch: Tier-0.5 receipt classifier bypass (Allan's USPS-receipt bug), system_check_cron health check wired into system_doctor, timing-aware install_crontab.py with backfill prompt. Push to GitHub at tag v0.8.2."
   },
-  "focus_area": "AP/AR Wave 3 — labor ingestion, master rollup, invoicing/aging/collections, AP-4 send wire-up",
+  "focus_area": "Finnn 2026-05-01 patch — receipt classifier hardening + cron observability",
   "tests": {
-    "total_target": "~1465 (1293 baseline + ~170 new across Waves 1-3)",
+    "total_target": "~1495 (1293 baseline + ~170 Wave 1-3 + ~30 Patch ABC)",
     "framework": "pytest",
     "command": "make test-fast",
     "default_excludes_marker": "network",
@@ -35,36 +35,35 @@
       "blocker": "Geotab API credentials."
     },
     {
+      "id": "Wave-4-quotes",
+      "priority": "med",
+      "summary": "Quote management module + e-signature wire-up. Operator deciding between PandaDoc (custom MCP, ~$19/user/mo, has proposal builder) and SignNow (in registry, ~$8/user/mo, e-sign only).",
+      "blocker": "Operator decision on signature backend."
+    },
+    {
       "id": "P1-7",
       "priority": "low",
       "summary": "Slack integration — parity with chat_* surface. Joshua deferred until real need surfaces.",
       "design_doc": "mcp-design-docs-2026-04-29.md#p1-7"
-    },
-    {
-      "id": "Polish-broad-except",
-      "priority": "low",
-      "summary": "Continue broad-except cleanup on densest remaining files (tools/contacts.py 27, tools/system.py 33, tools/receipts.py 31).",
-      "blocker": "None."
     }
   ],
   "recent_changes_summary": [
-    "v0.8.0 stable cut on 2026-05-01 — Wave 1 + Wave 2 (AP-2, AP-3, AP-4 routing, AP-5, AP-6).",
-    "AP-4 wire-up (e88482d): replaced ap_sweep.py's 4 stubbed call sites with real Gmail / Drive / Chat API integrations. Wave 2 fully operational.",
-    "AP-7 (4cf1170): labor_ingest.py — StaffWizard Overall Report parser, project grouping via project_registry.resolve_by_staffwizard_job, per-project daily labor workbook writer. Real-data validation: 108 April 29 shifts → 28 project groups.",
-    "AP-8 (a59f119): master_rollup.py — three-tab workbook (All Projects, PM Dashboard, Anomalies). N=30-day cold-start baseline, ±2σ deviation alerts in both directions, 7d/30d rolling run-rates.",
-    "AR-9 (54c69d9): ar_invoicing.py — invoice generation from labor (grouped by post), Net-15 default + per-customer overrides, weekly cadence for NY projects, 6 aging buckets, 5-tier collections cadence (no double-send).",
-    "AR-9 send wire-up: ar_send.py — HTML email body + Excel attachment for invoices, tier-appropriate reminder templates, dispatched via Gmail API. Calls mark_sent / add_collection_event on success.",
-    "Wave 3 MCP wrappers (tools/ap_wave3.py): 10 new tools (workflow_ingest_labor_report, workflow_build_master_rollup, workflow_generate_customer_invoice, workflow_invoice_mark_sent / apply_payment, workflow_ar_aging_report, workflow_collections_due_today, workflow_send_invoice, workflow_send_collection_reminder, workflow_record_daily_fact).",
-    "Total since v0.8.0: 4 new modules + 10 new MCP tools + ~59 new unit tests + ~1,800 LOC."
+    "v0.8.1 stable cut — Wave 3 (AP-7 labor / AP-8 master rollup / AR-9 invoicing+aging+collections) + AP-4 send wire-up.",
+    "Patch C (8eb7ce7): Tier-0.5 receipt classifier bypass. Internal-sender + image/PDF + thin body + receipt-keyword → Vision direct, HIGH 0.85 confidence. Fixes Allan Renazco's USPS receipt case (subject 'test', body 'receipt', JPG attached).",
+    "Patch B: system_check_cron health check. Inspects crontab via 'crontab -l', reports next-fire times via croniter, scans cron log files for the zsh paste-test artifact ('zsh: command not found: 0') that frequently gets misread as cron failures. Wired into system_doctor.",
+    "Patch A: timing-aware install_crontab.py + scripts/cron/crontab_template.txt + bash wrapper. Pre-install table of next-fire times, backfill prompt for entries past their last fire today (default Y per question 1a). 'make install-crontab' target.",
+    "Patch D: CHANGELOG [0.8.2] entry consolidating A/B/C, plus this stable cut.",
+    "Total since v0.8.1: 4 commits, ~30 new tests, ~750 LOC."
   ],
-  "pick_up_here": "AP-1 needs the Workday GL → Spend Category map to unblock. Geotab needs API credentials. After those, P1-7 Slack and the broad-except polish backlog are the remaining items.",
+  "pick_up_here": "Wave 4 (quote management with e-signatures) is the next strategic item. Operator deciding between PandaDoc (custom MCP) and SignNow (in registry). Once that decision lands, the deterministic quote-generation module ships in ~1 day and the signature integration is another ~1 day.",
   "instructions_for_next_handler": [
-    "Read HANDOFF_LOG.md latest entry first (2026-05-01 v0.8.1 cut).",
-    "Read coassisted-workspace-ap-roadmap-2026-04-30.md on the operator's Desktop for the AP/AR vision.",
-    "Bump VERSION in _version.py + pyproject.toml if you ship features (e.g. 0.8.2-dev).",
+    "Read HANDOFF_LOG.md latest entry first.",
+    "Read coassisted-workspace-ap-roadmap-2026-04-30.md on operator's Desktop for the AP/AR vision.",
+    "Read patch-cron-and-receipt-classifier-2026-05-01.md on operator's Desktop for the Finnn patch context.",
+    "Bump VERSION in _version.py + pyproject.toml if you ship features.",
     "Append a new entry to HANDOFF_LOG.md before handing off.",
     "Run `make test-fast` and record pass/fail in your log entry.",
     "Add a CHANGELOG.md entry under [Unreleased].",
-    "Commit each spec as a discrete git commit with the spec id."
+    "Commit each spec / patch as a discrete git commit."
   ]
 }

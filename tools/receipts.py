@@ -889,9 +889,30 @@ def register(mcp) -> None:
                 # plain-text body. Doing a full _extract_plaintext on every
                 # candidate would slow the scan, so we lazy-eval it.
                 snippet = full.get("snippet", "")
+
+                # Walk attachments first — needed by both the Tier-0.5
+                # bypass (Finnn 2026-05-01) and the existing PDF/image
+                # extraction path. Cheap; payload is already in memory.
+                attachments = []
+                def _walk(payload, acc):
+                    fn = payload.get("filename")
+                    body = payload.get("body", {}) or {}
+                    if fn and body.get("attachmentId"):
+                        acc.append({
+                            "id": body["attachmentId"],
+                            "filename": fn,
+                            "mime": payload.get("mimeType", ""),
+                            "mimeType": payload.get("mimeType", ""),
+                            "size": body.get("size", 0),
+                        })
+                    for p in payload.get("parts", []) or []:
+                        _walk(p, acc)
+                _walk(full.get("payload", {}), attachments)
+
                 is_receipt, reason = _r.classify_email_as_receipt(
                     subject=subject, sender=sender, body_preview=snippet,
                 )
+                full_body = None
                 if not is_receipt:
                     # Re-try the classifier with the full plain-text body in
                     # case the money signal lives past the snippet cutoff
@@ -903,25 +924,29 @@ def register(mcp) -> None:
                             subject=subject, sender=sender,
                             body_preview=full_body[:4000],
                         )
+
+                # Tier-0.5 rescue: internal-sender + image/PDF + thin body +
+                # receipt-keyword. Per the 2026-05-01 patch — covers Allan's
+                # 'subject: test, body: receipt, attached USPS jpg' case
+                # where the regular ladder rejects on text shape but the
+                # attachment is a perfect Vision target.
+                if not is_receipt:
+                    bypass_body = full_body if full_body else snippet
+                    bypass_ok, bypass_reason, _bypass_conf = (
+                        _r.classify_internal_image_bypass(
+                            subject=subject,
+                            sender=sender,
+                            body_preview=bypass_body,
+                            attachments=attachments,
+                        )
+                    )
+                    if bypass_ok:
+                        is_receipt = True
+                        reason = f"tier05_bypass:{bypass_reason}"
+
                 if not is_receipt:
                     results["skipped_not_receipt"] += 1
                     continue
-
-                # Try to find a PDF/image attachment first; fall back to body text.
-                attachments = []
-                def _walk(payload, acc):
-                    fn = payload.get("filename")
-                    body = payload.get("body", {}) or {}
-                    if fn and body.get("attachmentId"):
-                        acc.append({
-                            "id": body["attachmentId"],
-                            "filename": fn,
-                            "mime": payload.get("mimeType", ""),
-                            "size": body.get("size", 0),
-                        })
-                    for p in payload.get("parts", []) or []:
-                        _walk(p, acc)
-                _walk(full.get("payload", {}), attachments)
 
                 rec = None
                 pdf_or_image = next(

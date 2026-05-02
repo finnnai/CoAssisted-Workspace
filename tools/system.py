@@ -447,6 +447,20 @@ def register(mcp) -> None:
         return json.dumps(_check_dependencies(), indent=2)
 
     @mcp.tool(
+        name="system_check_cron",
+        annotations={
+            "title": "Inspect crontab + cron log files",
+            "readOnlyHint": True, "destructiveHint": False,
+            "idempotentHint": True, "openWorldHint": False,
+        },
+    )
+    async def system_check_cron(params: _NoArgs) -> str:
+        """Run the cron health check standalone (also runs as part of
+        system_doctor). Reports next-fire times per entry, plus warns
+        about the zsh paste-test artifact in log files."""
+        return json.dumps(_check_cron(), indent=2)
+
+    @mcp.tool(
         name="system_check_clock",
         annotations={
             "title": "Detect system clock skew (OAuth tokens are time-sensitive)",
@@ -575,6 +589,7 @@ def register(mcp) -> None:
         results.append(_check_filesystem())
         results.append(_check_dependencies())
         results.append(_check_clock())
+        results.append(_check_cron())
         results.append(_check_tools())
         results.append(_check_unit_tests())  # ~1s; deep diagnostic
         results.append(_check_quota_usage())
@@ -1679,3 +1694,172 @@ def _check_quota_usage() -> CheckResult:
         )
     except Exception as e:
         return _result(name, "warn", f"Couldn't estimate: {e}", fix=None)
+
+
+# =========================================================================== #
+# Cron schedule health — Finnn 2026-05-01 patch                                #
+# =========================================================================== #
+
+
+# Paste-test artifact pattern. When operators paste cron lines into a zsh
+# terminal during install, zsh interprets the leading minute field as a
+# command and writes "zsh: command not found: 0" (or similar) into the
+# log file via the >> redirect. This is NOT a cron failure — but it's
+# easy to misread as one. Match the leading 0 OR a 1-2 digit minute.
+_PASTE_TEST_PATTERN = re.compile(
+    r"zsh:\s*command not found:\s*\d{1,2}",
+    re.IGNORECASE,
+)
+
+
+def _read_crontab() -> tuple[bool, list[str], str]:
+    """Run `crontab -l`, return (have_crontab, lines, error).
+
+    Exit 1 with empty stdout means "no crontab installed" — return False
+    + empty list. Other errors return False + the stderr message.
+    """
+    try:
+        import subprocess
+        result = subprocess.run(
+            ["crontab", "-l"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except FileNotFoundError:
+        return False, [], "crontab binary not on PATH"
+    except subprocess.TimeoutExpired:
+        return False, [], "crontab -l timed out"
+    except Exception as e:
+        return False, [], f"crontab -l failed: {e}"
+    if result.returncode == 0:
+        lines = [
+            ln.rstrip()
+            for ln in result.stdout.splitlines()
+            if ln.strip() and not ln.lstrip().startswith("#")
+        ]
+        return True, lines, ""
+    if result.returncode == 1 and not result.stdout.strip():
+        return False, [], "no_crontab_installed"
+    return False, [], (result.stderr or "").strip() or f"exit={result.returncode}"
+
+
+def _parse_cron_entry(line: str) -> Optional[dict]:
+    """Split a crontab line into ``{schedule, command, log_path}``.
+
+    Returns None for malformed lines. Recognizes the standard
+    ``M H DOM MON DOW command`` shape used by all CoAssisted entries.
+    """
+    parts = line.split(None, 5)
+    if len(parts) < 6:
+        return None
+    schedule = " ".join(parts[:5])
+    command = parts[5]
+    log_path = None
+    # Look for trailing >> /path/to.log redirect.
+    redirect_match = re.search(r">>\s*(\S+)", command)
+    if redirect_match:
+        log_path = redirect_match.group(1)
+    return {"schedule": schedule, "command": command, "log_path": log_path}
+
+
+def _next_fire_iso(schedule: str) -> Optional[str]:
+    """Return next-fire ISO timestamp for a cron schedule, or None on miss.
+
+    Uses ``croniter`` if available; gracefully degrades to None when
+    the dep isn't installed (some environments skip it; not worth a
+    hard fail).
+    """
+    try:
+        from croniter import croniter
+        import datetime as _dt
+        now = _dt.datetime.now()
+        return croniter(schedule, now).get_next(_dt.datetime).isoformat(
+            timespec="seconds"
+        )
+    except ImportError:
+        return None
+    except Exception:
+        return None
+
+
+def _check_cron() -> CheckResult:
+    """Inspect crontab + per-job log files. Finnn 2026-05-01 patch.
+
+    Reports:
+        - `crontab -l` exit status (no crontab installed → WARN, not FAIL)
+        - For each parsed entry: next-fire timestamp + log file health
+        - PASTE-TEST signature in log files → WARN with explanation
+        - Empty/missing log files → noted but not flagged
+    """
+    name = "Cron schedule"
+    have, lines, err = _read_crontab()
+    if not have:
+        if err == "no_crontab_installed":
+            return _result(
+                name, "warn",
+                "No crontab installed yet. Run `make install-crontab` "
+                "to set up the daily refresh / receipt sweep / vendor "
+                "follow-up jobs.",
+                fix="make install-crontab",
+            )
+        return _result(
+            name, "warn", f"Couldn't inspect crontab: {err}", fix=None,
+        )
+
+    if not lines:
+        return _result(
+            name, "warn",
+            "Crontab present but contains no scheduled jobs.",
+            fix="make install-crontab",
+        )
+
+    # Per-entry diagnostics.
+    parsed_entries: list[dict] = []
+    paste_test_logs: list[str] = []
+    for line in lines:
+        entry = _parse_cron_entry(line)
+        if entry is None:
+            continue
+        entry["next_fire"] = _next_fire_iso(entry["schedule"])
+        if entry["log_path"]:
+            log_path = Path(entry["log_path"]).expanduser()
+            if log_path.exists() and log_path.stat().st_size > 0:
+                # Cheap read of the first few lines to check for the
+                # paste-test signature.
+                try:
+                    with log_path.open("r", encoding="utf-8", errors="replace") as f:
+                        head = f.read(4096)
+                    if _PASTE_TEST_PATTERN.search(head):
+                        paste_test_logs.append(str(log_path))
+                except OSError:
+                    pass
+        parsed_entries.append(entry)
+
+    # WARN if paste-test signatures were found in any log.
+    if paste_test_logs:
+        return _result(
+            name, "warn",
+            (
+                f"{len(parsed_entries)} cron entries scheduled. "
+                f"{len(paste_test_logs)} log file(s) contain paste-test "
+                f"artifacts (`zsh: command not found: <minute>`) — these "
+                f"are not cron failures, just install-time noise from "
+                f"pasting cron lines into a zsh terminal. Clear them "
+                f"to remove this warning."
+            ),
+            fix=(
+                "Clear the affected log files: "
+                + " && ".join(f"> {p}" for p in paste_test_logs)
+            ),
+            extra={
+                "entries": parsed_entries,
+                "paste_test_log_files": paste_test_logs,
+            },
+        )
+
+    return _result(
+        name, "pass",
+        f"{len(parsed_entries)} cron entries scheduled, all log files clean.",
+        extra={"entries": parsed_entries},
+    )

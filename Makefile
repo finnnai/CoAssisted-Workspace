@@ -43,7 +43,8 @@ DIST_NAME     := coassisted-workspace-$(shell date +%Y-%m-%d)
 
 .DEFAULT_GOAL := help
 .PHONY: help install auth test run refresh enrich brand-voice \
-        handoff release dev-build version clean distclean
+        handoff release dev-build version clean distclean \
+        install-crontab
 
 help:
 	@awk 'BEGIN {FS = ":.*#"} /^[a-zA-Z_-]+:.*?#/ {printf "\033[1m%-12s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -53,6 +54,9 @@ install: ## Run the full install.sh bootstrap (idempotent)
 
 auth: ## Start the OAuth flow (opens browser, saves token.json)
 	@$(PY) authenticate.py
+
+install-crontab: ## Install canonical 7-line schedule (timing-aware; backfills missed jobs from today)
+	@bash scripts/cron/install_crontab.sh
 
 test: ## Run the pytest suite (excludes 'network' marker by default)
 	@$(PY) -m pytest tests/ -v

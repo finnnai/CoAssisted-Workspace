@@ -849,4 +849,81 @@ to verify locally; sandbox couldn't reach venv during the build.
 
 ---
 
+## 2026-05-01 (continued, fourth cut) · Joshua — v0.8.2 stable
+
+Fourth stable cut in one day. Closes out the Finnn 2026-05-01
+patch — three operator-facing hardening items packaged in one
+release: Tier-0.5 receipt classifier bypass (Allan's bug),
+system_check_cron health check, timing-aware install_crontab.
+
+- **Version:** v0.8.2 stable, 2026-05-01.
+- **Time held:** ~3 hours since v0.8.1 cut.
+- **Focus area:** Finnn 2026-05-01 patch — receipt classifier
+  + cron observability.
+
+### Commits since v0.8.1
+
+```
+9b1ea58  (tag: v0.8.1) Cut stable v0.8.1
+758b5a0  Bump to 0.8.2-dev
+8eb7ce7  Patch C: Tier-0.5 receipt classifier bypass
+[NEXT]   Patch A+B+D: install_crontab + system_check_cron + CHANGELOG
+[NEXT]   Cut stable v0.8.2
+[NEXT]   Bump to 0.8.3-dev
+```
+
+### What works end-to-end now
+
+- **Allan-style receipts file correctly.** Internal-sender +
+  image/PDF + thin body + keyword (`receipt|invoice|expense|
+  rcpt|ap`) → Vision direct call, HIGH 0.85 confidence,
+  auto-post to expense sheet. Per-installation kill switch
+  via `config.receipts_internal_image_bypass`.
+- **`system_doctor` includes cron.** Detects missing crontab,
+  paste-test artifacts in log files (`zsh: command not found:
+  <minute>`), reports next-fire timestamps per entry. Standalone
+  via `system_check_cron`.
+- **`make install-crontab`** prints next-fire table, backfills
+  missed jobs from today (default Y per question-1a, opt-out
+  with `--no-backfill`), refuses to overwrite differing crontabs
+  without `--force`, preserves personal entries.
+
+### Open items deferred to 0.8.x and beyond
+
+- **AP-1 Supplier Invoice EIB**: still gated on Workday GL →
+  Spend Category map.
+- **Geotab integration**: still a stub.
+- **Wave 4 quote management**: operator deciding between
+  PandaDoc (custom MCP, has proposal builder) and SignNow (in
+  registry, e-sign only).
+- **P1-7 Slack**: still deferred.
+
+### Pick up here
+
+If Joshua: Wave 4 quote management is the next strategic
+build. Once you pick a signature backend the deterministic
+quote-generation module ships in ~1 day, signature integration
+another ~1 day.
+
+If Conor or Finnn: skim the v0.8.2 release notes; the patch
+notes on the operator's Desktop
+(`patch-cron-and-receipt-classifier-2026-05-01.md`) explain the
+Allan incident in full. Run `make test-fast` to verify ~1495
+tests pass.
+
+### Tests
+
+Cumulative across Waves 1-3 + Patch ABC: ~200 new tests on top
+of the 1293 baseline from v0.7.2. Target: ~1495 total.
+
+### Notes
+
+- Four stable cuts in one day. Run sheet: v0.7.2 (test/refactor
+  baseline) → v0.8.0 (Wave 1+2) → v0.8.1 (Wave 3 + AP-4 send
+  wire-up) → v0.8.2 (Finnn patch).
+- `patch-cron-and-receipt-classifier-2026-05-01.md` on Joshua's
+  Desktop carries the full patch context for the Allan incident.
+
+---
+
 <!-- Conor appends his entry below before sending back -->

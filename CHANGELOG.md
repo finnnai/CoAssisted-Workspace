@@ -32,11 +32,73 @@ testers and marketplace listings.
 
 ---
 
-## [Unreleased] — `0.8.2-dev`
+## [Unreleased] — `0.8.3-dev`
 
-Working window for the next dev cycle. Outstanding: AP-1
-Supplier Invoice EIB (still gated on Workday GL → Spend Category
-map), Geotab integration, P1-7 Slack.
+Working window for the next dev cycle. Outstanding: AP-1 Supplier
+Invoice EIB (still gated on Workday GL → Spend Category map),
+Geotab integration, P1-7 Slack.
+
+---
+
+## [0.8.2] — 2026-05-01 · stable
+
+Closes out the Finnn 2026-05-01 patch — three operator-facing
+hardening items packaged in one cut:
+
+### Fixed
+- **Tier-0.5 receipt classifier bypass** (`receipts.py` +
+  `tools/receipts.py`). Internal-domain sender + image/PDF
+  attachment + thin body (<200 chars) containing
+  receipt/invoice/expense/rcpt/ap → bypass the regular tier
+  ladder, send to Vision directly with HIGH base confidence
+  (0.85). Fixes Allan Renazco's 2026-05-01 USPS-receipt-with-
+  thin-body case where subject "test" + body "receipt" +
+  attached JPG was rejected before Vision was even called.
+  Per-installation kill switch via
+  `config.receipts_internal_image_bypass`. 13 new tests.
+
+### Added
+- **`system_check_cron`** health check (`tools/system.py`).
+  Inspects crontab via `crontab -l`, parses entries, reports
+  next-fire timestamps via croniter, scans cron log files for
+  the zsh paste-test artifact (`zsh: command not found:
+  <minute>`) that operators frequently misread as cron failures.
+  Wired into `system_doctor` as a Tier-3 environment check.
+  Standalone MCP tool: `system_check_cron`.
+- **Timing-aware crontab installer** (`scripts/cron/`).
+  `install_crontab.py` reads
+  `scripts/cron/crontab_template.txt`, substitutes
+  `$HOME` / `$VENV_PYTHON`, and prints a per-entry table of
+  next-fire times before installing. For any entry whose most
+  recent scheduled fire was earlier today, prompts the operator
+  to backfill (default Y per Joshua's 2026-05-01 question-1
+  answer; opt-out via `--no-backfill`). Refuses to install when
+  the existing crontab differs from canonical without `--force`.
+  Personal (non-CoAssisted) cron entries are preserved either
+  way. New `make install-crontab` target. ~17 tests for the cron
+  health check + the installer's pure helpers.
+
+### Stats since v0.8.1
+
+- 4 commits (Patch C standalone, then Patch A+B+D bundle, plus
+  this stable cut + dev bump)
+- ~30 new unit tests
+- ~750 LOC
+
+### Open items deferred to 0.8.x and beyond
+
+- **AP-1 Supplier Invoice EIB**: still gated on the Workday
+  GL → Spend Category map.
+- **Geotab integration**: still a stub.
+- **P1-7 Slack**: still deferred.
+
+### Upgrade
+
+Additive on top of v0.8.1. No breaking changes. Run
+`make install-crontab` to swap to the new timing-aware
+installer; it will preserve any personal cron entries and offer
+to backfill any jobs whose scheduled time has already passed
+today.
 
 ---
 

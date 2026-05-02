@@ -1,6 +1,6 @@
 [project]
 name = "coassisted-workspace"
-version = "0.8.1"
+version = "0.8.2"
 # IMPORTANT: keep this in sync with _version.py — that's the single source of
 # truth for runtime, and pyproject.toml has to be hand-synced because pip
 # install reads it before _version.py is importable. Use `make bump VERSION=X.Y.Z`

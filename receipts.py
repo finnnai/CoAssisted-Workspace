@@ -1217,6 +1217,125 @@ def classify_email_as_receipt(
 
 
 # --------------------------------------------------------------------------- #
+# Tier-0.5 trust bypass — internal sender + image/PDF + thin body
+# --------------------------------------------------------------------------- #
+
+# Mimetypes we trust enough to send to Vision when other signals are thin.
+# Restricted to receipt-shaped media — no DOCX or HEIC-LIVE rascals.
+_BYPASS_ATTACHMENT_MIMES = frozenset({
+    "image/jpeg", "image/jpg", "image/png",
+    "image/heic", "image/heif", "image/webp",
+    "application/pdf",
+})
+
+# Thin-body keywords that signal "I'm submitting an expense" intent.
+# Single-word matches in subject OR body. 'ap' is included for short replies
+# like "ap submission" but only matches as a whole word so it doesn't false-
+# positive on every email containing "ap" in random prose.
+_BYPASS_KEYWORDS = re.compile(
+    r"\b(receipt|invoice|expense|rcpt|ap)\b", re.IGNORECASE,
+)
+
+# Hard cap on body length we still consider "thin" — past this the regular
+# classifier ladder has plenty of text to work with and the bypass is
+# unnecessary. Per the 2026-05-01 patch from Finnn.
+_BYPASS_THIN_BODY_MAX = 200
+
+
+def classify_internal_image_bypass(
+    *,
+    subject: str,
+    sender: str,
+    body_preview: str,
+    attachments: Optional[list[dict]] = None,
+) -> tuple[bool, str, float]:
+    """Tier-0.5: trust internal-sender + image/PDF + thin-body emails.
+
+    Returns ``(should_bypass, reason, base_confidence)``. When
+    ``should_bypass`` is True, the caller should skip the regular tier
+    ladder and call Vision directly.
+
+    Bypass fires when ALL of these are true:
+      1. Sender's domain is in ``internal_domains()`` (which already
+         unions ``config.internal_domains``, ``config.subsidiary_domains``,
+         the auto-derived user domain, and Gmail send-as aliases).
+      2. At least one attachment has a receipt-eligible mimetype
+         (jpeg / jpg / png / heic / heif / webp / pdf).
+      3. Body length is below ``_BYPASS_THIN_BODY_MAX`` (200) AND either
+         the body or the subject contains one of the bypass keywords
+         (receipt / invoice / expense / rcpt / ap).
+
+    Returns ``(False, reason, 0.0)`` on any miss; ``reason`` describes
+    which gate failed so callers can log diagnostics.
+
+    Per the 2026-05-01 patch (Finnn → Joshua → 1a / 2a):
+      - Default base confidence is **0.85 (HIGH)** — auto-post the
+        extracted receipt, no review-queue stop on first sighting.
+      - Operator can disable globally via
+        ``config.receipts_internal_image_bypass = False``.
+    """
+    # Config kill-switch.
+    try:
+        import config as _config_mod
+        if not _config_mod.get("receipts_internal_image_bypass", True):
+            return False, "bypass_disabled_in_config", 0.0
+    except Exception:
+        # If config can't be loaded, fall through to evaluating the rule
+        # rather than failing closed — bypass is a hot-path classifier
+        # rescue and shouldn't crash the sweep when config glitches.
+        pass
+
+    # Gate 1 — internal sender domain.
+    sender_l = (sender or "").lower()
+    sender_addr = sender_l.split("<")[-1].split(">")[0].strip()
+    if "@" not in sender_addr:
+        return False, "sender_domain_unparseable", 0.0
+    sender_domain = sender_addr.split("@", 1)[1].strip()
+
+    try:
+        import sender_classifier
+        internal = sender_classifier.internal_domains()
+    except Exception:
+        return False, "sender_classifier_unavailable", 0.0
+
+    is_internal = (sender_domain in internal) or any(
+        sender_domain.endswith("." + d) for d in internal
+    )
+    if not is_internal:
+        return False, f"sender_not_internal={sender_domain}", 0.0
+
+    # Gate 2 — at least one receipt-eligible attachment.
+    if not attachments:
+        return False, "no_attachments", 0.0
+    has_eligible = False
+    for att in attachments:
+        mime = (att.get("mimeType") or att.get("mime_type") or "").lower()
+        if mime in _BYPASS_ATTACHMENT_MIMES:
+            has_eligible = True
+            break
+    if not has_eligible:
+        return False, "no_eligible_attachment", 0.0
+
+    # Gate 3 — thin body AND a bypass keyword in body or subject.
+    body = (body_preview or "").strip()
+    body_thin = len(body) < _BYPASS_THIN_BODY_MAX
+    if not body_thin:
+        return False, f"body_not_thin (len={len(body)})", 0.0
+
+    if not (
+        _BYPASS_KEYWORDS.search(body)
+        or _BYPASS_KEYWORDS.search(subject or "")
+    ):
+        return False, "no_bypass_keyword", 0.0
+
+    return (
+        True,
+        f"internal+attachment({sender_domain})+thin_body+keyword",
+        0.85,
+    )
+
+
+# --------------------------------------------------------------------------- #
 # Sheet column mapping + QuickBooks export
 # --------------------------------------------------------------------------- #
 
