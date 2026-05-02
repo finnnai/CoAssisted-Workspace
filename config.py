@@ -141,6 +141,25 @@ _DEFAULTS: dict[str, Any] = {
     # Format: { "Travel — Airfare": "Flight Expense", ... }. See
     # receipts.py _DEFAULT_QB_ACCOUNT_MAP for the default table.
     "receipts_qb_account_map": None,
+    # PandaDoc — Wave 4 e-signature backend (added 2026-05-01).
+    # Auth precedence: api_key wins; fall back to OAuth2 if api_key is unset.
+    # OAuth requires the trio (client_id, client_secret, refresh_token);
+    # the client auto-refreshes the access_token on every call.
+    # Get an API key from PandaDoc → Settings → API & Integrations →
+    # API Keys (paid tier required for production access).
+    "pandadoc": {
+        "api_key": None,                       # "API-Key xxxxxxxxxxxxxxxxxxxxxxx"
+        "oauth_client_id": None,
+        "oauth_client_secret": None,
+        "oauth_refresh_token": None,
+        "workspace_id": None,                  # optional default workspace
+        "api_base": "https://api.pandadoc.com",
+        # Polling for 202-async endpoints (getDocumentSummary,
+        # getDocumentContent). Most docs resolve in 1-3 seconds; cap
+        # generously so a slow render doesn't time out.
+        "poll_max_seconds": 60,
+        "poll_interval_seconds": 1.0,
+    },
     "retry": {
         "max_attempts": 4,
         "initial_backoff_seconds": 1.0,

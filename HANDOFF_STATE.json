@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "version": "0.8.3",
+  "version": "0.8.4",
   "channel": "stable",
   "release_date": "2026-05-01",
   "last_handler": {
     "name": "Joshua Szott",
     "email": "josh.szott@surefox.com",
-    "handed_off_at": "2026-05-01T23:30:00-07:00"
+    "handed_off_at": "2026-05-02T01:30:00-07:00"
   },
   "next_handler": {
     "name": "Finnn AI",
     "email": "finnn@surefox.com",
-    "context": "Stable cut v0.8.3. Fifth stable in one day — same-day hot-fix on top of v0.8.2. Closes out Finnn's three follow-up patches (Parts E/F/G): receipts cron pushed to 15-min biz-hours sweep, AR collections kill-switch with three-mode gate (send/draft/disabled) and post-approval hook architecture, plus three v0.8.1-upgrade bug fixes (openpyxl/croniter declared deps, GL classifier test isolation, AMEX DECLINED filter tightening). Push to GitHub at tag v0.8.3."
+    "context": "Stable cut v0.8.4. Sixth stable in one day. Wave 4 ships full PandaDoc API coverage (122 raw endpoints + 5 quote workflows, 127 tools total) plus a housekeeping pass (33 new tests) plus 3 hot-fixes caught during cold-load testing (missing 'import re', closure-scope InvalidSignature, async createDocument 409 race). Tool count moves 263 → 390. Live-verified end-to-end against the operator's real PandaDoc account (test doc hWCZTpz6GwY6dNSnHhbHa2 — safe to ignore or delete). Push to GitHub at tag v0.8.4."
   },
-  "focus_area": "Finnn 2026-05-01 follow-up patches E/F/G — receipts cadence + AR collections gate + upgrade-bug fixes",
+  "focus_area": "Wave 4 — PandaDoc API integration + housekeeping + cold-load hot-fixes",
   "tests": {
-    "total_target": "~1525 (1293 baseline + ~170 Wave 1-3 + ~30 Patch ABC + ~30 Patch EFG)",
+    "total_target": "~1595 (1293 baseline + ~170 Wave 1-3 + ~30 Patch ABC + ~30 Patch EFG + ~52 Wave 4 + ~33 housekeeping)",
     "framework": "pytest",
     "command": "make test-fast",
     "default_excludes_marker": "network",
@@ -48,13 +48,18 @@
     }
   ],
   "recent_changes_summary": [
-    "v0.8.2 stable cut — Tier-0.5 receipt classifier bypass + system_check_cron + timing-aware crontab installer.",
-    "Patch E (cron cadence): replaced single 0 18 * * * receipts entry with */15 8-18 * * 1-5 (15-min biz-hours sweep) plus 0 18 * * 6,0 (weekends daily). Run make install-crontab to pick up.",
-    "Patch F (AR collections kill-switch — safety-critical): three-mode gate in ar_send (send/draft/disabled) with per-tier override. Default: every tier 'draft' except escalation_to_legal 'disabled' (per Joshua's question-3 answer). Post-approval hook registry in draft_queue advances collection_events on approval. workflow_set_collections_mode lets operators flip from chat. 14 tests.",
-    "Patch G1: openpyxl + croniter promoted to declared dependencies in pyproject.toml. Were soft-deps, caused 17/19 v0.8.x test failures on clean upgrade.",
-    "Patch G2: gl_classifier test isolation — fixture now redirects gl_memo_classifier._INDEX_PATH to tmp + resets in-process _INDEX cache.",
-    "Patch G3: workday_journal_eib AMEX DECLINED filter tightened — DECLINED/REVERSED rows unconditionally excluded from EIB output regardless of include_pending.",
-    "Total since v0.8.2: 1 commit (E+F+G bundled), ~30 new tests, ~600 LOC."
+    "v0.8.3 stable cut — Finnn EFG patches (cron cadence + AR collections kill-switch + upgrade fixes).",
+    "Housekeeping (1d8c69b): README/INSTALL/pyproject tool counts refreshed 263 / 14 categories. 4 broad excepts narrowed (149 → 145).",
+    "Tests for ar_send + ap_tree (c350009): 33 new unit tests — invoice/reminder renderers, send_invoice paths, AP-6 forced-tree filing.",
+    "PandaDoc Wave 4 foundation (f8d8d0e): pandadoc_client.py (448 LOC) + scripts/generate_pandadoc_tools.py + pandadoc_operations.py + config.pandadoc block.",
+    "PandaDoc Wave 4 raw tools (88c4572): 122 generated tools across 6 modules covering every operation in the v7.24.0 OpenAPI spec.",
+    "PandaDoc Wave 4 workflows (485516f): 5 operator workflows (send_quote, signature_status, quote_pipeline, quote_to_invoice, resend_quote) + register wiring.",
+    "PandaDoc Wave 4 tests + docs (2364eca): 19 client tests + tool count refresh 263 → 390 + categories 13 → 14.",
+    "Hot-fix (e9a6743): missing 'import re' in tools/system.py — Patch B regression caught by Wave 4 cold-load.",
+    "Hot-fix (b258886): lifted PandaDoc input classes from register() closure scope to module scope. FastMCP get_type_hints couldn't resolve closure annotations and raised InvalidSignature.",
+    "Hot-fix (5fbf2b9): workflow_send_quote now polls statusDocument until status leaves document.uploaded. PandaDoc createDocument is async; previous immediate-send hit 409 every time.",
+    "Live verification: end-to-end smoke test against real PandaDoc account succeeded. Test doc hWCZTpz6GwY6dNSnHhbHa2 created + sent + email delivered.",
+    "Total since v0.8.3: 10 commits, ~70 new tests, ~3500 LOC (mostly auto-generated PandaDoc surface)."
   ],
   "pick_up_here": "Wave 4 (quote management with e-signatures) is the next strategic item. Operator deciding between PandaDoc (custom MCP) and SignNow (in registry). Once that decision lands, the deterministic quote-generation module ships in ~1 day and the signature integration is another ~1 day.",
   "instructions_for_next_handler": [

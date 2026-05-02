@@ -420,7 +420,7 @@ def resolve_collections_mode(tier: str) -> str:
     try:
         import config as _config_mod
         ar_block = _config_mod.get("ar", {}) or {}
-    except Exception:
+    except ImportError:
         return COLLECTIONS_MODE_DRAFT
 
     if not isinstance(ar_block, dict):
@@ -469,7 +469,9 @@ try:
     _draft_queue.register_post_approval_hook(
         "ar_collection", _on_ar_collection_approved,
     )
-except Exception:
+except (ImportError, AttributeError):
+    # draft_queue not on path (test isolation) or hook API not yet
+    # available during partial reload — both are non-fatal.
     pass
 
 

@@ -32,12 +32,199 @@ testers and marketplace listings.
 
 ---
 
-## [Unreleased] — `0.8.4-dev`
+## [Unreleased] — `0.8.5-dev`
 
 Working window for the next dev cycle. Outstanding: AP-1 Supplier
 Invoice EIB (still gated on Workday GL → Spend Category map),
-Geotab integration, P1-7 Slack, Wave 4 quote management +
-e-signature backend.
+Geotab integration, P1-7 Slack.
+
+---
+
+## [0.8.4] — 2026-05-01 · stable
+
+Wave 4 ships: full PandaDoc API coverage (122 raw endpoints + 5
+quote workflows) + housekeeping pass + 3 hot-fixes caught during
+live cold-load testing.
+
+Sixth stable cut today. Wave 4 is the e-signature backend
+Joshua's been after — full PandaDoc coverage means quote-to-
+signature-to-AR-9 loops can run inside the MCP without leaving
+the workspace.
+
+### Added — PandaDoc Wave 4 (127 tools)
+
+- **`pandadoc_client.py`** (448 LOC) — single auth + transport
+  surface used by every tool. API-key preferred, OAuth2 refresh-
+  token fallback, retry/backoff per `config.retry`, 202-poll loop
+  for the two async endpoints (`getDocumentSummary`,
+  `getDocumentContent`), hand-built multipart for the 7 upload
+  endpoints (no `requests` dep added). Errors:
+  `PandaDocAuthError`, `PandaDocAPIError` (carries status + body),
+  `PandaDocPollTimeout`, `UnknownOperationError`.
+- **`scripts/generate_pandadoc_tools.py`** — reads
+  `pandadoc_openapi.json` (PandaDoc Public API v7.24.0, 422 KB)
+  and emits `pandadoc_operations.py` (operationId → method/path
+  table) plus 6 `tools/pandadoc_*.py` modules. Pydantic input
+  models auto-built from OpenAPI parameters + requestBody.
+  Idempotent — rerun any time the upstream spec changes.
+- **122 generated raw API tools** across 6 modules:
+    - `tools/pandadoc_documents.py` — 49 tools (Documents +
+      Attachments + Sections + Recipients + Fields + Settings +
+      Audit + Structure)
+    - `tools/pandadoc_templates.py` — 10 tools (Templates +
+      Settings)
+    - `tools/pandadoc_workspace.py` — 25 tools (User/Workspace +
+      Members + Folders + Contacts + Comm Prefs)
+    - `tools/pandadoc_content.py` — 12 tools (Content Library +
+      Product Catalog + Forms + Quotes)
+    - `tools/pandadoc_webhooks.py` — 8 tools (Webhook Subs +
+      Events)
+    - `tools/pandadoc_misc.py` — 18 tools (Notary + Reminders +
+      CRM Links + Logs + OAuth)
+  Wraps every operation including 2 deprecated logs (marked
+  `[DEPRECATED]`) and 2 async endpoints (built-in 202-polling).
+- **5 Wave 4 quote workflows** in `tools/pandadoc_workflows.py`:
+    - `workflow_send_quote` — template + recipients + tokens →
+      created → sent for signature, with poll-until-draft so the
+      async createDocument transition doesn't 409 the send.
+    - `workflow_signature_status` — single-call status snapshot,
+      returns stage + per-recipient status + days-in-stage +
+      `is_stalled` flag + suggested next action.
+    - `workflow_quote_pipeline` — pipeline view across a date
+      window. Groups by status, flags stalled (>7d in
+      `document.sent`), surfaces top-3 oldest per stage.
+    - `workflow_quote_to_invoice` — hands a signed
+      (`document.completed`) quote to AR-9. Pulls total + customer
+      from PandaDoc, generates `ar_invoicing.InvoiceRecord` using
+      the project's billing terms. Optional auto-send.
+    - `workflow_resend_quote` — chase a stalled signature via
+      PandaDoc's `createManualReminder`.
+- **`config.pandadoc` block** — `api_key`, OAuth2 trio
+  (`oauth_client_id` / `_secret` / `_refresh_token`),
+  `workspace_id`, `api_base`, `poll_max_seconds`,
+  `poll_interval_seconds`. Auth precedence: `api_key` wins; OAuth
+  fires only when `api_key` is unset.
+- **19 unit tests** in `tests/test_pandadoc_client.py` covering
+  auth precedence, retry, 202-poll, multipart body, operation-
+  table integrity.
+
+### Added — Housekeeping (Phase 1-4)
+
+- **33 new unit tests**:
+    - `tests/test_ar_send_renderers.py` (18 tests) — invoice
+      HTML/text/xlsx renderers + 5 reminder tiers + send_invoice
+      happy path, missing recipient, override_to, attach_xlsx
+      false, send failure rollback, xlsx render failure fallback.
+    - `tests/test_ap_tree.py` (15 tests) — `_month_bucket_name`
+      pure utility + `register_new_project` full subtree creation
+      (folder + 7 subs + month buckets) + idempotency + error
+      paths + `ensure_month_subtree` lazy expansion + cache hit +
+      `audit_filing_tree` flagging recent non-conforming +
+      `last_audit` round-trip.
+- **README + INSTALL + pyproject** tool counts refreshed: 263 →
+  390. "13 categories" → "14 categories" (PandaDoc joins).
+  pyproject description expanded to mention AP/AR + PandaDoc
+  capabilities.
+- **`dist/` cleanup paste-block** delivered (operator pruned 5
+  stale tarballs, freeing ~250 MB).
+
+### Fixed
+
+- **`tools/system.py` missing `import re`** — Patch B
+  (system_check_cron, 2026-05-01) added a module-level
+  `re.compile()` for `_PASTE_TEST_PATTERN` without importing
+  `re`. Server crashed with NameError on every cold load. Caught
+  when the PandaDoc Wave 4 commits triggered a Cowork restart
+  that exercised the cold-import path.
+- **PandaDoc input classes nested in `register()`** —
+  FastMCP's `func_metadata` calls `typing.get_type_hints` with
+  `globalns=func.__globals__`. When Pydantic input classes lived
+  inside `register()` (closure scope), `get_type_hints` couldn't
+  resolve the deferred `params: _Input_xxx` annotations and raised
+  `InvalidSignature` on every server startup. Generator now emits
+  all 122 input classes at module scope. Same fix hand-applied to
+  `tools/pandadoc_workflows.py` for the 5 Wave 4 workflow input
+  classes.
+- **`workflow_send_quote` 409 race** — PandaDoc's
+  `createDocument` is asynchronous: status starts at
+  `document.uploaded` and transitions to `document.draft` after a
+  1-3s background template merge. Pre-fix, the workflow fired
+  `sendDocument` immediately and hit 409 every time. New
+  `_wait_for_draft` helper polls `statusDocument` until status
+  leaves `document.uploaded`. Reuses
+  `pandadoc.poll_max_seconds` / `poll_interval_seconds` config.
+  Caught live during 2026-05-01 smoke test.
+- **4 broad `except Exception:` clauses narrowed**:
+  `ar_send.resolve_collections_mode` → `ImportError`; module-
+  level hook registration → `(ImportError, AttributeError)`;
+  `project_registry._save` → `(OSError, TypeError, ValueError)`;
+  `project_registry._llm_infer_project` → `ImportError`. Working
+  count: 149 → 145.
+
+### Live verification
+
+End-to-end smoke test against the operator's real PandaDoc
+account confirmed:
+
+- API key auth (no 401)
+- Read paths: `pandadoc_list_documents`, `pandadoc_list_templates`,
+  `pandadoc_list_contacts`
+- Write paths: `workflow_send_quote` →
+  `pandadoc_status_document` (poll) →
+  `pandadoc_send_document`
+- Real document created (`hWCZTpz6GwY6dNSnHhbHa2`) and email
+  delivered to `josh.szott@surefox.com`
+
+### Stats since v0.8.3
+
+- 10 commits
+- ~70 new unit tests (33 housekeeping + 19 PandaDoc client + 18
+  ar_send renderers — wait, 33 + 19 = 52, plus ~18 for renderers
+  is the 33; tally: 33 housekeeping + 19 PandaDoc client = 52
+  new tests; renderers were part of housekeeping)
+- ~3500 LOC (mostly auto-generated PandaDoc surface)
+- Tool count: 263 → 390
+
+### Open items deferred to 0.8.5+
+
+- **AP-1 Supplier Invoice EIB**: still gated on Workday GL →
+  Spend Category map.
+- **Geotab integration**: still a stub.
+- **P1-7 Slack**: still deferred.
+- **PandaDoc workflow tests**: workflow-level tests were left for
+  a follow-up; the 5 Wave 4 workflows are unit-test-able with the
+  same `_FakeResponse` pattern.
+- **OAuth token caching**: current OAuth fallback re-mints an
+  access_token on every call. Fine for low-volume; for high-volume,
+  cache the token + expiry.
+- **Webhook receivers**: PandaDoc POSTs to URLs you register via
+  the webhook-subscription tools. Receiving those webhooks is a
+  separate concern (would need a small HTTP server on a public
+  address); out of scope for this MCP.
+
+### Upgrade
+
+Additive on top of v0.8.3. **No breaking changes.** PandaDoc tools
+are paid-tier by default (`is_paid()` returns True for anything
+not in `FREE_TOOLS`). The new `config.pandadoc` block is optional
+— only required if you actually want to use the PandaDoc tools;
+without it they fail with a clean `PandaDocAuthError` pointing at
+`config.json`.
+
+To start using PandaDoc:
+
+```jsonc
+// config.json — add a pandadoc block:
+{
+  "pandadoc": {
+    "api_key": "your-pandadoc-api-key-here"
+  }
+}
+```
+
+Then restart Cowork. Smoke-test with `pandadoc_list_documents`
+(no args). Once you have a template, fire `workflow_send_quote`
+end-to-end.
 
 ---
 

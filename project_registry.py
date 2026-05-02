@@ -133,7 +133,9 @@ def _save(data: dict[str, dict]) -> None:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False, sort_keys=True)
         os.replace(tmp_path, _REGISTRY_PATH)
-    except Exception:
+    except (OSError, TypeError, ValueError):
+        # OSError: filesystem (disk full, permissions, replace failed).
+        # TypeError/ValueError: non-serializable value snuck into data.
         try:
             os.unlink(tmp_path)
         except OSError:
@@ -452,7 +454,7 @@ def _llm_infer_project(invoice_text: str, projects: list[dict]) -> Optional[dict
     """
     try:
         import llm as _llm
-    except Exception:
+    except ImportError:
         return None
     ok, _why = _llm.is_available()
     if not ok:

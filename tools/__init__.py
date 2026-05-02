@@ -36,6 +36,14 @@ from . import workflows_crm as _workflows_crm
 from . import workflows_calendar as _workflows_calendar
 from . import workflows_chat as _workflows_chat
 from . import workflows_misc as _workflows_misc
+# PandaDoc — Wave 4 e-signature backend (122 generated tools + 5 workflows).
+from . import pandadoc_documents as _pandadoc_documents
+from . import pandadoc_templates as _pandadoc_templates
+from . import pandadoc_workspace as _pandadoc_workspace
+from . import pandadoc_content as _pandadoc_content
+from . import pandadoc_webhooks as _pandadoc_webhooks
+from . import pandadoc_misc as _pandadoc_misc
+from . import pandadoc_workflows as _pandadoc_workflows
 
 
 def register_all(mcp) -> None:
@@ -76,3 +84,11 @@ def register_all(mcp) -> None:
     _ap_journal.register(mcp)
     _ap_tree.register(mcp)
     _ap_wave3.register(mcp)
+    # PandaDoc — Wave 4 e-signature backend.
+    _pandadoc_documents.register(mcp)
+    _pandadoc_templates.register(mcp)
+    _pandadoc_workspace.register(mcp)
+    _pandadoc_content.register(mcp)
+    _pandadoc_webhooks.register(mcp)
+    _pandadoc_misc.register(mcp)
+    _pandadoc_workflows.register(mcp)

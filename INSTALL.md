@@ -5,7 +5,7 @@
 | Path | Time | What you get | Best for |
 |---|---|---|---|
 | 🟢 **Free** (`./install.sh --free`) | **~10 min** | All 53 free-tier tools — Workspace basics + system health + project-AP admin (register projects, see routing-rule shape) | Evaluating, casual use, marketplace single-click install |
-| 🔵 **Full** (`./install.sh`) | ~25 min | All 238 tools — adds Maps × CRM workflows, VRP routing, Receipt + Project-AP extractors, vendor follow-up loop, current-location detection | Daily-driver, sales/CSM/ops, AP automation, expense reporting |
+| 🔵 **Full** (`./install.sh`) | ~25 min | All 390 tools — adds Maps × CRM workflows, VRP routing, Receipt + Project-AP extractors, vendor follow-up loop, current-location detection | Daily-driver, sales/CSM/ops, AP automation, expense reporting |
 
 **The Free Path skips:** Maps API setup (10 Maps APIs), Anthropic API key, Route Optimization API, location services. Plenty for sending/reading mail, scheduling events, Drive/Sheets/Docs work, running `system_doctor`, and previewing the project-AP routing structure before paying. Run `./install.sh --upgrade` later to add the paid prereqs without re-doing OAuth.
 
@@ -15,7 +15,7 @@
 
 ## What you're setting up
 
-A local MCP server that gives Claude Cowork **182 tools across 13 categories**: Gmail, Calendar, Drive, Sheets, Docs, Tasks, Contacts (with a CRM layer), Chat, Maps, cross-service Workflows, the Receipt + Project-Invoice extractors, and System health checks.
+A local MCP server that gives Claude Cowork **390 tools across 14 categories**: Gmail, Calendar, Drive, Sheets, Docs, Tasks, Contacts (with a CRM layer), Chat, Maps, cross-service Workflows, the Receipt + Project-Invoice extractors, and System health checks.
 
 Everything runs locally on your Mac. Data flows between Claude and Google APIs only; nothing else touches it. You sign in once with your own Google account; nobody else can see your data.
 
@@ -47,7 +47,7 @@ Setup happens in 5 phases. Each is independent — you can stop after Phase 1 an
 
 | Phase | What you get | Time | Required? |
 |---|---|---|---|
-| 1. Core install | All 8 base Workspace tools (Gmail, Calendar, Drive, etc.) — **~182 tools** | 15 min | Yes |
+| 1. Core install | All 8 base Workspace tools (Gmail, Calendar, Drive, etc.) — **~390 tools** | 15 min | Yes |
 | 2. Maps API | 10 Maps tools + 12 Maps×CRM workflows | 5 min | Optional but recommended |
 | 3. Route Optimization | Vehicle Routing Problem solver | 3 min | Only if you do multi-stop routing |
 | 4. Current-location detection | Drive-time tools use your real location | 2 min | Recommended |
@@ -137,7 +137,7 @@ In Cowork, ask:
 
 Should call `calendar_list_calendars` and return your real calendars within 2-3 seconds. If it fails, jump to **Troubleshooting** below.
 
-You're done with Phase 1 — ~182 tools work right now.
+You're done with Phase 1 — ~390 tools work right now.
 
 ---
 

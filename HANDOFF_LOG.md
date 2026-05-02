@@ -1050,4 +1050,122 @@ Cumulative: ~30 new tests for Patches E/F/G on top of v0.8.2's
 
 ---
 
+## 2026-05-01 (continued, sixth cut) · Joshua — v0.8.4 stable
+
+Sixth stable cut today. The big one: full PandaDoc API coverage
+ships as Wave 4. 122 raw endpoints + 5 quote workflows = 127 new
+tools. Tool count moves 263 → 390. Joshua's "all and every function
+available, no limitations" answer drove the scope; OAuth fallback
+plus API-key preferred per the auth question.
+
+- **Version:** v0.8.4 stable, 2026-05-01.
+- **Time held:** ~2 hours since v0.8.3 cut.
+- **Focus area:** Wave 4 — PandaDoc API integration + housekeeping
+  + cold-load hot-fixes.
+
+### Commits since v0.8.3
+
+```
+[v0.8.3 tag]  Cut stable v0.8.3
+e35933d       Bump to 0.8.4-dev
+1d8c69b       Housekeeping: 263-tool count refresh + 4 broad
+              excepts narrowed
+c350009       Add unit tests: ar_send renderers + ap_tree
+              (33 new tests)
+f8d8d0e       PandaDoc Wave 4 — foundation client + OpenAPI
+              generator
+88c4572       PandaDoc Wave 4 — 122 generated raw API tools
+              (6 modules)
+485516f       PandaDoc Wave 4 — 5 quote workflows + register
+              wiring
+2364eca       PandaDoc Wave 4 — 19 client tests + docs
+              (390 tools / 14 categories)
+e9a6743       Fix: missing 'import re' in tools/system.py
+b258886       Fix: lift PandaDoc input classes to module scope
+5fbf2b9       Fix: lift PandaDoc input classes to module scope +
+              poll-until-draft
+[NEXT]        Cut stable v0.8.4
+[NEXT]        Bump to 0.8.5-dev
+```
+
+### What works end-to-end now
+
+- **122 raw PandaDoc tools** wrap every Public API operation
+  (v7.24.0 spec, 91 paths / 122 operations). Auto-generated
+  from `pandadoc_openapi.json` via
+  `scripts/generate_pandadoc_tools.py`. Module split by tag:
+  documents (49), workspace (25), misc (18), content (12),
+  templates (10), webhooks (8).
+- **5 Wave 4 workflows** for the operator-facing quote loop:
+  `workflow_send_quote`, `workflow_signature_status`,
+  `workflow_quote_pipeline`, `workflow_quote_to_invoice`,
+  `workflow_resend_quote`.
+- **Live verified**: end-to-end smoke test created
+  document `hWCZTpz6GwY6dNSnHhbHa2`, polled through async
+  `document.uploaded` → `document.draft` → `document.sent`,
+  email delivered to `josh.szott@surefox.com`.
+- **Housekeeping**: README/INSTALL/pyproject tool counts now
+  consistent at 390 across 14 categories. 33 new unit tests
+  on top of the renderer + AP-6 tree surface. 4 broad
+  exception clauses narrowed.
+
+### Three hot-fixes caught during cold-load testing
+
+1. `tools/system.py` was using `re.compile` without
+   `import re` — inherited from Patch B (system_check_cron),
+   crashed every cold load.
+2. PandaDoc input classes were nested inside `register()` —
+   FastMCP's `typing.get_type_hints` couldn't resolve the
+   closure scope and raised `InvalidSignature`. Generator
+   updated to emit classes at module level; same fix
+   hand-applied to `pandadoc_workflows.py`.
+3. `workflow_send_quote` was firing `sendDocument`
+   immediately after `createDocument`, hitting 409 every
+   time because PandaDoc's `createDocument` is async. New
+   `_wait_for_draft` polls until the doc leaves
+   `document.uploaded`.
+
+### Open items deferred to 0.8.5+
+
+- **AP-1 Supplier Invoice EIB**: still gated on Workday GL →
+  Spend Category map.
+- **Geotab integration**: still a stub.
+- **PandaDoc workflow tests**: workflow-level unit tests left
+  for follow-up.
+- **OAuth token caching**: re-mints on every call; fine for
+  low-volume.
+- **Webhook receivers**: out of scope (needs public HTTP
+  server).
+
+### Pick up here
+
+If Joshua: build the actual quote templates in PandaDoc's web
+UI and start running real deals. The MCP layer is ready.
+
+If Conor or Finnn: skim the v0.8.4 release notes; the Wave 4
+section of CHANGELOG.md has the full operator-facing summary.
+Smoke test by adding an API key to `config.json` under
+`pandadoc.api_key` and asking Claude to "list my PandaDoc
+documents".
+
+### Tests
+
+Cumulative target: ~1595 (1293 baseline + ~170 Wave 1-3 + ~30
+Patch ABC + ~30 Patch EFG + ~52 Wave 4 + ~33 housekeeping).
+Run `make test-fast` to verify.
+
+### Notes
+
+- Six stable cuts in one day. Run sheet: v0.7.2 (refactor
+  baseline) → v0.8.0 (Wave 1+2) → v0.8.1 (Wave 3 + AP-4) →
+  v0.8.2 (Finnn ABC) → v0.8.3 (Finnn EFG hot-fix) → v0.8.4
+  (Wave 4 PandaDoc).
+- Test document `hWCZTpz6GwY6dNSnHhbHa2` is in the operator's
+  PandaDoc account from the live smoke test; safe to delete or
+  ignore.
+- The PandaDoc auth model permits both API-key (preferred) and
+  OAuth2 refresh-token. Operator currently using API-key.
+
+---
+
 <!-- Conor appends his entry below before sending back -->
