@@ -40,22 +40,64 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 TEMPLATE_PATH = Path(__file__).resolve().parent / "crontab_template.txt"
 VENV_PYTHON = PROJECT_ROOT / ".venv" / "bin" / "python"
+JOBS_JSON_PATH = PROJECT_ROOT / "cron_jobs.json"
 
 
 # =============================================================================
-# Template loading + substitution
+# Canonical schedule loading + substitution
+#
+# v0.9.3+ — cron_jobs.json is the source of truth. The legacy
+# crontab_template.txt is the bootstrap source on first run (cron_manager
+# materializes it into cron_jobs.json) and stays as documentation.
 # =============================================================================
+
+
+def _substitute(line: str) -> str:
+    """Substitute $HOME and $VENV_PYTHON. The legacy template uses $HOME
+    pointing at the project root; we mirror that here so log paths sit
+    alongside the project.
+    """
+    repo_root = str(PROJECT_ROOT)
+    return (
+        line.replace("$VENV_PYTHON", str(VENV_PYTHON))
+        .replace("$HOME", repo_root)
+    )
+
 
 def load_template() -> list[str]:
-    """Return the canonical crontab as a list of substituted lines."""
+    """Return the canonical crontab as a list of substituted lines.
+
+    Reads from cron_jobs.json (v0.9.3+) when present; falls back to
+    crontab_template.txt for first-run bootstrap.
+    """
+    # v0.9.3+ path: cron_jobs.json.
+    if JOBS_JSON_PATH.exists():
+        try:
+            # Lazy import keeps install_crontab.py runnable as a standalone
+            # script even before cron_manager.py is sync'd.
+            sys.path.insert(0, str(PROJECT_ROOT))
+            import cron_manager  # type: ignore
+            jobs = cron_manager.list_jobs(enabled_only=True)
+            out: list[str] = []
+            for j in jobs:
+                schedule = (j.get("schedule") or "").strip()
+                command = _substitute((j.get("command") or "").strip())
+                if not schedule or not command:
+                    continue
+                out.append(f"{schedule} {command}")
+            if out:
+                return out
+            # Empty enabled set — fall through to template (defensive).
+        except Exception as e:
+            print(f"  warn: failed to load cron_jobs.json: {e}; "
+                  "falling back to template", file=sys.stderr)
+
+    # Bootstrap path: legacy template.
     if not TEMPLATE_PATH.exists():
         raise FileNotFoundError(
-            f"Canonical template missing: {TEMPLATE_PATH}. "
-            "Did the dist/ folder get pruned?"
+            f"Neither {JOBS_JSON_PATH} nor {TEMPLATE_PATH} exist. "
+            "Run cron_manager.bootstrap_from_template() to seed the JSON store."
         )
-    home = os.environ.get("HOME") or str(Path.home())
-    repo_root = str(PROJECT_ROOT)
-    venv_py = str(VENV_PYTHON)
 
     out: list[str] = []
     raw = TEMPLATE_PATH.read_text(encoding="utf-8")
@@ -63,12 +105,7 @@ def load_template() -> list[str]:
         s = line.rstrip()
         if not s.strip() or s.lstrip().startswith("#"):
             continue
-        # $HOME in the template references the project root (the operator's
-        # checkout dir), not the user's home dir. The template was
-        # written this way so log paths sit alongside the project.
-        s = s.replace("$HOME", repo_root)
-        s = s.replace("$VENV_PYTHON", venv_py)
-        out.append(s)
+        out.append(_substitute(s))
     return out
 
 
@@ -263,7 +300,11 @@ def main() -> int:
     print("CoAssisted Workspace — crontab installer")
     print("=" * 60)
     print(f"  Project root: {PROJECT_ROOT}")
-    print(f"  Template:     {TEMPLATE_PATH.relative_to(PROJECT_ROOT)}")
+    if JOBS_JSON_PATH.exists():
+        print(f"  Source:       cron_jobs.json (v0.9.3+ source of truth)")
+    else:
+        print(f"  Source:       {TEMPLATE_PATH.relative_to(PROJECT_ROOT)} "
+              "(legacy — will bootstrap to cron_jobs.json on first manage call)")
     print(f"  Venv python:  {VENV_PYTHON}")
     print()
 

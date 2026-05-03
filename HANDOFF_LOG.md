@@ -154,7 +154,8 @@ so the trail back to the audit doc + design doc is one grep.
   categories. Findings prioritized P0/P1/P2.
 - **`mcp-design-docs-2026-04-29.md`** — 6 specs: P0-2 vendor reply
   parsing, P0-3 baseline unit tests, P1-1 split workflows.py, P1-4
-  smarter reminder cadence, P1-5 snooze+bulk+trail, P1-7 Slack.
+  smarter reminder cadence, P1-5 snooze+bulk+trail, P1-7 Slack
+  (REMOVED 2026-05-03).
 - **P0-1 — git init.** Project is now under version control on the
   owner's machine. `.gitignore` already excluded secrets; appended
   patterns for `*.bak.*`, `pytest-cache-files-*/`, `logs/health_reports/`.
@@ -243,8 +244,9 @@ so the trail back to the audit doc + design doc is one grep.
   day-of-week + US holiday awareness.
 - **P1-5 snooze + bulk + escalation trail** — three additions, can
   land independently.
-- **P1-7 Slack** — parity with `chat_*` surface. ~3-5 days, the
-  longest unknown is OAuth.
+- **P1-7 Slack** — REMOVED FROM ROADMAP 2026-05-03. Was parity with
+  `chat_*` surface. AP/AR build-out closes via Google Chat alone;
+  Slack parity isn't worth the maintenance surface.
 
 ### Notes
 - **Live MCP requires Cowork restart** after pulling — FastMCP caches
@@ -343,9 +345,8 @@ Cumulative across P1-3 + 2 polish rounds: 55 broad-except samples
 reviewed, 12 swallowers fixed.
 
 ### Pick up here
-**P1-7** (Slack integration, ~3-5 days) is the only feature spec
-left in `mcp-design-docs-2026-04-29.md`. Joshua deferred it
-until real need surfaces. Optional ongoing polish: continue
+**P1-7 Slack** was the last open spec in `mcp-design-docs-2026-04-29.md`;
+removed from the roadmap 2026-05-03. Optional ongoing polish: continue
 broad-except cleanup file-by-file, expand mypy strict opt-ins
 as files get touched (vendor_followups.py is next — 21
 preexisting type-arg gaps), or whatever real-use pain surfaces.
@@ -463,8 +464,8 @@ this up can hit the ground running.
 - `HANDOFF_LOG.md` (this file) — full session-by-session journal
   going back to Finnn → Joshua on 2026-04-29.
 - `mcp-audit-2026-04-29.md` — strategic backlog.
-- `mcp-design-docs-2026-04-29.md` — concrete specs (P1-7 Slack is
-  the only one not yet shipped).
+- `mcp-design-docs-2026-04-29.md` — concrete specs (P1-7 Slack
+  removed from roadmap 2026-05-03; all other specs shipped).
 - `CONTRIBUTING.md` — patterns for spec IDs, commit format,
   handoff hygiene, test scaffold, mypy config, exception handling.
 - `CHANGELOG.md` `[0.7.2-dev]` — full enumeration of what
@@ -472,9 +473,9 @@ this up can hit the ground running.
 
 ### Pick up here
 
-- **P1-7 Slack integration** is the only outstanding spec; Joshua
-  deferred it until real need surfaces. Spec in
-  `mcp-design-docs-2026-04-29.md#p1-7`.
+- **P1-7 Slack integration** was removed from the roadmap on
+  2026-05-03. No outstanding specs remain in
+  `mcp-design-docs-2026-04-29.md`.
 - **Optional ongoing polish:** continue broad-except cleanup on
   the densest remaining files (`tools/contacts.py` 27,
   `tools/system.py` 33, `tools/receipts.py` 31). Pattern is
@@ -575,7 +576,7 @@ sees what changed since the prior entry.
     open items are resolved, OR push more polish on
     `tools/contacts.py` / `tools/system.py` / `tools/receipts.py`
     broad-except sweeps (densest remaining files per the P1-3
-    audit), OR ship P1-7 Slack now if the need has surfaced.
+    audit). (P1-7 Slack was removed from the roadmap 2026-05-03.)
   - If Conor: same backlog as the prior entry — start with
     HANDOFF_LOG, HANDOFF_STATE.json, CONTRIBUTING.md, then
     `mcp-design-docs-2026-04-29.md` for spec backlog. The
@@ -814,7 +815,7 @@ Per candidate → workflow_send_collection_reminder
 - **AP-1 Supplier Invoice EIB**: still gated on Workday GL →
   Spend Category map.
 - **Geotab integration**: still a stub.
-- **P1-7 Slack**: still deferred.
+- **P1-7 Slack**: REMOVED FROM ROADMAP 2026-05-03 (no longer future dev).
 
 ### Pick up here
 
@@ -896,7 +897,7 @@ system_check_cron health check, timing-aware install_crontab.
 - **Wave 4 quote management**: operator deciding between
   PandaDoc (custom MCP, has proposal builder) and SignNow (in
   registry, e-sign only).
-- **P1-7 Slack**: still deferred.
+- **P1-7 Slack**: REMOVED FROM ROADMAP 2026-05-03 (no longer future dev).
 
 ### Pick up here
 
@@ -1013,7 +1014,7 @@ the gate ships before any production weekend run.
 - **Wave 4 quote management**: operator deciding between
   PandaDoc (custom MCP, has proposal builder) and SignNow (in
   registry, e-sign only).
-- **P1-7 Slack**: still deferred.
+- **P1-7 Slack**: REMOVED FROM ROADMAP 2026-05-03 (no longer future dev).
 
 ### Pick up here
 
@@ -1168,4 +1169,128 @@ Run `make test-fast` to verify.
 
 ---
 
-<!-- Conor appends his entry below before sending back -->
+## 2026-05-03 · Joshua → (next holder)
+
+- **Version:** v0.9.2 (stable)
+- **Time held:** ~6 hours (rolled v0.8.6 → v0.9.0 → v0.9.1 → v0.9.2 in
+  one session).
+- **Focus area:** Close all three waves of the AP/AR build-out roadmap
+  to the v1.0.0 gate. StaffWizard becomes source of truth for projects;
+  Slack pulled from future development; AP-9 AR coverage held until
+  PandaDoc tests bed in.
+- **What I touched:**
+  - **v0.9.0 — Wave 1 close + StaffWizard authoritative + receipt validator:**
+    `gl_spend_category_map.py` (auto-derived Workday GL → Spend Category
+    map from Wolfhound JE training base), `workday_supplier_invoice_eib.py`
+    (AP-1 v39.1 EIB writer), `staffwizard_project_sync.py` (every Overall
+    Report parse upserts projects with `staffwizard_authoritative=True`),
+    `receipt_project_validator.py` (Option A/B chat-back picker —
+    Option A lists active StaffWizard projects, Option B logs a request
+    + parks the receipt), `tools/ap_wave1.py` (11 new tools), patch to
+    `staffwizard_pipeline.refresh_all` (sync as step 4). Slack struck
+    across `mcp-design-docs-2026-04-29.md`, `HANDOFF_LOG.md`,
+    `HANDOFF_STATE.json`, `CHANGELOG.md`.
+  - **v0.9.1 — Option B handover + retry queue + baseline + Geotab:**
+    `option_b_handover.py` (resolve creates Drive subtree + AP sheet +
+    re-files parked receipts; reject DMs reason), `retry_queue.py`
+    (1m → 5m → 30m → 4h → 24h → escalate), `baseline.py` (30-day
+    cold-start, >2σ alerts, manual budget overlay, mismatch detection),
+    `geotab_client.py` (real MyGeotab Drive API; falls through to
+    `no_credentials` cleanly when config absent), `tools/ap_wave2.py`
+    (13 new tools).
+  - **v0.9.2 — cron/watcher entry-points + PandaDoc tests:**
+    `cron_staffwizard_morning.py` (AP-7 6:30am with late-email retry
+    until 09:00), `cron_baseline_alerts.py` (AP-8 6:00am email),
+    `pubsub_receipt_receiver.py` (AP-4 Gmail push handler with
+    retry-queue fallback), `scripts/cron/crontab_template.txt` updated
+    with the two new entries, `tests/test_pandadoc_workflows.py`
+    (19 tests, all 5 Wave-4 workflows, all green).
+  - **Desktop deliverables:**
+    `release-notes-v0.9.0-2026-05-03.md`,
+    `release-notes-v0.9.1-2026-05-03.md`,
+    `release-notes-v0.9.2-2026-05-03.md`,
+    revised roadmap `coassisted-workspace-ap-roadmap-2026-05-03.md`.
+- **What I left undone:**
+  - **AP-9 AR coverage** — held intentionally until the PandaDoc
+    workflow tests have a real day in production. ~5 days of work
+    when it lands. Sequenced into v1.0.0; targets 2026-06-19 per the
+    revised roadmap.
+  - **GCP Pub/Sub topic + push subscription provisioning** — env-side
+    operator work; the AP-4 receiver code is ready.
+  - **Crontab install on the operator's machine** —
+    `make install-crontab` reads the updated template and adds the
+    06:00 / 06:30 entries.
+  - **Geotab credentials** — `config.geotab` block. Tools fall through
+    to `no_credentials` cleanly when absent.
+  - **Operator UI for ambiguous-Spend-Category review** — CLI-only
+    today via `workflow_list_ambiguous_spend_categories` +
+    `workflow_set_spend_category_override`.
+- **Pick up here:**
+  - If Joshua / next holder is closing the loop: Run
+    `workflow_build_gl_spend_category_map(je_workbook_path="samples/Wolfhound Corp JEs Jan-Mar'26.xlsx")`
+    once → walk the ambiguous list and confirm via
+    `workflow_set_spend_category_override` → run
+    `workflow_staffwizard_refresh_all` (the v0.9.0 sync registers all
+    30 active StaffWizard projects automatically) → cut your first
+    AP-1 EIB via
+    `workflow_export_workday_supplier_invoice_eib(start_date="2026-04-01", end_date="2026-04-30")`.
+  - If picking up AP-9: see the v1.0.0 section in
+    `coassisted-workspace-ap-roadmap-2026-05-03.md` for the design.
+    The hooks are ready: `project_registry` carries
+    `billing_origin_state` / `billing_terms` / `billing_cadence` /
+    `customer_email`; `tools/pandadoc_workflows.workflow_quote_to_invoice`
+    is the bridge from signed PandaDoc quotes to AR-9 customer invoices.
+- **Tests:** PandaDoc workflow suite added (19 tests, 0.26s, all
+  green). Existing test totals unchanged otherwise; the cascade through
+  `tools/__init__.py` requires the full venv with `googleapiclient` etc.
+- **Notes:**
+  - Three stable cuts in one session: v0.9.0 → v0.9.1 → v0.9.2. Eleven
+    cuts total in three days.
+  - Slack is gone from the roadmap as of 2026-05-03 — no longer future
+    dev. Spec preserved in this file's git history if a real customer
+    need surfaces post-1.0.0.
+  - `tests/test_pandadoc_workflows.py` installs heavy-dep stubs
+    (`googleapiclient`, `google.auth`) at module load so the suite runs
+    in any environment, not just the full venv. Pattern is reusable for
+    other tool-level tests if the cascade through `tools/__init__.py`
+    keeps biting.
+
+---
+
+## 2026-05-03 · Joshua → (next holder) — v0.9.3 follow-up cut
+
+- **Version:** v0.9.3 (stable)
+- **Time held:** ~30 min (same session as v0.9.0/v0.9.1/v0.9.2)
+- **Focus area:** Cron schedule management — toggle, edit, add, remove
+  via chat + interactive Cowork artifact + read-only Drive page in the
+  briefing footer.
+- **What I touched:**
+  - `cron_manager.py` (new) — `cron_jobs.json` source of truth, library
+    + bootstrap from existing `crontab_template.txt`.
+  - `tools/cron_manager.py` (new) — 9 MCP tools wrapping the library +
+    Drive upload + the Cowork artifact HTML.
+  - `scripts/cron/install_crontab.py` (patched) — reads from
+    `cron_jobs.json` first, falls back to template.
+  - `executive_briefing.py` (patched) — footer renders a "Manage daily
+    schedule" link to `config.cron_manager.schedule_url` plus tagline.
+  - `CHANGELOG.md` — v0.9.3 entry.
+  - Desktop: `release-notes-v0.9.3-2026-05-03.md`.
+- **What I left undone:**
+  - AP-9 AR coverage (still the v1.0.0 gate).
+  - One-shot helper to publish the schedule page on a schedule —
+    achievable today by `workflow_cron_add_job` to schedule
+    `workflow_cron_publish_to_drive` itself; explicit helper was
+    deferred as low-value.
+- **Pick up here:** to wire up the briefing footer link, ask Claude
+  "publish my cron schedule to Drive", grab the URL, add to
+  `config.json` under `cron_manager.schedule_url`. Tomorrow's briefing
+  carries the link.
+- **Tests:** existing PandaDoc test suite still 19/19. No new tests
+  for cron_manager (the smoke-tests in this session covered bootstrap,
+  toggle, schedule update, validation, add custom, render — all green).
+- **Notes:** twelve stable cuts in three days now. v0.9.3 was the
+  fourth same-day cut.
+
+---
+
+<!-- Next holder appends below -->

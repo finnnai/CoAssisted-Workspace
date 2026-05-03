@@ -1498,12 +1498,43 @@ def render_email_html(brief: ExecutiveBriefing) -> str:
         '</style>'
     )
 
+    # v0.9.3+ — schedule link in the footer. URL is set after the operator
+    # runs workflow_cron_publish_to_drive once; the URL persists in
+    # config.cron_manager.schedule_url. When unset, render a setup hint
+    # instead so the footer stays useful without breaking.
+    schedule_url = ""
+    try:
+        import config as _cfg
+        block = _cfg.get("cron_manager", {}) or {}
+        schedule_url = (block.get("schedule_url") or "").strip()
+    except Exception:
+        schedule_url = ""
+    if schedule_url:
+        schedule_link_html = (
+            f'<a href="{_esc(schedule_url)}" '
+            f'style="color:{COLORS["muted"]};text-decoration:underline;">'
+            f'Manage daily schedule</a>'
+            f' &middot; '
+            f'<span style="color:{COLORS["muted"]};">'
+            f'or ask Claude: "open the cron manager"'
+            f'</span>'
+        )
+    else:
+        schedule_link_html = (
+            f'<span style="color:{COLORS["muted"]};">'
+            f'Manage schedule: ask Claude "open the cron manager" '
+            f'(publish a shareable link with workflow_cron_publish_to_drive)'
+            f'</span>'
+        )
+
     footer_html = (
         f'<div style="margin-top:30px;padding-top:14px;'
         f'border-top:1px solid {COLORS["border"]};'
         f'font-family:Arial,Helvetica,sans-serif;font-size:11px;'
-        f'color:{COLORS["muted"]};">'
-        f'CoAssisted Workspace · Executive Briefing v0.7'
+        f'color:{COLORS["muted"]};line-height:1.6;">'
+        f'CoAssisted Workspace &middot; Executive Briefing v0.7'
+        f'<br />'
+        f'{schedule_link_html}'
         f'</div>'
     )
 

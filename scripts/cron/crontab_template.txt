@@ -35,3 +35,12 @@
 0 14 * * *        $VENV_PYTHON $HOME/vendor_followups.py --process-replies >> $HOME/logs/cron_vendor_replies.log 2>&1
 */15 8-18 * * 1-5 $VENV_PYTHON $HOME/receipts.py --sweep >> $HOME/logs/cron_receipts.log 2>&1
 0 18 * * 6,0      $VENV_PYTHON $HOME/receipts.py --sweep >> $HOME/logs/cron_receipts.log 2>&1
+
+# v0.9.2 additions:
+#   06:00 — baseline_alerts (AP-8 — daily deviation + budget burn email)
+#   06:30 — staffwizard_morning (AP-7 — pulls overnight Overall Report,
+#                                refreshes master + dashboards + project sync;
+#                                retries every 30 min until 09:00 if the
+#                                StaffWizard email is late)
+0 6 * * *         $VENV_PYTHON $HOME/cron_baseline_alerts.py >> $HOME/logs/cron_baseline_alerts.log 2>&1
+30 6 * * *        $VENV_PYTHON $HOME/cron_staffwizard_morning.py >> $HOME/logs/cron_staffwizard.log 2>&1

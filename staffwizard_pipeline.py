@@ -869,10 +869,18 @@ def refresh_all(
     work_date: Optional[_dt.date] = None,
     skip_dashboards: bool = False,
     upload_dashboards: bool = True,
+    skip_project_sync: bool = False,
 ) -> dict:
-    """Run the whole pipeline: ingest → build master → push sheets → dashboards.
+    """Run the whole pipeline: ingest → build master → push sheets → sync
+    project_registry → dashboards.
 
-    Returns: {status, steps: {ingest, build_master, push_sheets, dashboards}}
+    The project_registry sync (v0.9.0+) makes StaffWizard the source of truth
+    for which projects exist. Every receipt submission gates on the active
+    code set this sync produces, so it has to run before any AP-side
+    automation reads from the registry.
+
+    Returns: {status, steps: {ingest, build_master, push_sheets,
+                              project_sync, dashboards}}
     """
     out: dict[str, Any] = {"status": "ok", "steps": {}}
 
@@ -881,6 +889,20 @@ def refresh_all(
 
     out["steps"]["build_master"] = build_master_xlsx()
     out["steps"]["push_sheets"] = push_master_to_sheets()
+
+    if not skip_project_sync:
+        try:
+            import staffwizard_project_sync as _sps
+            detail = _parse_all_reports(reports_dir())
+            out["steps"]["project_sync"] = _sps.sync_projects_from_rows(detail)
+        except Exception as e:
+            # Non-fatal: log + continue. The dashboards still work without
+            # the sync, and the operator can re-run via
+            # workflow_staffwizard_sync_projects.
+            _log.warning("project_sync failed: %s", e)
+            out["steps"]["project_sync"] = {
+                "status": "error", "error": str(e),
+            }
 
     if not skip_dashboards:
         out["steps"]["dashboards"] = build_dashboards(upload=upload_dashboards)

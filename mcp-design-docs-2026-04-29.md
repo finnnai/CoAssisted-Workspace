@@ -240,54 +240,9 @@ Three additions, can land independently.
 
 ---
 
-## P1-7 — Slack integration
+## P1-7 — Slack integration  ❌ REMOVED FROM ROADMAP 2026-05-03
 
-### Problem
-`chat_*` tools cover Google Chat only. Many businesses live in Slack. The AP follow-up + executive-briefing patterns would compose with Slack identically — same messages, same threading, same DM model — but we have no Slack code path.
-
-### Scope
-Build `tools/slack.py` parallel to `tools/chat.py`. Tool naming convention: `slack_*` (matches the `chat_*` precedent).
-
-### Auth
-- OAuth 2.0 via Slack's `xoxp-` user token (acts as the user, not a bot).
-- New file: `slack_auth.py` parallel to `auth.py`. Stores token at `slack_token.json` next to `token.json`.
-- New: `./install.sh --slack-oauth` flag mirrors `--oauth`.
-- Slack credentials.json stays separate from Google's.
-
-### Tools (v1 — parity with `chat_*`)
-- `slack_list_channels` — channels you're in (public + private + DMs)
-- `slack_get_channel` — channel details
-- `slack_find_or_create_dm` — like `chat_find_or_create_dm`
-- `slack_send_dm` — sugar wrapper for find-or-create + send
-- `slack_send_to_channel_by_name` — substring match on channel name + send
-- `slack_send_message` — to a channel ID, with optional `thread_ts` for threaded replies
-- `slack_search` — message search across channels
-- `slack_get_thread` — fetch a thread
-- `slack_recent_activity` — channels with new messages since cutoff
-- `slack_send_attachment` — upload a file via files.upload + share to channel/DM
-- `slack_react_to_message` — emoji reactions
-
-### Files
-- New: `slack_auth.py`, `tools/slack.py`, `slack_services.py` (sdk wrapper)
-- Modified: `pyproject.toml` (add `slack-sdk>=3.27`)
-- Modified: `install.sh` (Slack OAuth path)
-- Modified: `GCP_SETUP.md` → split into `WORKSPACE_SETUP.md` + `SLACK_SETUP.md`
-- Modified: `config.json` schema — `slack_workspace_id`, `slack_default_channel`
-- New tests: `tests/test_slack_tools.py` (mock SDK)
-
-### Acceptance criteria
-- Identical surface to Google Chat — anyone using `chat_*` tools can swap to `slack_*` with no behavior surprise.
-- DM-by-email lookup works (Slack returns user ID for an email; we cache it).
-- Auth setup adds <10min to install (one OAuth round-trip).
-- The Receipt + AP pipelines optionally accept Slack as a source by passing `--source=slack` (orthogonal — out of scope for v1, but the door's open).
-
-### Effort
-**3–5 days.** Auth is the longest unknown — Slack OAuth has more edge cases than Google's. The send/read tools are mostly mechanical once auth works.
-
-### Open questions
-- **Workspace vs personal token?** Workspace install needs admin consent. User token works for one user. Recommend user token (mirrors how Google works in this MCP).
-- **Bot vs no-bot?** No bot. Send as the user. Same security posture as the Google Chat tools.
-- **Cross-workspace DMs?** Not in v1. Slack doesn't support it natively without Slack Connect anyway.
+Slack support was scoped here on 2026-04-29 and deferred through v0.8.x. Removed from future development on 2026-05-03 per Joshua's call: the AP/AR build-out closes via Google Chat alone, and Slack parity isn't worth the maintenance surface. If a real customer need surfaces post-1.0.0, the spec lives in this file's git history.
 
 ---
 
