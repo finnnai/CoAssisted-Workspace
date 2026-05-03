@@ -44,6 +44,8 @@ from . import pandadoc_content as _pandadoc_content
 from . import pandadoc_webhooks as _pandadoc_webhooks
 from . import pandadoc_misc as _pandadoc_misc
 from . import pandadoc_workflows as _pandadoc_workflows
+# StaffWizard — daily-operations pipeline (6 tools).
+from . import staffwizard as _staffwizard
 
 
 def register_all(mcp) -> None:
@@ -92,3 +94,5 @@ def register_all(mcp) -> None:
     _pandadoc_webhooks.register(mcp)
     _pandadoc_misc.register(mcp)
     _pandadoc_workflows.register(mcp)
+    # StaffWizard — daily-operations pipeline.
+    _staffwizard.register(mcp)

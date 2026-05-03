@@ -37,9 +37,9 @@ Don't add anything to this file that imports anything else from the project.
 It needs to be import-safe from tier.py, conftest.py, setup scripts, etc.
 """
 
-VERSION: str = "0.8.4"
+VERSION: str = "0.8.5"
 CHANNEL: str = "stable"  # "stable" | "dev"
-RELEASE_DATE = "2026-05-01"
+RELEASE_DATE = "2026-05-02"
 
 
 def is_dev_build() -> bool:

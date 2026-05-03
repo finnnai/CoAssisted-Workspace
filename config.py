@@ -160,6 +160,29 @@ _DEFAULTS: dict[str, Any] = {
         "poll_max_seconds": 60,
         "poll_interval_seconds": 1.0,
     },
+    # StaffWizard daily-operations pipeline (added 2026-05-02).
+    # Drives the 6 workflow_staffwizard_* MCP tools and the underlying
+    # scripts/build_*, scripts/refresh_*, scripts/build_project_dashboards.py.
+    "staffwizard": {
+        # Where the daily Overall Report .xls files land after Gmail ingest.
+        "reports_dir": "~/Developer/google_workspace_mcp/staffwizard_overall_reports",
+        # Combined master xlsx output. Read by both push_master_to_sheets and
+        # build_dashboards.
+        "master_xlsx_path": (
+            "~/Developer/google_workspace_mcp/staffwizard_overall_reports/master_april_2026.xlsx"
+        ),
+        # Local dir where build_dashboards writes index.html + per-project pages.
+        "dashboards_dir": "~/Developer/google_workspace_mcp/dashboards",
+        # Live rolling Sheets (created via the Sheets MCP, IDs hard-coded
+        # here so the pipeline can run without re-discovering them).
+        "master_sheet_id": "1Lj-3pKqJhepBLUkOjV-_P9xgJhaQD-iFIGIUlomSGAg",
+        "archive_sheet_id": "1XJwNs3Ts4_crklQpgFNjv5AURc6_pSRP-16cZ8M910U",
+        # Drive folder name where build_dashboards uploads the HTML bundle.
+        # Created on first run if missing.
+        "dashboards_drive_folder": "Surefox Daily Operations Dashboards",
+        # Rolling window in days. Anything older lands in archive.
+        "window_days": 90,
+    },
     "retry": {
         "max_attempts": 4,
         "initial_backoff_seconds": 1.0,

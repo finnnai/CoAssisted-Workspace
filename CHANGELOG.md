@@ -32,11 +32,80 @@ testers and marketplace listings.
 
 ---
 
-## [Unreleased] — `0.8.5-dev`
+## [Unreleased] — `0.8.6-dev`
 
-Working window for the next dev cycle. Outstanding: AP-1 Supplier
-Invoice EIB (still gated on Workday GL → Spend Category map),
-Geotab integration, P1-7 Slack.
+Working window for the next dev cycle.
+
+---
+
+## [0.8.5] — 2026-05-02 · stable
+
+StaffWizard daily-operations pipeline ships as MCP tools. The
+operator no longer has to drop into a terminal to run the four
+script chain — the whole "ingest yesterday's Overall Report,
+refresh the master Sheet, rebuild the dashboards, share with the
+team" loop is invokable from chat.
+
+### Added — StaffWizard pipeline (6 tools)
+
+- **`staffwizard_pipeline.py`** — pure-Python core with five
+  pipeline functions plus a `refresh_all` orchestrator.
+  Importable from both the new MCP tools and the existing
+  terminal scripts under `scripts/`.
+- **`tools/staffwizard.py`** — 6 MCP tool wrappers:
+    - `workflow_staffwizard_refresh_all` — orchestrator (the
+      one you usually call). Runs the full chain.
+    - `workflow_staffwizard_ingest_latest_report` — Gmail search
+      for the latest `Overall Report - MM/DD/YYYY` from
+      `noreply@staffwizard.com`, downloads the .xls attachment.
+    - `workflow_staffwizard_build_master_xlsx` — combines every
+      `.xls` in the reports dir into a single 3-tab master xlsx.
+    - `workflow_staffwizard_push_master_sheet` — refreshes both
+      the live Master Sheet and the Historic Archive Sheet
+      (rolling 90-day split). Tab structure: Daily Detail,
+      Project Rollup (16 cols incl. Reg/Holiday/OT/DT cost
+      breakdown), Daily Totals, Daily Totals by Project, plus
+      one tab per Job Description.
+    - `workflow_staffwizard_build_dashboards` — rebuilds the
+      visual HTML/JSON dashboards (overview with Summary /
+      Ranked / Action Items tabs, plus per-project pages) and
+      pushes to the configured Drive folder.
+    - `workflow_staffwizard_send_dashboards_email` — bundles
+      the dashboards into a self-contained zip (Chart.js
+      included for offline use) and emails it to a recipient
+      list.
+- **`config.staffwizard` block** — reports_dir,
+  master_xlsx_path, dashboards_dir, master_sheet_id,
+  archive_sheet_id, dashboards_drive_folder, window_days.
+
+### Changed
+
+- **Tool count: 390 → 396** (+6 StaffWizard tools).
+- README + INSTALL + pyproject description updated.
+
+### Open items deferred to 0.8.6+
+
+- **AP-1 Supplier Invoice EIB**: still gated on Workday GL →
+  Spend Category map.
+- **Geotab integration**: still a stub.
+- **P1-7 Slack**: still deferred.
+- **StaffWizard auto-cron**: deferred — manual ingest each
+  morning is fine while the pipeline beds in.
+- **Bulk-register the 28 StaffWizard projects** in
+  `project_registry` so AP-7's per-project filing tree and
+  AP-8's baseline-deviation alerts fire.
+- **PandaDoc workflow-level tests**: still TODO.
+
+### Upgrade
+
+Additive on top of v0.8.4. **No breaking changes.** New config
+block is optional — defaults baked into `config.py` apply
+(reports under `~/Developer/google_workspace_mcp/...`, the same
+Sheet IDs that have been live since 2026-05-02).
+
+To start using the pipeline tools, just ask Claude:
+
+> "Refresh the StaffWizard master."
 
 ---
 

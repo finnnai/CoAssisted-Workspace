@@ -1,11 +1,11 @@
 [project]
 name = "coassisted-workspace"
-version = "0.8.4"
+version = "0.8.5"
 # IMPORTANT: keep this in sync with _version.py — that's the single source of
 # truth for runtime, and pyproject.toml has to be hand-synced because pip
 # install reads it before _version.py is importable. Use `make bump VERSION=X.Y.Z`
 # to update both atomically.
-description = "Local MCP server: Gmail, Calendar, Drive, Sheets, Docs, Tasks, Contacts (CRM), Chat, plus AP/AR automation (invoices, receipts, vendor follow-up loop, customer collections cadence, Workday EIB, baseline-deviation alerts) and full PandaDoc API coverage (122 raw endpoints + 5 quote workflows for Wave 4 e-signatures) — 390 tools for Claude Cowork."
+description = "Local MCP server: Gmail, Calendar, Drive, Sheets, Docs, Tasks, Contacts (CRM), Chat, plus AP/AR automation (invoices, receipts, vendor follow-up loop, customer collections cadence, Workday EIB, baseline-deviation alerts), full PandaDoc API coverage (122 raw endpoints + 5 quote workflows for Wave 4 e-signatures), and StaffWizard daily-operations pipeline (ingest, master Sheets, HTML/JSON dashboards) — 396 tools for Claude Cowork."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}

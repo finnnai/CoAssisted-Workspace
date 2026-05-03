@@ -13,7 +13,7 @@ Built with Python + FastMCP + OAuth 2.0. Runs locally, stdio transport, your dat
 | Tier | Tools | What it's for |
 |---|---|---|
 | **Free** | 53 tools — all Workspace basics (send, read, organize across all 8 Google services) + system health checks + audit log + **project-registry admin** (`workflow_register_project`, `workflow_list_projects`, `workflow_create_project_sheet` so evaluators can see the AP routing-rule shape) | Get started, run real tasks today, prototype the project-AP structure without paying, decide if it's worth more |
-| **Paid** | All 390 tools — **flagship Receipt Extractor** (LLM-parses inbox + PDFs + photos into a Sheet, archives PDFs to Drive, exports QuickBooks CSV), **Project AP Pipeline** (auto-classify invoice vs. receipt, 5-tier project resolver, internal/external sender split, DM-or-email vendor follow-up loop with brand-voiced asks + project picker, automated reply parsing + row promotion, hybrid Drive layout: per-employee folders + per-project sheets + PDF archive, QuickBooks Bills CSV), Maps × CRM × Calendar workflows, Vehicle Routing optimization, brand voice extraction, bulk operations with rollback, advanced Chat (DMs, search, attachments), full CRM (custom fields, groups, stats refresh), templates + mail merge | Daily-driver productivity, sales/CSM/ops workflows, multi-vehicle routing, expense reporting, project-tracked AP with vendor follow-up loop |
+| **Paid** | All 396 tools — **flagship Receipt Extractor** (LLM-parses inbox + PDFs + photos into a Sheet, archives PDFs to Drive, exports QuickBooks CSV), **Project AP Pipeline** (auto-classify invoice vs. receipt, 5-tier project resolver, internal/external sender split, DM-or-email vendor follow-up loop with brand-voiced asks + project picker, automated reply parsing + row promotion, hybrid Drive layout: per-employee folders + per-project sheets + PDF archive, QuickBooks Bills CSV), Maps × CRM × Calendar workflows, Vehicle Routing optimization, brand voice extraction, bulk operations with rollback, advanced Chat (DMs, search, attachments), full CRM (custom fields, groups, stats refresh), templates + mail merge | Daily-driver productivity, sales/CSM/ops workflows, multi-vehicle routing, expense reporting, project-tracked AP with vendor follow-up loop |
 
 Free tier is fully self-serve. Paid tier requires a license key from the developer (`caw-XXXX-XXXX-XXXX-XXXX` format). Add to `config.json`: `{ "license_key": "caw-..." }`.
 
@@ -219,13 +219,13 @@ Resolutions below 0.65 confidence get parked in the Needs Review sheet so you ca
 - `system_check_filesystem` — writable logs/, token.json chmod 600, default_download_dir.
 - `system_check_dependencies` — Python version, required + optional deps.
 - `system_check_clock` — NTP skew vs Google (>5min skew = OAuth flakiness).
-- `system_check_tools` — confirms all 390 tools register without errors.
+- `system_check_tools` — confirms all 396 tools register without errors.
 - `system_check_quota_usage` — estimates Maps + Anthropic spend this month from logs.
 - `system_check_anthropic_key` — Anthropic API key + live test.
 
 **Junk filter** (in `junk_filter.py`): hard-fail signals include noreply local-part patterns (`noreply`, `do_not_reply`, `notifications`), cloud-vendor role accounts (`googlecloud`, `aws`, `azure`, etc.), notification/marketing sub-domains (`emailnotifications`, `accountprotection`, `e.stripe.com`), `List-Unsubscribe` / `Precedence: bulk` / `Auto-Submitted` headers. Soft signals combine body boilerplate ("please do not reply", "this is an automated message"), opt-out phrases ("unsubscribe", "view in browser"), link-to-text ratio, transactional subjects ("receipt", "your weekly digest", "thanks for upgrading"), and a 58-phrase spam-hype list ("free trial", "money back", "guaranteed", etc.). Two soft categories together classify as junk; 4+ spam-hype phrases trip on their own.
 
-**Total: 390 tools across 14 categories.**
+**Total: 396 tools across 14 categories.**
 
 ---
 
