@@ -388,27 +388,30 @@ def _push_to_sheet(svc, sheet_id: str, payload: dict[str, list[list]]) -> None:
         print(f"    cleaned {len(stale)} stale tabs: "
               f"{', '.join(stale[:5])}{' ...' if len(stale) > 5 else ''}")
 
-    # Clear every wanted tab first, then write fresh.
-    for tab in want_tabs:
-        svc.spreadsheets().values().clear(
-            spreadsheetId=sheet_id, range=f"'{tab}'",
+    # batchClear + batchUpdate — Finnn 2026-05-03 patch. The earlier
+    # per-tab loop hit the Sheets 60 writes/min/user quota part-way
+    # through master + archive (32 tabs × 2 calls each ≈ 64 writes).
+    if want_tabs:
+        svc.spreadsheets().values().batchClear(
+            spreadsheetId=sheet_id,
+            body={"ranges": [f"'{t}'" for t in want_tabs]},
         ).execute()
 
-    # Write each tab.
+    data = [
+        {"range": f"'{tab}'!A1", "values": rows}
+        for tab, rows in payload.items() if rows
+    ]
     total_cells = 0
-    for tab, rows in payload.items():
-        if not rows:
-            continue
-        resp = svc.spreadsheets().values().update(
+    if data:
+        resp = svc.spreadsheets().values().batchUpdate(
             spreadsheetId=sheet_id,
-            range=f"'{tab}'!A1",
-            valueInputOption="USER_ENTERED",
-            body={"values": rows},
+            body={"valueInputOption": "USER_ENTERED", "data": data},
         ).execute()
-        n = resp.get("updatedCells", 0)
-        total_cells += n
-        print(f"    {tab}: {n:,} cells")
-    print(f"    -- total {total_cells:,} cells across {len(payload)} tabs")
+        total_cells = resp.get("totalUpdatedCells", 0)
+        # Per-tab counts aren't returned by batchUpdate; print summary.
+        for d in data:
+            print(f"    {d['range'].split('!')[0].strip(chr(39))}: queued")
+    print(f"    -- total {total_cells:,} cells across {len(data)} tabs (batchUpdate)")
 
 
 # -----------------------------------------------------------------------------

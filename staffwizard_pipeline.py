@@ -585,20 +585,11 @@ def _push_sheet(svc, sheet_id: str, payload: dict[str, list[list]]) -> int:
                               for name in stale]},
         ).execute()
 
-    for tab in want_tabs:
-        svc.spreadsheets().values().clear(
-            spreadsheetId=sheet_id, range=f"'{tab}'",
-        ).execute()
-    total = 0
-    for tab, rows in payload.items():
-        if not rows:
-            continue
-        resp = svc.spreadsheets().values().update(
-            spreadsheetId=sheet_id, range=f"'{tab}'!A1",
-            valueInputOption="USER_ENTERED", body={"values": rows},
-        ).execute()
-        total += resp.get("updatedCells", 0)
-    return total
+    # Delegate the bulk write to gservices.sheets_batch_write so we
+    # share the quota-aware path with any other module that needs it
+    # (Finnn 2026-05-03 — moved from inlined batchClear/batchUpdate).
+    import gservices
+    return gservices.sheets_batch_write(sheet_id, payload)
 
 
 def push_master_to_sheets(

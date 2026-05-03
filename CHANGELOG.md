@@ -32,9 +32,78 @@ testers and marketplace listings.
 
 ---
 
-## [Unreleased] — `0.8.6-dev`
+## [Unreleased] — `0.8.7-dev`
 
 Working window for the next dev cycle.
+
+---
+
+## [0.8.6] — 2026-05-03 · stable
+
+Hot-fix release expanded into a global API-level fix. Finnn's
+morning ingest was 429-ing two days in a row from the Sheets API.
+His root-cause analysis pointed at the per-tab loop in
+StaffWizard's `_push_sheet`; rather than ship the StaffWizard-only
+patch, we lifted the fix up to `gservices.py` so every Google API
+call across the whole MCP — Sheets, Gmail, Drive, Calendar, Docs,
+Tasks, People, Chat — gets quota protection automatically.
+
+### Added
+
+- **`gservices._RetryingHttpRequest`** — HttpRequest subclass that
+  retries 408 / 429 / 500 / 502 / 503 / 504 with exponential
+  backoff + jitter. Honors the server's `Retry-After` header when
+  present (Sheets often sends one on 429). Wired into every cached
+  service via `requestBuilder=` on `build()`. Backoff config
+  reads from the existing `config.retry` block, so live config
+  edits take effect without rebuilding services.
+
+  Net effect: every `.execute()` call in the codebase — across
+  ~150+ callsites — is now invisibly quota-resilient. Existing code
+  doesn't need to change. Only true, unrecoverable errors propagate.
+
+- **`gservices.sheets_batch_write(spreadsheet_id, payload)`** —
+  reusable helper for the multi-tab refresh pattern. Issues a
+  single `values().batchClear` covering every tab in the payload,
+  then a single `values().batchUpdate` writing them all in one
+  request. Returns `totalUpdatedCells`. Use this whenever you need
+  to refresh more than ~10 tabs at once — turns N+N writes into 2.
+
+### Fixed
+
+- **StaffWizard `_push_sheet` 429 quota exhaustion** (root issue
+  Finnn caught) — the per-tab loop in `staffwizard_pipeline.py`
+  (and the same pattern in `scripts/refresh_staffwizard_master.py`)
+  was making one `values().clear()` + one `values().update()` per
+  tab. With ~32 tabs across Master + Archive, that's ~64 writes
+  per spreadsheet, blowing past the Sheets API `60 writes/min/user`
+  limit partway through the daily cron. Both call sites refactored
+  to use the new `gservices.sheets_batch_write` helper — 64 writes
+  → 2 writes per Sheet. Patch credit: Finnn 2026-05-03.
+
+### Changed
+
+- **Every Google API call now auto-retries on 429 + 5xx** thanks
+  to the `_RetryingHttpRequest` base class. Previously each
+  individual tool either rolled its own retry (mostly the AP/AR
+  surface) or just propagated the 429. Now consistent behavior
+  everywhere.
+
+### Upgrade
+
+Drop-in. No config changes required. The `config.retry` block
+already existed; the new retry behavior just consumes it.
+
+If you want different retry caps for Sheets specifically (e.g.
+more aggressive backoff during heavy receipt extraction days),
+the simplest path is still to bump `max_attempts` in `config.json`
+under the `retry` block — the change applies to every service.
+
+The 14 other Sheets call sites scattered across `tools/receipts.py`,
+`tools/project_invoices.py`, `tools/workflows_crm.py`, and
+`ap_drive_layout.py` keep their per-call shape (single-row writes,
+not multi-tab orchestration) but are now protected by the retry
+wrapper. No migration required.
 
 ---
 
